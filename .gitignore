@@ -1,0 +1,17 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+
+# Secrets / entorno local — NO commitear
+appsettings.Development.json
+appsettings.*.json
+!appsettings.json
+
+# Docker volumes (si se generan localmente)
+docker/volumes/
