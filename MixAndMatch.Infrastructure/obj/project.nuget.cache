@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "Wf8a8aDU9tE=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Luz\\RiderProjects\\MixAndMatch\\MixAndMatch.Infrastructure\\MixAndMatch.Infrastructure.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Luz\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512",
+    "C:\\Users\\Luz\\.nuget\\packages\\microsoft.netcore.app.ref\\9.0.15\\microsoft.netcore.app.ref.9.0.15.nupkg.sha512",
+    "C:\\Users\\Luz\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\9.0.15\\microsoft.windowsdesktop.app.ref.9.0.15.nupkg.sha512",
+    "C:\\Users\\Luz\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\9.0.15\\microsoft.aspnetcore.app.ref.9.0.15.nupkg.sha512"
+  ],
+  "logs": []
+}

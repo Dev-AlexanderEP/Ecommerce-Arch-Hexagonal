@@ -1,0 +1,6 @@
+@MixAndMatch.Api_HostAddress = http://localhost:5221
+
+GET {{MixAndMatch.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

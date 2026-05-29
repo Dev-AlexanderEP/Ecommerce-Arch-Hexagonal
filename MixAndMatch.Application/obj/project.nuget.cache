@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "FB2j8nM5bjQ=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Luz\\RiderProjects\\MixAndMatch\\MixAndMatch.Application\\MixAndMatch.Application.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Luz\\.nuget\\packages\\microsoft.netcore.app.ref\\9.0.15\\microsoft.netcore.app.ref.9.0.15.nupkg.sha512",
+    "C:\\Users\\Luz\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\9.0.15\\microsoft.windowsdesktop.app.ref.9.0.15.nupkg.sha512",
+    "C:\\Users\\Luz\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\9.0.15\\microsoft.aspnetcore.app.ref.9.0.15.nupkg.sha512"
+  ],
+  "logs": []
+}
