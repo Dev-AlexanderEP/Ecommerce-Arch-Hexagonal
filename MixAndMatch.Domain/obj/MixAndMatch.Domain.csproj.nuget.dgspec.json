@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Luz\\RiderProjects\\MixAndMatch\\MixAndMatch.Domain\\MixAndMatch.Domain.csproj": {}
+    "C:\\Users\\George\\Downloads\\Ecommerce-Arch-Hexagonal\\MixAndMatch.Domain\\MixAndMatch.Domain.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Luz\\RiderProjects\\MixAndMatch\\MixAndMatch.Domain\\MixAndMatch.Domain.csproj": {
+    "C:\\Users\\George\\Downloads\\Ecommerce-Arch-Hexagonal\\MixAndMatch.Domain\\MixAndMatch.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Luz\\RiderProjects\\MixAndMatch\\MixAndMatch.Domain\\MixAndMatch.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\George\\Downloads\\Ecommerce-Arch-Hexagonal\\MixAndMatch.Domain\\MixAndMatch.Domain.csproj",
         "projectName": "MixAndMatch.Domain",
-        "projectPath": "C:\\Users\\Luz\\RiderProjects\\MixAndMatch\\MixAndMatch.Domain\\MixAndMatch.Domain.csproj",
-        "packagesPath": "C:\\Users\\Luz\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Luz\\RiderProjects\\MixAndMatch\\MixAndMatch.Domain\\obj\\",
+        "projectPath": "C:\\Users\\George\\Downloads\\Ecommerce-Arch-Hexagonal\\MixAndMatch.Domain\\MixAndMatch.Domain.csproj",
+        "packagesPath": "C:\\Users\\George\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\George\\Downloads\\Ecommerce-Arch-Hexagonal\\MixAndMatch.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Luz\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\George\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
@@ -38,7 +38,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.200"
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net9.0": {
@@ -60,26 +60,12 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[9.0.15, 9.0.15]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[9.0.15, 9.0.15]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[9.0.15, 9.0.15]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Users\\Luz\\.dotnet\\sdk\\10.0.202/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.312/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

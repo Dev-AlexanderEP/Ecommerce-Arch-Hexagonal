@@ -2,6 +2,15 @@
   "version": 3,
   "targets": {
     "net9.0": {
+      "BCrypt.Net-Next/4.2.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.1/BCrypt-Net-Next.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.1/BCrypt-Net-Next.dll": {}
+        }
+      },
       "Humanizer.Core/2.14.1": {
         "type": "package",
         "compile": {
@@ -1111,10 +1120,77 @@
         "build": {
           "buildTransitive/net6.0/_._": {}
         }
+      },
+      "MixAndMatch.Application/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "MediatR": "14.1.0",
+          "MixAndMatch.Domain": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/MixAndMatch.Application.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/MixAndMatch.Application.dll": {}
+        }
+      },
+      "MixAndMatch.Domain/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "MediatR": "14.1.0"
+        },
+        "compile": {
+          "bin/placeholder/MixAndMatch.Domain.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/MixAndMatch.Domain.dll": {}
+        }
+      },
+      "MixAndMatch.Infrastructure/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "BCrypt.Net-Next": "4.2.0",
+          "MixAndMatch.Domain": "1.0.0",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.4"
+        },
+        "compile": {
+          "bin/placeholder/MixAndMatch.Infrastructure.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/MixAndMatch.Infrastructure.dll": {}
+        }
       }
     }
   },
   "libraries": {
+    "BCrypt.Net-Next/4.2.0": {
+      "sha512": "gwLD2KfCuwQesP17aVh4h6lpiMPEVt5Lbpndo0ej903hNUUTtyxt3ARdDjmuydBRTAUICc7OVKVbaOvc6SQYXA==",
+      "type": "package",
+      "path": "bcrypt.net-next/4.2.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "bcrypt.net-next.4.2.0.nupkg.sha512",
+        "bcrypt.net-next.nuspec",
+        "ico.png",
+        "lib/net10.0/BCrypt-Net-Next.dll",
+        "lib/net10.0/BCrypt.Net-Next.xml",
+        "lib/net462/BCrypt-Net-Next.dll",
+        "lib/net462/BCrypt.Net-Next.xml",
+        "lib/net472/BCrypt-Net-Next.dll",
+        "lib/net472/BCrypt.Net-Next.xml",
+        "lib/net48/BCrypt-Net-Next.dll",
+        "lib/net48/BCrypt.Net-Next.xml",
+        "lib/netstandard2.0/BCrypt-Net-Next.dll",
+        "lib/netstandard2.0/BCrypt.Net-Next.xml",
+        "lib/netstandard2.1/BCrypt-Net-Next.dll",
+        "lib/netstandard2.1/BCrypt.Net-Next.xml",
+        "readme.md"
+      ]
+    },
     "Humanizer.Core/2.14.1": {
       "sha512": "lQKvtaTDOXnoVJ20ibTuSIOf2i0uO0MPbDhd1jm238I+U/2ZnRENj0cktKZhtchBMtCUSRQ5v4xBCUbKNmyVMw==",
       "type": "package",
@@ -3247,6 +3323,21 @@
         "system.threading.channels.nuspec",
         "useSharedDesignerContext.txt"
       ]
+    },
+    "MixAndMatch.Application/1.0.0": {
+      "type": "project",
+      "path": "../MixAndMatch.Application/MixAndMatch.Application.csproj",
+      "msbuildProject": "../MixAndMatch.Application/MixAndMatch.Application.csproj"
+    },
+    "MixAndMatch.Domain/1.0.0": {
+      "type": "project",
+      "path": "../MixAndMatch.Domain/MixAndMatch.Domain.csproj",
+      "msbuildProject": "../MixAndMatch.Domain/MixAndMatch.Domain.csproj"
+    },
+    "MixAndMatch.Infrastructure/1.0.0": {
+      "type": "project",
+      "path": "../MixAndMatch.Infrastructure/MixAndMatch.Infrastructure.csproj",
+      "msbuildProject": "../MixAndMatch.Infrastructure/MixAndMatch.Infrastructure.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -3255,6 +3346,9 @@
       "Microsoft.AspNetCore.OpenApi >= 9.0.16",
       "Microsoft.EntityFrameworkCore.Design >= 9.0.16",
       "Microsoft.EntityFrameworkCore.Tools >= 9.0.16",
+      "MixAndMatch.Application >= 1.0.0",
+      "MixAndMatch.Domain >= 1.0.0",
+      "MixAndMatch.Infrastructure >= 1.0.0",
       "Npgsql.EntityFrameworkCore.PostgreSQL >= 9.0.4",
       "Swashbuckle.AspNetCore.Swagger >= 9.0.6",
       "Swashbuckle.AspNetCore.SwaggerGen >= 9.0.6",
@@ -3262,19 +3356,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Luz\\.nuget\\packages\\": {}
+    "C:\\Users\\George\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Luz\\RiderProjects\\MixAndMatch\\MixAndMatch.Api\\MixAndMatch.Api.csproj",
+      "projectUniqueName": "C:\\Users\\George\\Downloads\\Ecommerce-Arch-Hexagonal\\MixAndMatch.Api\\MixAndMatch.Api.csproj",
       "projectName": "MixAndMatch.Api",
-      "projectPath": "C:\\Users\\Luz\\RiderProjects\\MixAndMatch\\MixAndMatch.Api\\MixAndMatch.Api.csproj",
-      "packagesPath": "C:\\Users\\Luz\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Luz\\RiderProjects\\MixAndMatch\\MixAndMatch.Api\\obj\\",
+      "projectPath": "C:\\Users\\George\\Downloads\\Ecommerce-Arch-Hexagonal\\MixAndMatch.Api\\MixAndMatch.Api.csproj",
+      "packagesPath": "C:\\Users\\George\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\George\\Downloads\\Ecommerce-Arch-Hexagonal\\MixAndMatch.Api\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Luz\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\George\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -3285,7 +3379,17 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\George\\Downloads\\Ecommerce-Arch-Hexagonal\\MixAndMatch.Application\\MixAndMatch.Application.csproj": {
+              "projectPath": "C:\\Users\\George\\Downloads\\Ecommerce-Arch-Hexagonal\\MixAndMatch.Application\\MixAndMatch.Application.csproj"
+            },
+            "C:\\Users\\George\\Downloads\\Ecommerce-Arch-Hexagonal\\MixAndMatch.Domain\\MixAndMatch.Domain.csproj": {
+              "projectPath": "C:\\Users\\George\\Downloads\\Ecommerce-Arch-Hexagonal\\MixAndMatch.Domain\\MixAndMatch.Domain.csproj"
+            },
+            "C:\\Users\\George\\Downloads\\Ecommerce-Arch-Hexagonal\\MixAndMatch.Infrastructure\\MixAndMatch.Infrastructure.csproj": {
+              "projectPath": "C:\\Users\\George\\Downloads\\Ecommerce-Arch-Hexagonal\\MixAndMatch.Infrastructure\\MixAndMatch.Infrastructure.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
@@ -3298,7 +3402,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "10.0.200"
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "net9.0": {
@@ -3352,24 +3456,6 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "downloadDependencies": [
-          {
-            "name": "Microsoft.AspNetCore.App.Ref",
-            "version": "[9.0.15, 9.0.15]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Host.win-x64",
-            "version": "[9.0.15, 9.0.15]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Ref",
-            "version": "[9.0.15, 9.0.15]"
-          },
-          {
-            "name": "Microsoft.WindowsDesktop.App.Ref",
-            "version": "[9.0.15, 9.0.15]"
-          }
-        ],
         "frameworkReferences": {
           "Microsoft.AspNetCore.App": {
             "privateAssets": "none"
@@ -3378,7 +3464,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Users\\Luz\\.dotnet\\sdk\\10.0.202/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.312/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
