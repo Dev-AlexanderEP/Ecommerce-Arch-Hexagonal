@@ -8,6 +8,11 @@
 
     <ItemGroup>
       <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\MixAndMatch.Domain\MixAndMatch.Domain.csproj" />
     </ItemGroup>
 
 </Project>
