@@ -10,12 +10,14 @@ public static class InfrastructureServicesExtensions
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
+        // Database Connection
         services.AddDbContext<MixAndMatchDbContext>(options =>
         {
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             options.UseNpgsql(connectionString);
         });
 
+        // Services Register
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;

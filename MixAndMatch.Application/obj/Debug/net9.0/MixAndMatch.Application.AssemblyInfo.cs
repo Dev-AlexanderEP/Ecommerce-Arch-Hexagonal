@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MixAndMatch.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+79e98e7dd676e2ec232dc4259666fd74e068a66f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+70f64e642b582b975213106823e091563adde5e9")]
 [assembly: System.Reflection.AssemblyProductAttribute("MixAndMatch.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MixAndMatch.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

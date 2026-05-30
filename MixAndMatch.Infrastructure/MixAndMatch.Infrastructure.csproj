@@ -15,4 +15,9 @@
       <ProjectReference Include="..\MixAndMatch.Domain\MixAndMatch.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Adapters\Services\" />
+      <Folder Include="Middlewares\" />
+    </ItemGroup>
+
 </Project>
