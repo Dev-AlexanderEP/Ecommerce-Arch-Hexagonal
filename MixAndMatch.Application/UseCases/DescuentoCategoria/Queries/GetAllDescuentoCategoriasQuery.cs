@@ -14,6 +14,11 @@ public class GetAllDescuentoCategoriasQueryHandler(IUnitOfWork _uow) : IRequestH
     public async Task<ApiResponseDto<IEnumerable<DescuentoCategoriaResponseDto>>> Handle(GetAllDescuentoCategoriasQuery request, CancellationToken cancellationToken)
     {
         var items = await _uow.Repository<DescuentoCategoriaEntity>().GetAll();
+        if (!items.Any())
+        {
+            return ApiResponseDto<IEnumerable<DescuentoCategoriaResponseDto>>.Fail("No se encontraron descuentos por categoría.");
+        }
+
         return ApiResponseDto<IEnumerable<DescuentoCategoriaResponseDto>>.Ok(items.Select(x => new DescuentoCategoriaResponseDto
         {
             Id = x.Id,

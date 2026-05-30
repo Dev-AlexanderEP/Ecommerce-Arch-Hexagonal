@@ -14,6 +14,11 @@ public class GetAllMarcasQueryHandler(IUnitOfWork _uow) : IRequestHandler<GetAll
     public async Task<ApiResponseDto<IEnumerable<MarcaResponseDto>>> Handle(GetAllMarcasQuery request, CancellationToken cancellationToken)
     {
         var items = await _uow.Repository<MarcaEntity>().GetAll();
+        if (!items.Any())
+        {
+            return ApiResponseDto<IEnumerable<MarcaResponseDto>>.Fail("No se encontraron marcas.");
+        }
+
         return ApiResponseDto<IEnumerable<MarcaResponseDto>>.Ok(items.Select(x => new MarcaResponseDto
         {
             Id = x.Id,

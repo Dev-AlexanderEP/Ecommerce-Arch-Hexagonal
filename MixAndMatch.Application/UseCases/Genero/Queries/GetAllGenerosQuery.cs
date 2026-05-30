@@ -14,6 +14,11 @@ public class GetAllGenerosQueryHandler(IUnitOfWork _uow) : IRequestHandler<GetAl
     public async Task<ApiResponseDto<IEnumerable<GeneroResponseDto>>> Handle(GetAllGenerosQuery request, CancellationToken cancellationToken)
     {
         var items = await _uow.Repository<GeneroEntity>().GetAll();
+        if (!items.Any())
+        {
+            return ApiResponseDto<IEnumerable<GeneroResponseDto>>.Fail("No se encontraron géneros.");
+        }
+
         return ApiResponseDto<IEnumerable<GeneroResponseDto>>.Ok(items.Select(x => new GeneroResponseDto
         {
             Id = x.Id,

@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.Prenda.Commands;
 using MixAndMatch.Application.UseCases.Prenda.Queries;
 using MixAndMatch.Domain.DTOs;
@@ -13,19 +14,19 @@ public class PrendasController(IMediator _mediator) : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        return Ok(await _mediator.Send(new GetAllPrendasQuery()));
+        return this.ToActionResult(await _mediator.Send(new GetAllPrendasQuery()));
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(long id)
     {
-        return Ok(await _mediator.Send(new GetPrendaByIdQuery { PrendaId = id }));
+        return this.ToActionResult(await _mediator.Send(new GetPrendaByIdQuery { PrendaId = id }));
     }
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] PrendaRequestDto dto)
     {
-        return Ok(await _mediator.Send(new CreatePrendaCommand
+        return this.ToActionResult(await _mediator.Send(new CreatePrendaCommand
         {
             Nombre = dto.Nombre,
             Descripcion = dto.Descripcion,
@@ -41,7 +42,7 @@ public class PrendasController(IMediator _mediator) : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(long id, [FromBody] PrendaRequestDto dto)
     {
-        return Ok(await _mediator.Send(new UpdatePrendaCommand
+        return this.ToActionResult(await _mediator.Send(new UpdatePrendaCommand
         {
             PrendaId = id,
             Nombre = dto.Nombre,
@@ -58,6 +59,6 @@ public class PrendasController(IMediator _mediator) : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(long id)
     {
-        return Ok(await _mediator.Send(new DeletePrendaCommand { PrendaId = id }));
+        return this.ToActionResult(await _mediator.Send(new DeletePrendaCommand { PrendaId = id }));
     }
 }

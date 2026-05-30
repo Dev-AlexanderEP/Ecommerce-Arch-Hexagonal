@@ -14,6 +14,11 @@ public class GetAllPrendasQueryHandler(IUnitOfWork _uow) : IRequestHandler<GetAl
     public async Task<ApiResponseDto<IEnumerable<PrendaResponseDto>>> Handle(GetAllPrendasQuery request, CancellationToken cancellationToken)
     {
         var items = await _uow.Repository<PrendaEntity>().GetAll();
+        if (!items.Any())
+        {
+            return ApiResponseDto<IEnumerable<PrendaResponseDto>>.Fail("No se encontraron prendas.");
+        }
+
         return ApiResponseDto<IEnumerable<PrendaResponseDto>>.Ok(items.Select(x => new PrendaResponseDto
         {
             Id = x.Id,

@@ -14,6 +14,11 @@ public class GetAllProveedoresQueryHandler(IUnitOfWork _uow) : IRequestHandler<G
     public async Task<ApiResponseDto<IEnumerable<ProveedorResponseDto>>> Handle(GetAllProveedoresQuery request, CancellationToken cancellationToken)
     {
         var items = await _uow.Repository<ProveedorEntity>().GetAll();
+        if (!items.Any())
+        {
+            return ApiResponseDto<IEnumerable<ProveedorResponseDto>>.Fail("No se encontraron proveedores.");
+        }
+
         return ApiResponseDto<IEnumerable<ProveedorResponseDto>>.Ok(items.Select(x => new ProveedorResponseDto
         {
             Id = x.Id,

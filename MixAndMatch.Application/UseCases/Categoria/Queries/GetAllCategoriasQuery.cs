@@ -14,6 +14,11 @@ public class GetAllCategoriasQueryHandler(IUnitOfWork _uow) : IRequestHandler<Ge
     public async Task<ApiResponseDto<IEnumerable<CategoriaResponseDto>>> Handle(GetAllCategoriasQuery request, CancellationToken cancellationToken)
     {
         var items = await _uow.Repository<CategoriaEntity>().GetAll();
+        if (!items.Any())
+        {
+            return ApiResponseDto<IEnumerable<CategoriaResponseDto>>.Fail("No se encontraron categorías.");
+        }
+
         return ApiResponseDto<IEnumerable<CategoriaResponseDto>>.Ok(items.Select(x => new CategoriaResponseDto
         {
             Id = x.Id,
