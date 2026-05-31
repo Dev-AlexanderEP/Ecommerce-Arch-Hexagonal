@@ -238,12 +238,16 @@ CREATE TABLE IF NOT EXISTS descuento_usuario (
 
 -- ─── REVIEWS ────────────────────────────────────────────────
 
-CREATE TABLE IF NOT EXISTS "reseña" (
+CREATE TABLE IF NOT EXISTS "resenia" (
     id           BIGSERIAL PRIMARY KEY NOT NULL,
     prenda_id    BIGINT    NOT NULL REFERENCES prenda(id),
     usuario_id   BIGINT    NOT NULL REFERENCES usuarios(id),
     calificacion INT       NOT NULL,
     comentario   TEXT,
+    estado       VARCHAR(50) NOT NULL,
+    moderado_por_id UUID,
+    moderado_en  TIMESTAMP,
+    motivo_rechazo VARCHAR(255),
     created_at   TIMESTAMP NOT NULL,
     updated_at   TIMESTAMP,
     UNIQUE (prenda_id, usuario_id)

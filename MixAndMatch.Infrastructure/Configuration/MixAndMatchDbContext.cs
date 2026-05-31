@@ -46,7 +46,7 @@ public partial class MixAndMatchDbContext : DbContext
 
     public virtual DbSet<Proveedor> Proveedors { get; set; }
 
-    public virtual DbSet<Reseña> Reseña { get; set; }
+    public virtual DbSet<Resenia> Resenia { get; set; }
 
     public virtual DbSet<Talla> Tallas { get; set; }
 
@@ -552,11 +552,11 @@ public partial class MixAndMatchDbContext : DbContext
                 .HasColumnName("nom_proveedor");
         });
 
-        modelBuilder.Entity<Reseña>(entity =>
+        modelBuilder.Entity<Resenia>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("resenia_pkey");
 
-            entity.ToTable("reseña");
+            entity.ToTable("resenia");
 
             entity.HasIndex(e => new { e.PrendaId, e.UsuarioId }, "resenia_prenda_id_usuario_id_key").IsUnique();
 
@@ -572,12 +572,12 @@ public partial class MixAndMatchDbContext : DbContext
                 .HasColumnName("updated_at");
             entity.Property(e => e.UsuarioId).HasColumnName("usuario_id");
 
-            entity.HasOne(d => d.Prenda).WithMany(p => p.Reseña)
+            entity.HasOne(d => d.Prenda).WithMany(p => p.Resenia)
                 .HasForeignKey(d => d.PrendaId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("resenia_prenda_id_fkey");
 
-            entity.HasOne(d => d.Usuario).WithMany(p => p.Reseña)
+            entity.HasOne(d => d.Usuario).WithMany(p => p.Resenia)
                 .HasForeignKey(d => d.UsuarioId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("resenia_usuario_id_fkey");

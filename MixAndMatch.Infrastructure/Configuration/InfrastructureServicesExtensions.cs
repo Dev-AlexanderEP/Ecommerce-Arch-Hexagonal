@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MixAndMatch.Domain.Ports;
 using MixAndMatch.Domain.Ports.IRepositories;
 using MixAndMatch.Domain.Ports.IServices;
 using MixAndMatch.Infrastructure.Adapters;
@@ -22,6 +23,7 @@ public static class InfrastructureServicesExtensions
 
         // Services Register
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IReseniaRepository, ReseniaRepository>();
         services.AddScoped<IPasswordService, PasswordService>();
 
         // Middlewares
