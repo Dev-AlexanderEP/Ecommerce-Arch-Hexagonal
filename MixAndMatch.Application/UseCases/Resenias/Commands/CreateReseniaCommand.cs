@@ -4,7 +4,6 @@ using MixAndMatch.Domain.DTOs.Resenias;
 using MixAndMatch.Domain.Entities;
 using MixAndMatch.Domain.Ports;
 using MixAndMatch.Domain.Ports.IRepositories;
-using MixAndMatch.Domain.ValueObjects;
 using ReseniaEntity = MixAndMatch.Domain.Entities.Resenia;
 
 namespace MixAndMatch.Application.UseCases.Resenias.Commands;
@@ -40,7 +39,7 @@ public class CreateReseniaCommandHandler(IReseniaRepository _reseniaRepository, 
         {
             PrendaId = request.PrendaId,
             UsuarioId = request.UsuarioId,
-            Calificacion = new Calificacion(request.Calificacion),
+            Calificacion = request.Calificacion,
             Comentario = request.Comentario,
             Estado = EstadoResenia.PENDIENTE,
             CreatedAt = DateTime.UtcNow,
@@ -55,7 +54,7 @@ public class CreateReseniaCommandHandler(IReseniaRepository _reseniaRepository, 
             Id = entity.Id,
             PrendaId = entity.PrendaId,
             UsuarioId = entity.UsuarioId,
-            Calificacion = entity.Calificacion.Valor,
+            Calificacion = entity.Calificacion,
             Comentario = entity.Comentario,
             Estado = entity.Estado,
             ModeradoPorId = entity.ModeradoPorId,

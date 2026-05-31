@@ -4,7 +4,6 @@ using MixAndMatch.Domain.DTOs.Resenias;
 using MixAndMatch.Domain.Entities;
 using MixAndMatch.Domain.Ports;
 using MixAndMatch.Domain.Ports.IRepositories;
-using MixAndMatch.Domain.ValueObjects;
 using ReseniaEntity = MixAndMatch.Domain.Entities.Resenia;
 
 namespace MixAndMatch.Application.UseCases.Resenias.Commands;
@@ -39,7 +38,7 @@ public class UpdateReseniaCommandHandler(IReseniaRepository _reseniaRepository, 
             return ApiResponseDto<ReseniaResponseDto>.Fail("La calificacion debe estar entre 1 y 5.");
         }
 
-        entity.Calificacion = new Calificacion(request.Calificacion);
+        entity.Calificacion = request.Calificacion;
         entity.Comentario = request.Comentario;
         entity.UpdatedAt = DateTime.UtcNow;
 
@@ -51,7 +50,7 @@ public class UpdateReseniaCommandHandler(IReseniaRepository _reseniaRepository, 
             Id = entity.Id,
             PrendaId = entity.PrendaId,
             UsuarioId = entity.UsuarioId,
-            Calificacion = entity.Calificacion.Valor,
+            Calificacion = entity.Calificacion,
             Comentario = entity.Comentario,
             Estado = entity.Estado,
             ModeradoPorId = entity.ModeradoPorId,

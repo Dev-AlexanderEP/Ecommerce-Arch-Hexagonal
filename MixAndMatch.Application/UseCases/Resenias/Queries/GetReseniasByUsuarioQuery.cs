@@ -26,7 +26,7 @@ public class GetReseniasByUsuarioQueryHandler(IReseniaRepository _reseniaReposit
             Id = x.Id,
             PrendaId = x.PrendaId,
             UsuarioId = x.UsuarioId,
-            Calificacion = x.Calificacion.Valor,
+            Calificacion = x.Calificacion,
             Comentario = x.Comentario,
             Estado = x.Estado,
             ModeradoPorId = x.ModeradoPorId,

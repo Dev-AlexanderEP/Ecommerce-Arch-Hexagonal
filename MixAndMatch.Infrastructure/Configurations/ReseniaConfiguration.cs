@@ -36,11 +36,9 @@ public sealed class ReseniaConfiguration : IEntityTypeConfiguration<Resenia>
             .HasColumnType("timestamp without time zone")
             .HasColumnName("updated_at");
 
-        builder.ComplexProperty(r => r.Calificacion, calificacion =>
-        {
-            calificacion.Property(c => c.Valor)
-                .HasColumnName("calificacion");
-        });
+        builder.Property(r => r.Calificacion)
+            .HasColumnName("calificacion")
+            .HasColumnType("integer");
 
         builder.HasOne(r => r.Prenda).WithMany(p => p.Resenia)
             .HasForeignKey(r => r.PrendaId)

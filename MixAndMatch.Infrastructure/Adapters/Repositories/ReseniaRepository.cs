@@ -49,7 +49,7 @@ public class ReseniaRepository(MixAndMatchDbContext context) : IReseniaRepositor
         var promedio = await _context.Resenia
             .AsNoTracking()
             .Where(r => r.PrendaId == prendaId)
-            .Select(r => (decimal?)r.Calificacion.Valor)
+            .Select(r => (decimal?)r.Calificacion)
             .AverageAsync();
 
         return promedio ?? 0m;

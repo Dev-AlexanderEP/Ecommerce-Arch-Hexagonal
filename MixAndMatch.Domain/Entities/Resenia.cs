@@ -1,7 +1,5 @@
 namespace MixAndMatch.Domain.Entities;
 
-using MixAndMatch.Domain.ValueObjects;
-
 public partial class Resenia
 {
     public long Id { get; set; }
@@ -10,7 +8,7 @@ public partial class Resenia
 
     public long UsuarioId { get; set; }
 
-    public Calificacion Calificacion { get; set; } = null!;
+    public int Calificacion { get; set; }
 
     public string? Comentario { get; set; }
 

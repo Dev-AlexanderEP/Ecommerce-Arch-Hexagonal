@@ -27,7 +27,7 @@ public class GetReseniaByIdQueryHandler(IUnitOfWork _uow)
             Id = entity.Id,
             PrendaId = entity.PrendaId,
             UsuarioId = entity.UsuarioId,
-            Calificacion = entity.Calificacion.Valor,
+            Calificacion = entity.Calificacion,
             Comentario = entity.Comentario,
             Estado = entity.Estado,
             ModeradoPorId = entity.ModeradoPorId,
