@@ -27,7 +27,7 @@ public partial class Usuario
 
     public virtual ICollection<DescuentoUsuario> DescuentoUsuarios { get; set; } = new List<DescuentoUsuario>();
 
-    public virtual ICollection<Reseña> Reseña { get; set; } = new List<Reseña>();
+    public virtual ICollection<Resenia> Resenia { get; set; } = new List<Resenia>();
 
     public virtual ICollection<Venta> Venta { get; set; } = new List<Venta>();
 }

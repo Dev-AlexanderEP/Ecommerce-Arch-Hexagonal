@@ -41,5 +41,5 @@ public partial class Prenda
 
     public virtual Proveedor Proveedor { get; set; } = null!;
 
-    public virtual ICollection<Reseña> Reseña { get; set; } = new List<Reseña>();
+    public virtual ICollection<Resenia> Resenia { get; set; } = new List<Resenia>();
 }
