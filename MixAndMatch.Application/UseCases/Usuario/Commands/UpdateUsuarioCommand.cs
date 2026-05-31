@@ -1,0 +1,58 @@
+using MediatR;
+using MixAndMatch.Domain.DTOs;
+using MixAndMatch.Domain.Ports.IRepositories;
+using MixAndMatch.Domain.Ports.IServices;
+using UsuarioEntity = MixAndMatch.Domain.Entities.Usuario;
+
+namespace MixAndMatch.Application.UseCases.Usuario.Commands;
+
+public class UpdateUsuarioCommand : IRequest<ApiResponseDto<UsuarioResponseDto>>
+{
+    public required long UsuarioId { get; set; }
+    public required string NombreUsuario { get; set; }
+    public required string Email { get; set; }
+    public string? Rol { get; set; }
+    public required bool Activo { get; set; }
+    public string? NuevaContrasenia { get; set; }
+}
+
+public class UpdateUsuarioCommandHandler(IUnitOfWork _uow, IPasswordService _passwordService)
+    : IRequestHandler<UpdateUsuarioCommand, ApiResponseDto<UsuarioResponseDto>>
+{
+    public async Task<ApiResponseDto<UsuarioResponseDto>> Handle(UpdateUsuarioCommand request, CancellationToken cancellationToken)
+    {
+        var repo   = _uow.Repository<UsuarioEntity>();
+        var entity = await repo.GetById(request.UsuarioId);
+
+        if (entity is null)
+            return ApiResponseDto<UsuarioResponseDto>.Fail($"Usuario no encontrado para id {request.UsuarioId}.");
+
+        var emailTaken = (await repo.GetAll())
+            .Any(u => u.Email == request.Email && u.Id != request.UsuarioId);
+        if (emailTaken)
+            return ApiResponseDto<UsuarioResponseDto>.Fail($"El email {request.Email} ya está en uso por otro usuario.");
+
+        entity.NombreUsuario = request.NombreUsuario;
+        entity.Email         = request.Email;
+        entity.Rol           = request.Rol;
+        entity.Activo        = request.Activo;
+        entity.UpdatedAt     = DateTime.UtcNow;
+
+        if (!string.IsNullOrWhiteSpace(request.NuevaContrasenia))
+            entity.Contrasenia = _passwordService.Hash(request.NuevaContrasenia);
+
+        await repo.Update(entity);
+        await _uow.Complete();
+
+        return ApiResponseDto<UsuarioResponseDto>.Ok(new UsuarioResponseDto
+        {
+            Id            = entity.Id,
+            NombreUsuario = entity.NombreUsuario,
+            Email         = entity.Email,
+            Rol           = entity.Rol,
+            Activo        = entity.Activo,
+            CreatedAt     = entity.CreatedAt,
+            UpdatedAt     = entity.UpdatedAt
+        });
+    }
+}
