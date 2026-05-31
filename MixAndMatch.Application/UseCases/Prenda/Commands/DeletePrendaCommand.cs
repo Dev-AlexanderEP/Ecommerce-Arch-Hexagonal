@@ -5,7 +5,7 @@ using DescuentoPrendaEntity = MixAndMatch.Domain.Entities.DescuentoPrenda;
 using PrendaEntity = MixAndMatch.Domain.Entities.Prenda;
 using PrendaImagenEntity = MixAndMatch.Domain.Entities.PrendaImagen;
 using PrendaTallaEntity = MixAndMatch.Domain.Entities.PrendaTalla;
-using ReseñaEntity = MixAndMatch.Domain.Entities.Reseña;
+using ReseniaEntity = MixAndMatch.Domain.Entities.Resenia;
 
 namespace MixAndMatch.Application.UseCases.Prenda.Commands;
 
@@ -40,7 +40,7 @@ public class DeletePrendaCommandHandler(IUnitOfWork _uow) : IRequestHandler<Dele
             return ApiResponseDto<bool>.Fail("La prenda tiene tallas asociadas.");
         }
 
-        if ((await _uow.Repository<ReseñaEntity>().GetAll()).Any(x => x.PrendaId == request.PrendaId))
+        if ((await _uow.Repository<ReseniaEntity>().GetAll()).Any(x => x.PrendaId == request.PrendaId))
         {
             return ApiResponseDto<bool>.Fail("La prenda tiene reseñas asociadas.");
         }
