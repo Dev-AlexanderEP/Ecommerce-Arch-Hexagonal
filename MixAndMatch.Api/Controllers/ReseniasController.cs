@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.Resenias.Commands;
 using MixAndMatch.Application.UseCases.Resenias.Queries;
-using MixAndMatch.Domain.DTOs;
 
 namespace MixAndMatch.Api.Controllers;
 
@@ -25,24 +24,12 @@ public class ReseniasController(IMediator _mediator) : ControllerBase
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10)
     {
-        if (prendaId.HasValue == usuarioId.HasValue)
+        return this.ToActionResult(await _mediator.Send(new GetReseniasQuery
         {
-            return BadRequest(ApiResponseDto<string>.Fail("Debe enviar prendaId o usuarioId."));
-        }
-
-        if (prendaId.HasValue)
-        {
-            return this.ToActionResult(await _mediator.Send(new GetReseniasByPrendaQuery
-            {
-                PrendaId = prendaId.Value,
-                Page = page,
-                PageSize = pageSize
-            }));
-        }
-
-        return this.ToActionResult(await _mediator.Send(new GetReseniasByUsuarioQuery
-        {
-            UsuarioId = usuarioId!.Value
+            PrendaId = prendaId,
+            UsuarioId = usuarioId,
+            Page = page,
+            PageSize = pageSize
         }));
     }
 
