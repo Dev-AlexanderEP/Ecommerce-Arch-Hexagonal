@@ -2,7 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MixAndMatch.Domain.Ports.IRepositories;
+using MixAndMatch.Domain.Ports.IServices;
 using MixAndMatch.Infrastructure.Adapters;
+using MixAndMatch.Infrastructure.Adapters.Services;
 using MixAndMatch.Infrastructure.Middlewares;
 
 namespace MixAndMatch.Infrastructure.Configuration;
@@ -20,6 +22,7 @@ public static class InfrastructureServicesExtensions
 
         // Services Register
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IPasswordService, PasswordService>();
 
         // Middlewares
         services.AddExceptionHandler<GlobalExceptionHandler>();
