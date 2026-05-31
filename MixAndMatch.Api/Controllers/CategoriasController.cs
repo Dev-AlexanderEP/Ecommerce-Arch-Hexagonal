@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.Categoria.Commands;
 using MixAndMatch.Application.UseCases.Categoria.Queries;
-using MixAndMatch.Domain.DTOs;
 
 namespace MixAndMatch.Api.Controllers;
 
@@ -24,15 +23,16 @@ public class CategoriasController(IMediator _mediator) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CategoriaRequestDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateCategoriaCommand command)
     {
-        return this.ToActionResult(await _mediator.Send(new CreateCategoriaCommand { NomCategoria = dto.NomCategoria }));
+        return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(long id, [FromBody] CategoriaRequestDto dto)
+    public async Task<IActionResult> Update(long id, [FromBody] UpdateCategoriaCommand command)
     {
-        return this.ToActionResult(await _mediator.Send(new UpdateCategoriaCommand { CategoriaId = id, NomCategoria = dto.NomCategoria }));
+        command.CategoriaId = id;
+        return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpDelete("{id}")]

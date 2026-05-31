@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.Proveedor.Commands;
 using MixAndMatch.Application.UseCases.Proveedor.Queries;
-using MixAndMatch.Domain.DTOs;
 
 namespace MixAndMatch.Api.Controllers;
 
@@ -24,15 +23,16 @@ public class ProveedoresController(IMediator _mediator) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] ProveedorRequestDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateProveedorCommand command)
     {
-        return this.ToActionResult(await _mediator.Send(new CreateProveedorCommand { NomProveedor = dto.NomProveedor }));
+        return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(long id, [FromBody] ProveedorRequestDto dto)
+    public async Task<IActionResult> Update(long id, [FromBody] UpdateProveedorCommand command)
     {
-        return this.ToActionResult(await _mediator.Send(new UpdateProveedorCommand { ProveedorId = id, NomProveedor = dto.NomProveedor }));
+        command.ProveedorId = id;
+        return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpDelete("{id}")]

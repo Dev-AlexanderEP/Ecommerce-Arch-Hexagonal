@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.Prenda.Commands;
 using MixAndMatch.Application.UseCases.Prenda.Queries;
-using MixAndMatch.Domain.DTOs;
 
 namespace MixAndMatch.Api.Controllers;
 
@@ -24,36 +23,16 @@ public class PrendasController(IMediator _mediator) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] PrendaRequestDto dto)
+    public async Task<IActionResult> Create([FromBody] CreatePrendaCommand command)
     {
-        return this.ToActionResult(await _mediator.Send(new CreatePrendaCommand
-        {
-            Nombre = dto.Nombre,
-            Descripcion = dto.Descripcion,
-            MarcaId = dto.MarcaId,
-            CategoriaId = dto.CategoriaId,
-            ProveedorId = dto.ProveedorId,
-            GeneroId = dto.GeneroId,
-            Precio = dto.Precio,
-            Activo = dto.Activo
-        }));
+        return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(long id, [FromBody] PrendaRequestDto dto)
+    public async Task<IActionResult> Update(long id, [FromBody] UpdatePrendaCommand command)
     {
-        return this.ToActionResult(await _mediator.Send(new UpdatePrendaCommand
-        {
-            PrendaId = id,
-            Nombre = dto.Nombre,
-            Descripcion = dto.Descripcion,
-            MarcaId = dto.MarcaId,
-            CategoriaId = dto.CategoriaId,
-            ProveedorId = dto.ProveedorId,
-            GeneroId = dto.GeneroId,
-            Precio = dto.Precio,
-            Activo = dto.Activo
-        }));
+        command.PrendaId = id;
+        return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpDelete("{id}")]

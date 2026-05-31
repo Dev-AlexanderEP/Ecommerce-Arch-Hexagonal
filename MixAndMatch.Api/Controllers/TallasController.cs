@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.Talla.Commands;
 using MixAndMatch.Application.UseCases.Talla.Queries;
-using MixAndMatch.Domain.DTOs;
 
 namespace MixAndMatch.Api.Controllers;
 
@@ -20,12 +19,15 @@ public class TallasController(IMediator _mediator) : ControllerBase
         this.ToActionResult(await _mediator.Send(new GetTallaByIdQuery { TallaId = id }));
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] TallaRequestDto dto) =>
-        this.ToActionResult(await _mediator.Send(new CreateTallaCommand { NomTalla = dto.NomTalla }));
+    public async Task<IActionResult> Create([FromBody] CreateTallaCommand command) =>
+        this.ToActionResult(await _mediator.Send(command));
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(long id, [FromBody] TallaRequestDto dto) =>
-        this.ToActionResult(await _mediator.Send(new UpdateTallaCommand { TallaId = id, NomTalla = dto.NomTalla }));
+    public async Task<IActionResult> Update(long id, [FromBody] UpdateTallaCommand command)
+    {
+        command.TallaId = id;
+        return this.ToActionResult(await _mediator.Send(command));
+    }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(long id) =>

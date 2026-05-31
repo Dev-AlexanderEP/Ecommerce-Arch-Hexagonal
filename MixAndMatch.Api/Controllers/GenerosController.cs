@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.Genero.Commands;
 using MixAndMatch.Application.UseCases.Genero.Queries;
-using MixAndMatch.Domain.DTOs;
 
 namespace MixAndMatch.Api.Controllers;
 
@@ -24,15 +23,16 @@ public class GenerosController(IMediator _mediator) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] GeneroRequestDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateGeneroCommand command)
     {
-        return this.ToActionResult(await _mediator.Send(new CreateGeneroCommand { NomGenero = dto.NomGenero }));
+        return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(long id, [FromBody] GeneroRequestDto dto)
+    public async Task<IActionResult> Update(long id, [FromBody] UpdateGeneroCommand command)
     {
-        return this.ToActionResult(await _mediator.Send(new UpdateGeneroCommand { GeneroId = id, NomGenero = dto.NomGenero }));
+        command.GeneroId = id;
+        return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpDelete("{id}")]

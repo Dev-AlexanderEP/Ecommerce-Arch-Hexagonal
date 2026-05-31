@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.Marca.Commands;
 using MixAndMatch.Application.UseCases.Marca.Queries;
-using MixAndMatch.Domain.DTOs;
 
 namespace MixAndMatch.Api.Controllers;
 
@@ -24,15 +23,16 @@ public class MarcasController(IMediator _mediator) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] MarcaRequestDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateMarcaCommand command)
     {
-        return this.ToActionResult(await _mediator.Send(new CreateMarcaCommand { NomMarca = dto.NomMarca }));
+        return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(long id, [FromBody] MarcaRequestDto dto)
+    public async Task<IActionResult> Update(long id, [FromBody] UpdateMarcaCommand command)
     {
-        return this.ToActionResult(await _mediator.Send(new UpdateMarcaCommand { MarcaId = id, NomMarca = dto.NomMarca }));
+        command.MarcaId = id;
+        return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpDelete("{id}")]
