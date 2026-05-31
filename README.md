@@ -69,7 +69,7 @@ Domain no conoce ninguna capa externa. Infrastructure implementa los contratos q
 | **Payment** | Métodos de pago y procesamiento (MercadoPago / Stripe / PayPal) |
 | **Shipping** | Envíos, tracking y datos de destinatario |
 | **Discounts** | Descuentos por prenda, categoría y códigos promocionales |
-| **Reviews** | Reseñas y calificaciones de prendas |
+| **Reviews** | Resenias y calificaciones de prendas con moderacion |
 | **Notifications** | Envío de emails transaccionales (bienvenida, confirmación, tracking, reset) |
 
 ---
@@ -77,8 +77,8 @@ Domain no conoce ninguna capa externa. Infrastructure implementa los contratos q
 ## Requisitos previos
 
 - [.NET 9 SDK](https://dotnet.microsoft.com/download)
-- [PostgreSQL](https://www.postgresql.org/)
-- [Docker](https://www.docker.com/) (para levantar Redis en contenedor)
+- [Docker](https://www.docker.com/) y Docker Compose
+- PostgreSQL no hace falta instalarlo localmente si usas `docker compose`
 
 ---
 
@@ -91,50 +91,60 @@ git clone <url-del-repo>
 cd MixAndMatch
 ```
 
-2. Levantar Redis con Docker:
+2. Levantar la base de datos y Redis con Docker Compose:
 
 ```bash
-docker run -d --name redis-mixandmatch -p 6379:6379 redis:alpine
+docker compose up -d
 ```
 
-3. Configurar `appsettings.Development.json` en `src/MixAndMatch.Api/`:
+3. Configurar `appsettings.Development.json` en `MixAndMatch.Api/`:
 
 ```json
 {
   "ConnectionStrings": {
-    "Default": "Host=localhost;Database=mixandmatch;Username=postgres;Password=tu_password",
-    "Redis": "localhost:6379"
+    "DefaultConnection": "Host=localhost;Port=5435;Database=mixandmatch;Username=postgres;Password=postgres"
   },
-  "Jwt": {
-    "Issuer": "MixAndMatch",
-    "Audience": "MixAndMatch",
-    "SecretKey": "tu_clave_secreta"
-  },
-  "Smtp": {
-    "Host": "smtp.gmail.com",
-    "Port": 587,
-    "User": "correo@gmail.com",
-    "Password": "tu_app_password"
-  }
+  "AllowedHosts": "*"
 }
 ```
 
 4. Aplicar migraciones:
 
 ```bash
-dotnet ef database update --project src/MixAndMatch.Infrastructure --startup-project src/MixAndMatch.Api
+dotnet ef database update --project MixAndMatch.Infrastructure --startup-project MixAndMatch.Api
 ```
 
 5. Ejecutar:
 
 ```bash
-dotnet run --project src/MixAndMatch.Api
+dotnet run --project MixAndMatch.Api
 ```
 
 6. Acceder a Swagger:
 
 ```
-https://localhost:5001/swagger
+http://localhost:5221
+```
+
+### Docker Compose
+
+El archivo `docker-compose.yml` levanta estos servicios:
+
+- PostgreSQL en `localhost:5435`
+- Redis en `localhost:6380`
+
+El script de inicialización de PostgreSQL vive en `docker/postgres/init.sql` y se monta automáticamente en el contenedor.
+
+Para revisar el estado de los contenedores:
+
+```bash
+docker compose ps
+```
+
+Para ver logs:
+
+```bash
+docker compose logs -f
 ```
 
 ---

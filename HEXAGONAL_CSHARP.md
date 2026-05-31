@@ -678,43 +678,50 @@ DescuentoUsuarioController.cs
 **Domain**
 ```
 Entities/
-  Resenia.cs               ← id, prendaId, usuarioId, calificacion int, comentario, createdAt (AggregateRoot)
-                              (índice único: prendaId + usuarioId — un usuario, una reseña por prenda)
+  Resenia.cs               ← id, prendaId, usuarioId, calificacion, comentario, estado, moderadoPorId,
+                              moderadoEn, motivoRechazo, createdAt, updatedAt (AggregateRoot)
+                              (indice unico: prendaId + usuarioId — un usuario, una resenia por prenda)
   Calificacion.cs          ← VO: int validado 1–5
 
-Ports/Repositories/
-  IReseniaRepository.cs    ← FindByPrendaId (paginado), FindByUsuarioId, FindByPrendaYUsuario,
-                              Save, Delete, GetPromedioByPrenda
+Enums/
+  EstadoResenia.cs         ← PENDIENTE, APROBADA, RECHAZADA
+
+Ports/
+  IReseniaRepository.cs    ← GetPaginatedByPrendaId, GetByUsuarioId, GetByPrendaAndUsuario,
+                              GetPromedioByPrendaId, Add, Update, Delete
+
+DTOs/Resenias/
+  ReseniaResponseDto.cs
+  ReseniaResumenDto.cs     ← promedio + total resenias por prenda
 ```
 
 **Application**
 ```
 UseCases/
-  Resenia/
+  Resenias/
     Commands/
       CreateReseniaCommand.cs      ← Command + Handler
       UpdateReseniaCommand.cs      ← Command + Handler
       DeleteReseniaCommand.cs      ← Command + Handler
+      UpdateEstadoReseniaCommand.cs← Command + Handler
     Queries/
-      GetReseniasByPrendaQuery.cs  ← Query + Handler (paginado + promedio calificación)
+      GetReseniasByPrendaQuery.cs  ← Query + Handler (paginado + promedio)
       GetReseniasByUsuarioQuery.cs ← Query + Handler
-
-DTOs/
-  ReseniaDto.cs
-  ReseniaRequestDto.cs
-  ReseniaResumenDto.cs             ← promedio + total reseñas por prenda
+      GetReseniaByIdQuery.cs       ← Query + Handler
 ```
 
 **Infrastructure**
 ```
 Adapters/Repositories/
   ReseniaRepository.cs
-  ReseniaConfiguration.cs          ← Fluent API: FK prendaId+usuarioId, índice único
+
+Configurations/
+  ReseniaConfiguration.cs          ← Fluent API: estado como string, indice unico (prenda_id, usuario_id)
 ```
 
 **Api/Controllers/**
 ```
-ReseniaController.cs
+ReseniasController.cs
 ```
 
 ---
