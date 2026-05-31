@@ -3,6 +3,15 @@
 --  Base: mixandmatch | PostgreSQL 17
 -- ============================================================
 
+-- ─── ENUMS ──────────────────────────────────────────────────
+
+CREATE TYPE rol_usuario      AS ENUM ('ADMIN', 'CLIENTE', 'VENDEDOR');
+CREATE TYPE tipo_imagen      AS ENUM ('PRINCIPAL', 'SECUNDARIA', 'DETALLE');
+CREATE TYPE estado_carrito   AS ENUM ('ACTIVO', 'CERRADO', 'ABANDONADO');
+CREATE TYPE estado_venta     AS ENUM ('PENDIENTE', 'PAGADO', 'ENVIADO', 'ENTREGADO', 'CANCELADO');
+CREATE TYPE estado_pago      AS ENUM ('PENDIENTE', 'COMPLETADO', 'FALLIDO', 'REEMBOLSADO');
+CREATE TYPE estado_envio     AS ENUM ('PREPARANDO', 'EN_CAMINO', 'ENTREGADO', 'DEVUELTO');
+
 -- ─── IDENTITY ───────────────────────────────────────────────
 
 CREATE TABLE IF NOT EXISTS usuarios (
@@ -10,7 +19,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     nombre_usuario VARCHAR(255) NOT NULL UNIQUE,
     email          VARCHAR(255) NOT NULL UNIQUE,
     contrasenia    VARCHAR(255),
-    rol            VARCHAR(50),
+    rol            rol_usuario,
     activo         BOOLEAN      DEFAULT true,
     created_at     TIMESTAMP,
     updated_at     TIMESTAMP
@@ -82,7 +91,7 @@ CREATE TABLE IF NOT EXISTS prenda (
 CREATE TABLE IF NOT EXISTS prenda_imagen (
     id         BIGSERIAL    PRIMARY KEY NOT NULL,
     prenda_id  BIGINT       NOT NULL REFERENCES prenda(id),
-    tipo       VARCHAR(20)  NOT NULL,
+    tipo       tipo_imagen  NOT NULL,
     url        VARCHAR(500) NOT NULL,
     orden      INT          DEFAULT 0,
     created_at TIMESTAMP,
@@ -105,7 +114,7 @@ CREATE TABLE IF NOT EXISTS carrito (
     id             BIGSERIAL   PRIMARY KEY NOT NULL,
     usuario_id     BIGINT      NOT NULL REFERENCES usuarios(id),
     fecha_creacion TIMESTAMP,
-    estado         VARCHAR(50),
+    estado         estado_carrito,
     updated_at     TIMESTAMP
 );
 
@@ -130,7 +139,7 @@ CREATE TABLE IF NOT EXISTS ventas (
     id             BIGSERIAL   PRIMARY KEY NOT NULL,
     usuario_id     BIGINT      NOT NULL REFERENCES usuarios(id),
     fecha_creacion TIMESTAMP   NOT NULL,
-    estado         VARCHAR(50),
+    estado         estado_venta,
     updated_at     TIMESTAMP
 );
 
@@ -159,7 +168,7 @@ CREATE TABLE IF NOT EXISTS pago (
     venta_id       BIGINT        NOT NULL REFERENCES ventas(id),
     metodo_id      BIGINT        NOT NULL REFERENCES metodo_pago(id),
     monto          DECIMAL(10,2) NOT NULL,
-    estado         VARCHAR(50)   NOT NULL,
+    estado         estado_pago   NOT NULL,
     fecha_creacion TIMESTAMP     NOT NULL,
     updated_at     TIMESTAMP
 );
@@ -173,7 +182,7 @@ CREATE TABLE IF NOT EXISTS envio (
     costo_envio     DECIMAL(10,2) NOT NULL,
     fecha_envio     DATE          NOT NULL,
     fecha_entrega   DATE,
-    estado          VARCHAR(50)   NOT NULL,
+    estado          estado_envio  NOT NULL,
     metodo_envio    VARCHAR(50)   NOT NULL,
     tracking_number VARCHAR(100),
     created_at      TIMESTAMP     NOT NULL,
