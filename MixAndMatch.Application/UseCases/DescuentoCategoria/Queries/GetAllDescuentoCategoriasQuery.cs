@@ -1,5 +1,6 @@
 using MediatR;
 using MixAndMatch.Domain.DTOs;
+using MixAndMatch.Domain.DTOs.Descuentos;
 using MixAndMatch.Domain.Ports.IRepositories;
 using DescuentoCategoriaEntity = MixAndMatch.Domain.Entities.DescuentoCategoria;
 

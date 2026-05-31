@@ -24,30 +24,16 @@ public class DescuentoCategoriasController(IMediator _mediator) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] DescuentoCategoriaRequestDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateDescuentoCategoriaCommand command)
     {
-        return this.ToActionResult(await _mediator.Send(new CreateDescuentoCategoriaCommand
-        {
-            CategoriaId = dto.CategoriaId,
-            Porcentaje = dto.Porcentaje,
-            FechaInicio = dto.FechaInicio,
-            FechaFin = dto.FechaFin,
-            Activo = dto.Activo
-        }));
+        return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(long id, [FromBody] DescuentoCategoriaRequestDto dto)
+    public async Task<IActionResult> Update(long id, [FromBody] UpdateDescuentoCategoriaCommand command)
     {
-        return this.ToActionResult(await _mediator.Send(new UpdateDescuentoCategoriaCommand
-        {
-            DescuentoCategoriaId = id,
-            CategoriaId = dto.CategoriaId,
-            Porcentaje = dto.Porcentaje,
-            FechaInicio = dto.FechaInicio,
-            FechaFin = dto.FechaFin,
-            Activo = dto.Activo
-        }));
+        command.DescuentoCategoriaId = id;
+        return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpDelete("{id}")]
