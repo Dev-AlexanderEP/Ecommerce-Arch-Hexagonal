@@ -1,4 +1,4 @@
-using MixAndMatch.Domain.Enums;
+using MixAndMatch.Domain.Entities;
 
 namespace MixAndMatch.Domain.DTOs.Resenias;
 

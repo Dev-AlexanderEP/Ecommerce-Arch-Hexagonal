@@ -684,7 +684,7 @@ Entities/
   Calificacion.cs          ← VO: int validado 1–5
 
 Enums/
-  EstadoResenia.cs         ← PENDIENTE, APROBADA, RECHAZADA
+  EstadoResenia.cs         ← PENDIENTE, APROBADA, RECHAZADA (en Entities)
 
 Ports/
   IReseniaRepository.cs    ← GetPaginatedByPrendaId, GetByUsuarioId, GetByPrendaAndUsuario,

@@ -1,4 +1,4 @@
-namespace MixAndMatch.Domain.Enums;
+namespace MixAndMatch.Domain.Entities;
 
 public enum EstadoResenia
 {

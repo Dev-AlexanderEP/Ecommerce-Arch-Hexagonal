@@ -1,6 +1,5 @@
 namespace MixAndMatch.Domain.Entities;
 
-using MixAndMatch.Domain.Enums;
 using MixAndMatch.Domain.ValueObjects;
 
 public partial class Resenia

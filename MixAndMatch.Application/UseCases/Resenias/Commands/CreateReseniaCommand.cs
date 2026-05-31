@@ -1,7 +1,7 @@
 using MediatR;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Resenias;
-using MixAndMatch.Domain.Enums;
+using MixAndMatch.Domain.Entities;
 using MixAndMatch.Domain.Ports;
 using MixAndMatch.Domain.Ports.IRepositories;
 using MixAndMatch.Domain.ValueObjects;
