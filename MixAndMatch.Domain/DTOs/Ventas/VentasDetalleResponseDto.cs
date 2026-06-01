@@ -1,4 +1,4 @@
-namespace MixAndMatch.Domain.DTOs;
+namespace MixAndMatch.Domain.DTOs.Ventas;
 
 public class VentasDetalleResponseDto
 {

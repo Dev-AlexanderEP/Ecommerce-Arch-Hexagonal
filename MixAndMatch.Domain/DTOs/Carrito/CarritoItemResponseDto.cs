@@ -1,4 +1,4 @@
-namespace MixAndMatch.Domain.DTOs;
+namespace MixAndMatch.Domain.DTOs.Carrito;
 
 public class CarritoItemResponseDto
 {
