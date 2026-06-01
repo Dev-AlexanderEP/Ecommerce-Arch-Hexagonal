@@ -1,5 +1,6 @@
 using MediatR;
 using MixAndMatch.Domain.DTOs;
+using MixAndMatch.Domain.DTOs.Ventas;
 using MixAndMatch.Domain.Ports.IRepositories;
 using VentasDetalleEntity = MixAndMatch.Domain.Entities.VentasDetalle;
 
