@@ -1,5 +1,6 @@
 using MediatR;
 using MixAndMatch.Domain.DTOs;
+using MixAndMatch.Domain.DTOs.Carrito;
 using MixAndMatch.Domain.Ports.IRepositories;
 using CarritoEntity = MixAndMatch.Domain.Entities.Carrito;
 using UsuarioEntity = MixAndMatch.Domain.Entities.Usuario;
