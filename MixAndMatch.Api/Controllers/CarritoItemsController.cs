@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.CarritoItem.Commands;
 using MixAndMatch.Application.UseCases.CarritoItem.Queries;
-using MixAndMatch.Domain.DTOs;
 
 namespace MixAndMatch.Api.Controllers;
 
@@ -20,23 +19,15 @@ public class CarritoItemsController(IMediator _mediator) : ControllerBase
         this.ToActionResult(await _mediator.Send(new GetCarritoItemByIdQuery { CarritoItemId = id }));
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CarritoItemRequestDto dto) =>
-        this.ToActionResult(await _mediator.Send(new CreateCarritoItemCommand
-        {
-            CarritoId = dto.CarritoId,
-            PrendaTallaId = dto.PrendaTallaId,
-            PrecioUnitario = dto.PrecioUnitario,
-            Cantidad = dto.Cantidad
-        }));
+    public async Task<IActionResult> Create([FromBody] CreateCarritoItemCommand command) =>
+        this.ToActionResult(await _mediator.Send(command));
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(long id, [FromBody] CarritoItemRequestDto dto) =>
-        this.ToActionResult(await _mediator.Send(new UpdateCarritoItemCommand
-        {
-            CarritoItemId = id,
-            PrecioUnitario = dto.PrecioUnitario,
-            Cantidad = dto.Cantidad
-        }));
+    public async Task<IActionResult> Update(long id, [FromBody] UpdateCarritoItemCommand command)
+    {
+        command.CarritoItemId = id;
+        return this.ToActionResult(await _mediator.Send(command));
+    }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(long id) =>

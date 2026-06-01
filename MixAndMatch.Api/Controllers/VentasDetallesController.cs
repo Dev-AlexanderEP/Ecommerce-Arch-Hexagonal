@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.VentasDetalle.Commands;
 using MixAndMatch.Application.UseCases.VentasDetalle.Queries;
-using MixAndMatch.Domain.DTOs;
 
 namespace MixAndMatch.Api.Controllers;
 
@@ -24,26 +23,16 @@ public class VentasDetallesController(IMediator _mediator) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] VentasDetalleRequestDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateVentasDetalleCommand command)
     {
-        return this.ToActionResult(await _mediator.Send(new CreateVentasDetalleCommand
-        {
-            VentaId = dto.VentaId,
-            PrendaTallaId = dto.PrendaTallaId,
-            Cantidad = dto.Cantidad,
-            PrecioUnitario = dto.PrecioUnitario
-        }));
+        return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(long id, [FromBody] VentasDetalleRequestDto dto)
+    public async Task<IActionResult> Update(long id, [FromBody] UpdateVentasDetalleCommand command)
     {
-        return this.ToActionResult(await _mediator.Send(new UpdateVentasDetalleCommand
-        {
-            VentasDetalleId = id,
-            Cantidad = dto.Cantidad,
-            PrecioUnitario = dto.PrecioUnitario
-        }));
+        command.VentasDetalleId = id;
+        return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpDelete("{id}")]
