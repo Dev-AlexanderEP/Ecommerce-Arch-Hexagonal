@@ -14,10 +14,4 @@ public interface IReseniaRepository
     Task<Resenia?> GetByPrendaAndUsuarioAsync(long prendaId, long usuarioId);
 
     Task<decimal> GetPromedioByPrendaIdAsync(long prendaId);
-
-    Task AddAsync(Resenia resenia);
-
-    Task UpdateAsync(Resenia resenia);
-
-    Task DeleteAsync(long id);
 }

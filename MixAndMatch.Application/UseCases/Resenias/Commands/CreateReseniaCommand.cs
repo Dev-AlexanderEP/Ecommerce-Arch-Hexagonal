@@ -46,7 +46,7 @@ public class CreateReseniaCommandHandler(IReseniaRepository _reseniaRepository, 
             UpdatedAt = DateTime.UtcNow
         };
 
-        await _reseniaRepository.AddAsync(entity);
+        await _uow.Repository<ReseniaEntity>().Add(entity);
         await _uow.Complete();
 
         return ApiResponseDto<ReseniaResponseDto>.Ok(new ReseniaResponseDto

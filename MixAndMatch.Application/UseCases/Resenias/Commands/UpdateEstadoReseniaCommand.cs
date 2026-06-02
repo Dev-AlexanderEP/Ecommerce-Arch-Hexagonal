@@ -2,7 +2,6 @@ using MediatR;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Resenias;
 using MixAndMatch.Domain.Entities;
-using MixAndMatch.Domain.Ports;
 using MixAndMatch.Domain.Ports.IRepositories;
 using ReseniaEntity = MixAndMatch.Domain.Entities.Resenia;
 
@@ -19,7 +18,7 @@ public class UpdateEstadoReseniaCommand : IRequest<ApiResponseDto<ReseniaRespons
     public string? MotivoRechazo { get; set; }
 }
 
-public class UpdateEstadoReseniaCommandHandler(IReseniaRepository _reseniaRepository, IUnitOfWork _uow)
+public class UpdateEstadoReseniaCommandHandler(IUnitOfWork _uow)
     : IRequestHandler<UpdateEstadoReseniaCommand, ApiResponseDto<ReseniaResponseDto>>
 {
     public async Task<ApiResponseDto<ReseniaResponseDto>> Handle(UpdateEstadoReseniaCommand request, CancellationToken cancellationToken)
@@ -48,7 +47,7 @@ public class UpdateEstadoReseniaCommandHandler(IReseniaRepository _reseniaReposi
             : null;
         entity.UpdatedAt = DateTime.UtcNow;
 
-        await _reseniaRepository.UpdateAsync(entity);
+        await _uow.Repository<ReseniaEntity>().Update(entity);
         await _uow.Complete();
 
         return ApiResponseDto<ReseniaResponseDto>.Ok(new ReseniaResponseDto

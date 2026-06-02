@@ -54,24 +54,4 @@ public class ReseniaRepository(MixAndMatchDbContext context) : IReseniaRepositor
 
         return promedio ?? 0m;
     }
-
-    public async Task AddAsync(Resenia resenia)
-    {
-        await _context.Resenia.AddAsync(resenia);
-    }
-
-    public Task UpdateAsync(Resenia resenia)
-    {
-        _context.Resenia.Update(resenia);
-        return Task.CompletedTask;
-    }
-
-    public async Task DeleteAsync(long id)
-    {
-        var entity = await _context.Resenia.FindAsync(id);
-        if (entity is not null)
-        {
-            _context.Resenia.Remove(entity);
-        }
-    }
 }
