@@ -1,4 +1,5 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Resenias;
 using MixAndMatch.Domain.Entities;
@@ -7,7 +8,7 @@ using ReseniaEntity = MixAndMatch.Domain.Entities.Resenia;
 
 namespace MixAndMatch.Application.UseCases.Resenias.Commands;
 
-public class UpdateEstadoReseniaCommand : IRequest<ApiResponseDto<ReseniaResponseDto>>
+public class UpdateEstadoReseniaCommand : IRequest<ApiResponse<ReseniaResponseDto>>
 {
     public required long ReseniaId { get; set; }
 
@@ -19,24 +20,24 @@ public class UpdateEstadoReseniaCommand : IRequest<ApiResponseDto<ReseniaRespons
 }
 
 public class UpdateEstadoReseniaCommandHandler(IUnitOfWork _uow)
-    : IRequestHandler<UpdateEstadoReseniaCommand, ApiResponseDto<ReseniaResponseDto>>
+    : IRequestHandler<UpdateEstadoReseniaCommand, ApiResponse<ReseniaResponseDto>>
 {
-    public async Task<ApiResponseDto<ReseniaResponseDto>> Handle(UpdateEstadoReseniaCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<ReseniaResponseDto>> Handle(UpdateEstadoReseniaCommand request, CancellationToken cancellationToken)
     {
         var entity = await _uow.Repository<ReseniaEntity>().GetById(request.ReseniaId);
         if (entity is null)
         {
-            return ApiResponseDto<ReseniaResponseDto>.Fail($"Resenia no encontrada para id {request.ReseniaId}.");
+            return ApiResponse<ReseniaResponseDto>.Fail($"Resenia no encontrada para id {request.ReseniaId}.");
         }
 
         if (request.Estado == EstadoResenia.PENDIENTE)
         {
-            return ApiResponseDto<ReseniaResponseDto>.Fail("El estado de moderacion no puede ser PENDIENTE.");
+            return ApiResponse<ReseniaResponseDto>.Fail("El estado de moderacion no puede ser PENDIENTE.");
         }
 
         if (request.Estado == EstadoResenia.RECHAZADA && string.IsNullOrWhiteSpace(request.MotivoRechazo))
         {
-            return ApiResponseDto<ReseniaResponseDto>.Fail("El motivo de rechazo es obligatorio.");
+            return ApiResponse<ReseniaResponseDto>.Fail("El motivo de rechazo es obligatorio.");
         }
 
         entity.Estado = request.Estado;
@@ -50,7 +51,7 @@ public class UpdateEstadoReseniaCommandHandler(IUnitOfWork _uow)
         await _uow.Repository<ReseniaEntity>().Update(entity);
         await _uow.Complete();
 
-        return ApiResponseDto<ReseniaResponseDto>.Ok(new ReseniaResponseDto
+        return ApiResponse<ReseniaResponseDto>.Ok(new ReseniaResponseDto
         {
             Id = entity.Id,
             PrendaId = entity.PrendaId,

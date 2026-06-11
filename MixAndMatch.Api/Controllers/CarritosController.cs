@@ -11,8 +11,8 @@ namespace MixAndMatch.Api.Controllers;
 public class CarritosController(IMediator _mediator) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetAll() =>
-        this.ToActionResult(await _mediator.Send(new GetAllCarritosQuery()));
+    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
+        this.ToActionResult(await _mediator.Send(new GetAllCarritosQuery { Page = page, PageSize = pageSize }));
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(long id) =>

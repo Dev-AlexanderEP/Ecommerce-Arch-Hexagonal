@@ -1,19 +1,20 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using PagoEntity = MixAndMatch.Domain.Entities.Pago;
 
 namespace MixAndMatch.Application.UseCases.Pago.Commands;
 
-public class DeletePagoCommand : IRequest<ApiResponseDto<bool>>
+public class DeletePagoCommand : IRequest<ApiResponse<bool>>
 {
     public long Id { get; set; }
 }
 
 public class DeletePagoCommandHandler(IUnitOfWork _uow)
-    : IRequestHandler<DeletePagoCommand, ApiResponseDto<bool>>
+    : IRequestHandler<DeletePagoCommand, ApiResponse<bool>>
 {
-    public async Task<ApiResponseDto<bool>> Handle(
+    public async Task<ApiResponse<bool>> Handle(
         DeletePagoCommand request,
         CancellationToken cancellationToken)
     {
@@ -23,7 +24,7 @@ public class DeletePagoCommandHandler(IUnitOfWork _uow)
                 .GetById(request.Id);
 
             if (entity is null)
-                return ApiResponseDto<bool>
+                return ApiResponse<bool>
                     .Fail($"Pago no encontrado para id {request.Id}");
 
             await _uow.Repository<PagoEntity>()
@@ -31,11 +32,11 @@ public class DeletePagoCommandHandler(IUnitOfWork _uow)
 
             await _uow.Complete();
 
-            return ApiResponseDto<bool>.Ok(true);
+            return ApiResponse<bool>.Ok(true);
         }
         catch (Exception ex)
         {
-            return ApiResponseDto<bool>.Fail(ex.Message);
+            return ApiResponse<bool>.Fail(ex.Message);
         }
     }
 }

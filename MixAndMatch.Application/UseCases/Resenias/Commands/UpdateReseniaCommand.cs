@@ -1,4 +1,5 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Resenias;
 using MixAndMatch.Domain.Entities;
@@ -7,7 +8,7 @@ using ReseniaEntity = MixAndMatch.Domain.Entities.Resenia;
 
 namespace MixAndMatch.Application.UseCases.Resenias.Commands;
 
-public class UpdateReseniaCommand : IRequest<ApiResponseDto<ReseniaResponseDto>>
+public class UpdateReseniaCommand : IRequest<ApiResponse<ReseniaResponseDto>>
 {
     public required long ReseniaId { get; set; }
 
@@ -17,24 +18,24 @@ public class UpdateReseniaCommand : IRequest<ApiResponseDto<ReseniaResponseDto>>
 }
 
 public class UpdateReseniaCommandHandler(IUnitOfWork _uow)
-    : IRequestHandler<UpdateReseniaCommand, ApiResponseDto<ReseniaResponseDto>>
+    : IRequestHandler<UpdateReseniaCommand, ApiResponse<ReseniaResponseDto>>
 {
-    public async Task<ApiResponseDto<ReseniaResponseDto>> Handle(UpdateReseniaCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<ReseniaResponseDto>> Handle(UpdateReseniaCommand request, CancellationToken cancellationToken)
     {
         var entity = await _uow.Repository<ReseniaEntity>().GetById(request.ReseniaId);
         if (entity is null)
         {
-            return ApiResponseDto<ReseniaResponseDto>.Fail($"Resenia no encontrada para id {request.ReseniaId}.");
+            return ApiResponse<ReseniaResponseDto>.Fail($"Resenia no encontrada para id {request.ReseniaId}.");
         }
 
         if (entity.Estado != EstadoResenia.PENDIENTE)
         {
-            return ApiResponseDto<ReseniaResponseDto>.Fail("Solo se pueden actualizar resenias en estado PENDIENTE.");
+            return ApiResponse<ReseniaResponseDto>.Fail("Solo se pueden actualizar resenias en estado PENDIENTE.");
         }
 
         if (request.Calificacion < 1 || request.Calificacion > 5)
         {
-            return ApiResponseDto<ReseniaResponseDto>.Fail("La calificacion debe estar entre 1 y 5.");
+            return ApiResponse<ReseniaResponseDto>.Fail("La calificacion debe estar entre 1 y 5.");
         }
 
         entity.Calificacion = request.Calificacion;
@@ -44,7 +45,7 @@ public class UpdateReseniaCommandHandler(IUnitOfWork _uow)
         await _uow.Repository<ReseniaEntity>().Update(entity);
         await _uow.Complete();
 
-        return ApiResponseDto<ReseniaResponseDto>.Ok(new ReseniaResponseDto
+        return ApiResponse<ReseniaResponseDto>.Ok(new ReseniaResponseDto
         {
             Id = entity.Id,
             PrendaId = entity.PrendaId,

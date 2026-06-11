@@ -1,10 +1,11 @@
-using MixAndMatch.Domain.DTOs.MetodoPago;
+﻿using MixAndMatch.Domain.DTOs.MetodoPago;
 
 namespace MixAndMatch.Application.UseCases.MetodoPagoUseCase.Commands;
 
 
 
 using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Entities;
 using MixAndMatch.Domain.Ports.IRepositories;
@@ -14,7 +15,7 @@ using VentaEntity = MixAndMatch.Domain.Entities.Venta;
 
 
 
-public class CreateMetodoPagoCommand : IRequest<ApiResponseDto<PagoResponseDto>>
+public class CreateMetodoPagoCommand : IRequest<ApiResponse<PagoResponseDto>>
 {
     public required long VentaId { get; set; }
     public required long MetodoId { get; set; }
@@ -23,9 +24,9 @@ public class CreateMetodoPagoCommand : IRequest<ApiResponseDto<PagoResponseDto>>
 }
 
 public class CreatePagoCommandHandler(IUnitOfWork _uow)
-    : IRequestHandler<CreateMetodoPagoCommand, ApiResponseDto<PagoResponseDto>>
+    : IRequestHandler<CreateMetodoPagoCommand, ApiResponse<PagoResponseDto>>
 {
-    public async Task<ApiResponseDto<PagoResponseDto>> Handle(CreateMetodoPagoCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<PagoResponseDto>> Handle(CreateMetodoPagoCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -34,7 +35,7 @@ public class CreatePagoCommandHandler(IUnitOfWork _uow)
 
             if (venta is null)
             {
-                return ApiResponseDto<PagoResponseDto>
+                return ApiResponse<PagoResponseDto>
                     .Fail($"No existe la venta con id {request.VentaId}.");
             }
 
@@ -43,8 +44,8 @@ public class CreatePagoCommandHandler(IUnitOfWork _uow)
 
             if (metodo is null)
             {
-                return ApiResponseDto<PagoResponseDto>
-                    .Fail($"No existe el método de pago con id {request.MetodoId}.");
+                return ApiResponse<PagoResponseDto>
+                    .Fail($"No existe el mÃ©todo de pago con id {request.MetodoId}.");
             }
 
             var entity = new PagoEntity
@@ -59,7 +60,7 @@ public class CreatePagoCommandHandler(IUnitOfWork _uow)
             await _uow.Repository<PagoEntity>().Add(entity);
             await _uow.Complete();
 
-            return ApiResponseDto<PagoResponseDto>.Ok(
+            return ApiResponse<PagoResponseDto>.Ok(
                 new PagoResponseDto
                 {
                     Id = entity.Id,
@@ -73,7 +74,7 @@ public class CreatePagoCommandHandler(IUnitOfWork _uow)
         }
         catch (Exception ex)
         {
-            return ApiResponseDto<PagoResponseDto>
+            return ApiResponse<PagoResponseDto>
                 .Fail($"Error al registrar el pago: {ex.Message}");
         }
     }

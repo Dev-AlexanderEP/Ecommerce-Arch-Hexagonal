@@ -1,4 +1,5 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using CategoriaEntity = MixAndMatch.Domain.Entities.Categoria;
@@ -7,36 +8,36 @@ using PrendaEntity = MixAndMatch.Domain.Entities.Prenda;
 
 namespace MixAndMatch.Application.UseCases.Categoria.Commands;
 
-public class DeleteCategoriaCommand : IRequest<ApiResponseDto<bool>>
+public class DeleteCategoriaCommand : IRequest<ApiResponse<bool>>
 {
     public required long CategoriaId { get; set; }
 }
 
-public class DeleteCategoriaCommandHandler(IUnitOfWork _uow) : IRequestHandler<DeleteCategoriaCommand, ApiResponseDto<bool>>
+public class DeleteCategoriaCommandHandler(IUnitOfWork _uow) : IRequestHandler<DeleteCategoriaCommand, ApiResponse<bool>>
 {
-    public async Task<ApiResponseDto<bool>> Handle(DeleteCategoriaCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<bool>> Handle(DeleteCategoriaCommand request, CancellationToken cancellationToken)
     {
         var repo = _uow.Repository<CategoriaEntity>();
         var entity = await repo.GetById(request.CategoriaId);
         if (entity is null)
         {
-            return ApiResponseDto<bool>.Fail($"Categoría no encontrada para id {request.CategoriaId}.");
+            return ApiResponse<bool>.Fail($"CategorÃ­a no encontrada para id {request.CategoriaId}.");
         }
 
         var prendas = await _uow.Repository<PrendaEntity>().GetAll();
         if (prendas.Any(x => x.CategoriaId == request.CategoriaId))
         {
-            return ApiResponseDto<bool>.Fail("La categoría tiene prendas asociadas.");
+            return ApiResponse<bool>.Fail("La categorÃ­a tiene prendas asociadas.");
         }
 
         var descuentos = await _uow.Repository<DescuentoCategoriaEntity>().GetAll();
         if (descuentos.Any(x => x.CategoriaId == request.CategoriaId))
         {
-            return ApiResponseDto<bool>.Fail("La categoría tiene descuentos asociados.");
+            return ApiResponse<bool>.Fail("La categorÃ­a tiene descuentos asociados.");
         }
 
         await repo.Delete(request.CategoriaId);
         await _uow.Complete();
-        return ApiResponseDto<bool>.Ok(true, "Categoría eliminada correctamente.");
+        return ApiResponse<bool>.Ok(true, "CategorÃ­a eliminada correctamente.");
     }
 }

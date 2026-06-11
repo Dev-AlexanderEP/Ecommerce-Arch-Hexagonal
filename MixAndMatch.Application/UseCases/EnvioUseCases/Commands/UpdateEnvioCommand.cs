@@ -1,4 +1,5 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using EnvioEntity = MixAndMatch.Domain.Entities.Envio;
@@ -7,7 +8,7 @@ using DatosEnvioEntity = MixAndMatch.Domain.Entities.DatosEnvio;
 
 namespace MixAndMatch.Application.UseCases.Envio.Commands;
 
-public class UpdateEnvioCommand : IRequest<ApiResponseDto<EnvioResponseDto>>
+public class UpdateEnvioCommand : IRequest<ApiResponse<EnvioResponseDto>>
 {
     public required long EnvioId { get; set; }
 
@@ -29,9 +30,9 @@ public class UpdateEnvioCommand : IRequest<ApiResponseDto<EnvioResponseDto>>
 }
 
 public class UpdateEnvioCommandHandler(IUnitOfWork _uow)
-    : IRequestHandler<UpdateEnvioCommand, ApiResponseDto<EnvioResponseDto>>
+    : IRequestHandler<UpdateEnvioCommand, ApiResponse<EnvioResponseDto>>
 {
-    public async Task<ApiResponseDto<EnvioResponseDto>> Handle(
+    public async Task<ApiResponse<EnvioResponseDto>> Handle(
         UpdateEnvioCommand request,
         CancellationToken cancellationToken)
     {
@@ -39,22 +40,22 @@ public class UpdateEnvioCommandHandler(IUnitOfWork _uow)
             .GetById(request.EnvioId);
 
         if (entity is null)
-            return ApiResponseDto<EnvioResponseDto>
-                .Fail($"Envío no encontrado para id {request.EnvioId}.");
+            return ApiResponse<EnvioResponseDto>
+                .Fail($"EnvÃ­o no encontrado para id {request.EnvioId}.");
 
         var venta = await _uow.Repository<VentaEntity>()
             .GetById(request.VentaId);
 
         if (venta is null)
-            return ApiResponseDto<EnvioResponseDto>
+            return ApiResponse<EnvioResponseDto>
                 .Fail($"Venta no encontrada para id {request.VentaId}.");
 
         var datosEnvio = await _uow.Repository<DatosEnvioEntity>()
             .GetById(request.DatosEnvioId);
 
         if (datosEnvio is null)
-            return ApiResponseDto<EnvioResponseDto>
-                .Fail($"Datos de envío no encontrados para id {request.DatosEnvioId}.");
+            return ApiResponse<EnvioResponseDto>
+                .Fail($"Datos de envÃ­o no encontrados para id {request.DatosEnvioId}.");
 
         entity.VentaId = request.VentaId;
         entity.DatosEnvioId = request.DatosEnvioId;
@@ -69,7 +70,7 @@ public class UpdateEnvioCommandHandler(IUnitOfWork _uow)
         await _uow.Repository<EnvioEntity>().Update(entity);
         await _uow.Complete();
 
-        return ApiResponseDto<EnvioResponseDto>.Ok(new EnvioResponseDto
+        return ApiResponse<EnvioResponseDto>.Ok(new EnvioResponseDto
         {
             Id = entity.Id,
             VentaId = entity.VentaId,

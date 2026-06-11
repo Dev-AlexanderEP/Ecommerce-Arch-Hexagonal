@@ -1,19 +1,20 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using EnvioEntity = MixAndMatch.Domain.Entities.Envio;
 
 namespace MixAndMatch.Application.UseCases.Envio.Queries;
 
-public class GetEnvioByIdQuery : IRequest<ApiResponseDto<EnvioResponseDto>>
+public class GetEnvioByIdQuery : IRequest<ApiResponse<EnvioResponseDto>>
 {
     public required long EnvioId { get; set; }
 }
 
 public class GetEnvioByIdQueryHandler(IUnitOfWork _uow)
-    : IRequestHandler<GetEnvioByIdQuery, ApiResponseDto<EnvioResponseDto>>
+    : IRequestHandler<GetEnvioByIdQuery, ApiResponse<EnvioResponseDto>>
 {
-    public async Task<ApiResponseDto<EnvioResponseDto>> Handle(
+    public async Task<ApiResponse<EnvioResponseDto>> Handle(
         GetEnvioByIdQuery request,
         CancellationToken cancellationToken)
     {
@@ -21,10 +22,10 @@ public class GetEnvioByIdQueryHandler(IUnitOfWork _uow)
             .GetById(request.EnvioId);
 
         if (entity is null)
-            return ApiResponseDto<EnvioResponseDto>
-                .Fail($"Envío no encontrado para id {request.EnvioId}.");
+            return ApiResponse<EnvioResponseDto>
+                .Fail($"EnvÃ­o no encontrado para id {request.EnvioId}.");
 
-        return ApiResponseDto<EnvioResponseDto>.Ok(new EnvioResponseDto
+        return ApiResponse<EnvioResponseDto>.Ok(new EnvioResponseDto
         {
             Id = entity.Id,
             VentaId = entity.VentaId,

@@ -11,6 +11,16 @@ public class GenericRepository<T>(MixAndMatchDbContext context) : IGenericReposi
     public async Task<IEnumerable<T>> GetAll() =>
         await _context.Set<T>().ToListAsync();
 
+    public async Task<(IEnumerable<T> Items, int TotalCount)> GetPaged(int page, int pageSize)
+    {
+        var total = await _context.Set<T>().CountAsync();
+        var items = await _context.Set<T>()
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        return (items, total);
+    }
+
     public async Task<T?> GetById(long id) =>
         await _context.Set<T>().FindAsync(id);
 

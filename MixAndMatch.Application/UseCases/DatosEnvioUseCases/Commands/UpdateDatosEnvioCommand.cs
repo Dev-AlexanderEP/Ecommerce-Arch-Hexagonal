@@ -1,4 +1,5 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using DatosEnvioEntity = MixAndMatch.Domain.Entities.DatosEnvio;
@@ -6,7 +7,7 @@ using UsuarioEntity = MixAndMatch.Domain.Entities.Usuario;
 
 namespace MixAndMatch.Application.UseCases.DatosEnvio.Commands;
 
-public class UpdateDatosEnvioCommand : IRequest<ApiResponseDto<DatosEnvioResponseDto>>
+public class UpdateDatosEnvioCommand : IRequest<ApiResponse<DatosEnvioResponseDto>>
 {
     public required long DatosEnvioId { get; set; }
     public required long UsuarioId { get; set; }
@@ -24,9 +25,9 @@ public class UpdateDatosEnvioCommand : IRequest<ApiResponseDto<DatosEnvioRespons
 }
 
 public class UpdateDatosEnvioCommandHandler(IUnitOfWork _uow)
-    : IRequestHandler<UpdateDatosEnvioCommand, ApiResponseDto<DatosEnvioResponseDto>>
+    : IRequestHandler<UpdateDatosEnvioCommand, ApiResponse<DatosEnvioResponseDto>>
 {
-    public async Task<ApiResponseDto<DatosEnvioResponseDto>> Handle(
+    public async Task<ApiResponse<DatosEnvioResponseDto>> Handle(
         UpdateDatosEnvioCommand request,
         CancellationToken cancellationToken)
     {
@@ -34,14 +35,14 @@ public class UpdateDatosEnvioCommandHandler(IUnitOfWork _uow)
             .GetById(request.DatosEnvioId);
 
         if (entity is null)
-            return ApiResponseDto<DatosEnvioResponseDto>
-                .Fail($"Datos de envío no encontrados para id {request.DatosEnvioId}.");
+            return ApiResponse<DatosEnvioResponseDto>
+                .Fail($"Datos de envÃ­o no encontrados para id {request.DatosEnvioId}.");
 
         var usuario = await _uow.Repository<UsuarioEntity>()
             .GetById(request.UsuarioId);
 
         if (usuario is null)
-            return ApiResponseDto<DatosEnvioResponseDto>
+            return ApiResponse<DatosEnvioResponseDto>
                 .Fail($"Usuario no encontrado para id {request.UsuarioId}.");
 
         entity.UsuarioId = request.UsuarioId;
@@ -60,7 +61,7 @@ public class UpdateDatosEnvioCommandHandler(IUnitOfWork _uow)
         await _uow.Repository<DatosEnvioEntity>().Update(entity);
         await _uow.Complete();
 
-        return ApiResponseDto<DatosEnvioResponseDto>.Ok(
+        return ApiResponse<DatosEnvioResponseDto>.Ok(
             new DatosEnvioResponseDto
             {
                 Id = entity.Id,

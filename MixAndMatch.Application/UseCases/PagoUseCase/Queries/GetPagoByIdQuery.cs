@@ -1,4 +1,5 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.MetodoPago;
 using MixAndMatch.Domain.Ports.IRepositories;
@@ -6,15 +7,15 @@ using PagoEntity = MixAndMatch.Domain.Entities.Pago;
 
 namespace MixAndMatch.Application.UseCases.Pago.Queries;
 
-public class GetPagoByIdQuery : IRequest<ApiResponseDto<PagoResponseDto>>
+public class GetPagoByIdQuery : IRequest<ApiResponse<PagoResponseDto>>
 {
     public long Id { get; set; }
 }
 
 public class GetPagoByIdQueryHandler(IUnitOfWork _uow)
-    : IRequestHandler<GetPagoByIdQuery, ApiResponseDto<PagoResponseDto>>
+    : IRequestHandler<GetPagoByIdQuery, ApiResponse<PagoResponseDto>>
 {
-    public async Task<ApiResponseDto<PagoResponseDto>> Handle(
+    public async Task<ApiResponse<PagoResponseDto>> Handle(
         GetPagoByIdQuery request,
         CancellationToken cancellationToken)
     {
@@ -24,10 +25,10 @@ public class GetPagoByIdQueryHandler(IUnitOfWork _uow)
                 .GetById(request.Id);
 
             if (entity is null)
-                return ApiResponseDto<PagoResponseDto>
+                return ApiResponse<PagoResponseDto>
                     .Fail($"Pago no encontrado para id {request.Id}");
 
-            return ApiResponseDto<PagoResponseDto>.Ok(
+            return ApiResponse<PagoResponseDto>.Ok(
                 new PagoResponseDto
                 {
                     Id = entity.Id,
@@ -41,7 +42,7 @@ public class GetPagoByIdQueryHandler(IUnitOfWork _uow)
         }
         catch (Exception ex)
         {
-            return ApiResponseDto<PagoResponseDto>.Fail(ex.Message);
+            return ApiResponse<PagoResponseDto>.Fail(ex.Message);
         }
     }
 }

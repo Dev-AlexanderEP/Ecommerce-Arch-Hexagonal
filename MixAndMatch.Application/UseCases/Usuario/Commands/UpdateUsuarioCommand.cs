@@ -1,4 +1,5 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using MixAndMatch.Domain.Ports.IServices;
@@ -6,7 +7,7 @@ using UsuarioEntity = MixAndMatch.Domain.Entities.Usuario;
 
 namespace MixAndMatch.Application.UseCases.Usuario.Commands;
 
-public class UpdateUsuarioCommand : IRequest<ApiResponseDto<UsuarioResponseDto>>
+public class UpdateUsuarioCommand : IRequest<ApiResponse<UsuarioResponseDto>>
 {
     public required long UsuarioId { get; set; }
     public required string NombreUsuario { get; set; }
@@ -17,20 +18,20 @@ public class UpdateUsuarioCommand : IRequest<ApiResponseDto<UsuarioResponseDto>>
 }
 
 public class UpdateUsuarioCommandHandler(IUnitOfWork _uow, IPasswordService _passwordService)
-    : IRequestHandler<UpdateUsuarioCommand, ApiResponseDto<UsuarioResponseDto>>
+    : IRequestHandler<UpdateUsuarioCommand, ApiResponse<UsuarioResponseDto>>
 {
-    public async Task<ApiResponseDto<UsuarioResponseDto>> Handle(UpdateUsuarioCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<UsuarioResponseDto>> Handle(UpdateUsuarioCommand request, CancellationToken cancellationToken)
     {
         var repo   = _uow.Repository<UsuarioEntity>();
         var entity = await repo.GetById(request.UsuarioId);
 
         if (entity is null)
-            return ApiResponseDto<UsuarioResponseDto>.Fail($"Usuario no encontrado para id {request.UsuarioId}.");
+            return ApiResponse<UsuarioResponseDto>.Fail($"Usuario no encontrado para id {request.UsuarioId}.");
 
         var emailTaken = (await repo.GetAll())
             .Any(u => u.Email == request.Email && u.Id != request.UsuarioId);
         if (emailTaken)
-            return ApiResponseDto<UsuarioResponseDto>.Fail($"El email {request.Email} ya está en uso por otro usuario.");
+            return ApiResponse<UsuarioResponseDto>.Fail($"El email {request.Email} ya está en uso por otro usuario.");
 
         entity.NombreUsuario = request.NombreUsuario;
         entity.Email         = request.Email;
@@ -44,7 +45,7 @@ public class UpdateUsuarioCommandHandler(IUnitOfWork _uow, IPasswordService _pas
         await repo.Update(entity);
         await _uow.Complete();
 
-        return ApiResponseDto<UsuarioResponseDto>.Ok(new UsuarioResponseDto
+        return ApiResponse<UsuarioResponseDto>.Ok(new UsuarioResponseDto
         {
             Id            = entity.Id,
             NombreUsuario = entity.NombreUsuario,

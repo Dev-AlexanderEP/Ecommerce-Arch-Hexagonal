@@ -1,27 +1,28 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Resenias;
 using MixAndMatch.Domain.Ports;
 
 namespace MixAndMatch.Application.UseCases.Resenias.Queries;
 
-public class GetReseniasByUsuarioQuery : IRequest<ApiResponseDto<IEnumerable<ReseniaResponseDto>>>
+public class GetReseniasByUsuarioQuery : IRequest<ApiResponse<IEnumerable<ReseniaResponseDto>>>
 {
     public required long UsuarioId { get; set; }
 }
 
 public class GetReseniasByUsuarioQueryHandler(IReseniaRepository _reseniaRepository)
-    : IRequestHandler<GetReseniasByUsuarioQuery, ApiResponseDto<IEnumerable<ReseniaResponseDto>>>
+    : IRequestHandler<GetReseniasByUsuarioQuery, ApiResponse<IEnumerable<ReseniaResponseDto>>>
 {
-    public async Task<ApiResponseDto<IEnumerable<ReseniaResponseDto>>> Handle(GetReseniasByUsuarioQuery request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<IEnumerable<ReseniaResponseDto>>> Handle(GetReseniasByUsuarioQuery request, CancellationToken cancellationToken)
     {
         var items = await _reseniaRepository.GetByUsuarioIdAsync(request.UsuarioId);
         if (!items.Any())
         {
-            return ApiResponseDto<IEnumerable<ReseniaResponseDto>>.Fail("No se encontraron resenias para el usuario.");
+            return ApiResponse<IEnumerable<ReseniaResponseDto>>.Fail("No se encontraron resenias para el usuario.");
         }
 
-        return ApiResponseDto<IEnumerable<ReseniaResponseDto>>.Ok(items.Select(x => new ReseniaResponseDto
+        return ApiResponse<IEnumerable<ReseniaResponseDto>>.Ok(items.Select(x => new ReseniaResponseDto
         {
             Id = x.Id,
             PrendaId = x.PrendaId,

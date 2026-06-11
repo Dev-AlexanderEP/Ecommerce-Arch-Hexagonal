@@ -1,28 +1,31 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using EnvioEntity = MixAndMatch.Domain.Entities.Envio;
 
 namespace MixAndMatch.Application.UseCases.Envio.Queries;
 
-public class GetAllEnviosQuery : IRequest<ApiResponseDto<IEnumerable<EnvioResponseDto>>>
+public class GetAllEnviosQuery : IRequest<ApiPaginationResponse<EnvioResponseDto>>
 {
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
 }
 
 public class GetAllEnviosQueryHandler(IUnitOfWork _uow)
-    : IRequestHandler<GetAllEnviosQuery, ApiResponseDto<IEnumerable<EnvioResponseDto>>>
+    : IRequestHandler<GetAllEnviosQuery, ApiPaginationResponse<EnvioResponseDto>>
 {
-    public async Task<ApiResponseDto<IEnumerable<EnvioResponseDto>>> Handle(
+    public async Task<ApiPaginationResponse<EnvioResponseDto>> Handle(
         GetAllEnviosQuery request,
         CancellationToken cancellationToken)
     {
-        var items = await _uow.Repository<EnvioEntity>().GetAll();
+        var (items, total) = await _uow.Repository<EnvioEntity>().GetPaged(request.Page, request.PageSize);
 
         if (!items.Any())
-            return ApiResponseDto<IEnumerable<EnvioResponseDto>>
+            return ApiPaginationResponse<EnvioResponseDto>
                 .Fail("No se encontraron envíos.");
 
-        return ApiResponseDto<IEnumerable<EnvioResponseDto>>.Ok(
+        return ApiPaginationResponse<EnvioResponseDto>.Ok(
             items.Select(entity => new EnvioResponseDto
             {
                 Id = entity.Id,
@@ -36,6 +39,6 @@ public class GetAllEnviosQueryHandler(IUnitOfWork _uow)
                 TrackingNumber = entity.TrackingNumber,
                 CreatedAt = entity.CreatedAt,
                 UpdatedAt = entity.UpdatedAt
-            }));
+            }), total, request.Page, request.PageSize);
     }
 }

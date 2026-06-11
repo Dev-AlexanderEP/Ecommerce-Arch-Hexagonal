@@ -1,4 +1,5 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Resenias;
 using MixAndMatch.Domain.Entities;
@@ -8,7 +9,7 @@ using ReseniaEntity = MixAndMatch.Domain.Entities.Resenia;
 
 namespace MixAndMatch.Application.UseCases.Resenias.Commands;
 
-public class CreateReseniaCommand : IRequest<ApiResponseDto<ReseniaResponseDto>>
+public class CreateReseniaCommand : IRequest<ApiResponse<ReseniaResponseDto>>
 {
     public required long PrendaId { get; set; }
 
@@ -20,19 +21,19 @@ public class CreateReseniaCommand : IRequest<ApiResponseDto<ReseniaResponseDto>>
 }
 
 public class CreateReseniaCommandHandler(IReseniaRepository _reseniaRepository, IUnitOfWork _uow)
-    : IRequestHandler<CreateReseniaCommand, ApiResponseDto<ReseniaResponseDto>>
+    : IRequestHandler<CreateReseniaCommand, ApiResponse<ReseniaResponseDto>>
 {
-    public async Task<ApiResponseDto<ReseniaResponseDto>> Handle(CreateReseniaCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<ReseniaResponseDto>> Handle(CreateReseniaCommand request, CancellationToken cancellationToken)
     {
         if (request.Calificacion < 1 || request.Calificacion > 5)
         {
-            return ApiResponseDto<ReseniaResponseDto>.Fail("La calificacion debe estar entre 1 y 5.");
+            return ApiResponse<ReseniaResponseDto>.Fail("La calificacion debe estar entre 1 y 5.");
         }
 
         var existing = await _reseniaRepository.GetByPrendaAndUsuarioAsync(request.PrendaId, request.UsuarioId);
         if (existing is not null)
         {
-            return ApiResponseDto<ReseniaResponseDto>.Fail("El usuario ya tiene una resenia para esta prenda.");
+            return ApiResponse<ReseniaResponseDto>.Fail("El usuario ya tiene una resenia para esta prenda.");
         }
 
         var entity = new ReseniaEntity
@@ -49,7 +50,7 @@ public class CreateReseniaCommandHandler(IReseniaRepository _reseniaRepository, 
         await _uow.Repository<ReseniaEntity>().Add(entity);
         await _uow.Complete();
 
-        return ApiResponseDto<ReseniaResponseDto>.Ok(new ReseniaResponseDto
+        return ApiResponse<ReseniaResponseDto>.Ok(new ReseniaResponseDto
         {
             Id = entity.Id,
             PrendaId = entity.PrendaId,

@@ -13,9 +13,9 @@ public class MetodoPagoController(IMediator mediator) : ControllerBase
     private readonly IMediator _mediator = mediator;
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
-        var result = await _mediator.Send(new GetAllMetodoPagoQuery());
+        var result = await _mediator.Send(new GetAllMetodoPagoQuery { Page = page, PageSize = pageSize });
         return Ok(result);
     }
 

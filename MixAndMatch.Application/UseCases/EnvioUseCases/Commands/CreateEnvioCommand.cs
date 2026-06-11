@@ -1,4 +1,5 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using EnvioEntity = MixAndMatch.Domain.Entities.Envio;
@@ -7,7 +8,7 @@ using DatosEnvioEntity = MixAndMatch.Domain.Entities.DatosEnvio;
 
 namespace MixAndMatch.Application.UseCases.Envio.Commands;
 
-public class CreateEnvioCommand : IRequest<ApiResponseDto<EnvioResponseDto>>
+public class CreateEnvioCommand : IRequest<ApiResponse<EnvioResponseDto>>
 {
     public required long VentaId { get; set; }
 
@@ -27,9 +28,9 @@ public class CreateEnvioCommand : IRequest<ApiResponseDto<EnvioResponseDto>>
 }
 
 public class CreateEnvioCommandHandler(IUnitOfWork _uow)
-    : IRequestHandler<CreateEnvioCommand, ApiResponseDto<EnvioResponseDto>>
+    : IRequestHandler<CreateEnvioCommand, ApiResponse<EnvioResponseDto>>
 {
-    public async Task<ApiResponseDto<EnvioResponseDto>> Handle(
+    public async Task<ApiResponse<EnvioResponseDto>> Handle(
         CreateEnvioCommand request,
         CancellationToken cancellationToken)
     {
@@ -37,22 +38,22 @@ public class CreateEnvioCommandHandler(IUnitOfWork _uow)
             .GetById(request.VentaId);
 
         if (venta is null)
-            return ApiResponseDto<EnvioResponseDto>
+            return ApiResponse<EnvioResponseDto>
                 .Fail($"Venta no encontrada para id {request.VentaId}.");
 
         var datosEnvio = await _uow.Repository<DatosEnvioEntity>()
             .GetById(request.DatosEnvioId);
 
         if (datosEnvio is null)
-            return ApiResponseDto<EnvioResponseDto>
-                .Fail($"Datos de envío no encontrados para id {request.DatosEnvioId}.");
+            return ApiResponse<EnvioResponseDto>
+                .Fail($"Datos de envÃ­o no encontrados para id {request.DatosEnvioId}.");
 
         var existing = (await _uow.Repository<EnvioEntity>().GetAll())
             .FirstOrDefault(x => x.VentaId == request.VentaId);
 
         if (existing is not null)
-            return ApiResponseDto<EnvioResponseDto>
-                .Fail($"La venta {request.VentaId} ya tiene un envío registrado.");
+            return ApiResponse<EnvioResponseDto>
+                .Fail($"La venta {request.VentaId} ya tiene un envÃ­o registrado.");
 
         var entity = new EnvioEntity
         {
@@ -70,7 +71,7 @@ public class CreateEnvioCommandHandler(IUnitOfWork _uow)
         await _uow.Repository<EnvioEntity>().Add(entity);
         await _uow.Complete();
 
-        return ApiResponseDto<EnvioResponseDto>.Ok(new EnvioResponseDto
+        return ApiResponse<EnvioResponseDto>.Ok(new EnvioResponseDto
         {
             Id = entity.Id,
             VentaId = entity.VentaId,

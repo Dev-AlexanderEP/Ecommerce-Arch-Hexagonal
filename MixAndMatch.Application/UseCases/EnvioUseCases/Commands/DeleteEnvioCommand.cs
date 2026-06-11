@@ -1,19 +1,20 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using EnvioEntity = MixAndMatch.Domain.Entities.Envio;
 
 namespace MixAndMatch.Application.UseCases.Envio.Commands;
 
-public class DeleteEnvioCommand : IRequest<ApiResponseDto<bool>>
+public class DeleteEnvioCommand : IRequest<ApiResponse<bool>>
 {
     public required long EnvioId { get; set; }
 }
 
 public class DeleteEnvioCommandHandler(IUnitOfWork _uow)
-    : IRequestHandler<DeleteEnvioCommand, ApiResponseDto<bool>>
+    : IRequestHandler<DeleteEnvioCommand, ApiResponse<bool>>
 {
-    public async Task<ApiResponseDto<bool>> Handle(
+    public async Task<ApiResponse<bool>> Handle(
         DeleteEnvioCommand request,
         CancellationToken cancellationToken)
     {
@@ -22,12 +23,12 @@ public class DeleteEnvioCommandHandler(IUnitOfWork _uow)
         var entity = await repo.GetById(request.EnvioId);
 
         if (entity is null)
-            return ApiResponseDto<bool>
-                .Fail($"Envío no encontrado para id {request.EnvioId}.");
+            return ApiResponse<bool>
+                .Fail($"EnvÃ­o no encontrado para id {request.EnvioId}.");
 
         await repo.Delete(request.EnvioId);
         await _uow.Complete();
 
-        return ApiResponseDto<bool>.Ok(true, "Envío eliminado correctamente.");
+        return ApiResponse<bool>.Ok(true, "EnvÃ­o eliminado correctamente.");
     }
 }

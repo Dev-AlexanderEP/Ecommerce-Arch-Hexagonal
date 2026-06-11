@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Descuentos;
 using MixAndMatch.Domain.Ports.IRepositories;
@@ -8,27 +9,27 @@ using UsuarioEntity = MixAndMatch.Domain.Entities.Usuario;
 
 namespace MixAndMatch.Application.UseCases.DescuentoUsuario.Commands;
 
-public class CreateDescuentoUsuarioCommand : IRequest<ApiResponseDto<DescuentoUsuarioResponseDto>>
+public class CreateDescuentoUsuarioCommand : IRequest<ApiResponse<DescuentoUsuarioResponseDto>>
 {
     public required long DescuentoCodigoId { get; set; }
     public required long UsuarioId { get; set; }
     public required DateOnly FechaUso { get; set; }
 }
 
-public class CreateDescuentoUsuarioCommandHandler(IUnitOfWork _uow) : IRequestHandler<CreateDescuentoUsuarioCommand, ApiResponseDto<DescuentoUsuarioResponseDto>>
+public class CreateDescuentoUsuarioCommandHandler(IUnitOfWork _uow) : IRequestHandler<CreateDescuentoUsuarioCommand, ApiResponse<DescuentoUsuarioResponseDto>>
 {
-    public async Task<ApiResponseDto<DescuentoUsuarioResponseDto>> Handle(CreateDescuentoUsuarioCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<DescuentoUsuarioResponseDto>> Handle(CreateDescuentoUsuarioCommand request, CancellationToken cancellationToken)
     {
         var descuentoCodigo = await _uow.Repository<DescuentoCodigoEntity>().GetById(request.DescuentoCodigoId);
         if (descuentoCodigo is null)
         {
-            return ApiResponseDto<DescuentoUsuarioResponseDto>.Fail($"Descuento de código no encontrado para id {request.DescuentoCodigoId}.");
+            return ApiResponse<DescuentoUsuarioResponseDto>.Fail($"Descuento de código no encontrado para id {request.DescuentoCodigoId}.");
         }
 
         var usuario = await _uow.Repository<UsuarioEntity>().GetById(request.UsuarioId);
         if (usuario is null)
         {
-            return ApiResponseDto<DescuentoUsuarioResponseDto>.Fail($"Usuario no encontrado para id {request.UsuarioId}.");
+            return ApiResponse<DescuentoUsuarioResponseDto>.Fail($"Usuario no encontrado para id {request.UsuarioId}.");
         }
 
         var entity = new DescuentoUsuarioEntity
@@ -43,7 +44,7 @@ public class CreateDescuentoUsuarioCommandHandler(IUnitOfWork _uow) : IRequestHa
         await repo.Add(entity);
         await _uow.Complete();
 
-        return ApiResponseDto<DescuentoUsuarioResponseDto>.Ok(new DescuentoUsuarioResponseDto
+        return ApiResponse<DescuentoUsuarioResponseDto>.Ok(new DescuentoUsuarioResponseDto
         {
             Id = entity.Id,
             DescuentoCodigoId = entity.DescuentoCodigoId,

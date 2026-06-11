@@ -1,24 +1,27 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using UsuarioEntity = MixAndMatch.Domain.Entities.Usuario;
 
 namespace MixAndMatch.Application.UseCases.Usuario.Queries;
 
-public class GetAllUsuariosQuery : IRequest<ApiResponseDto<IEnumerable<UsuarioResponseDto>>>
+public class GetAllUsuariosQuery : IRequest<ApiPaginationResponse<UsuarioResponseDto>>
 {
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
 }
 
-public class GetAllUsuariosQueryHandler(IUnitOfWork _uow) : IRequestHandler<GetAllUsuariosQuery, ApiResponseDto<IEnumerable<UsuarioResponseDto>>>
+public class GetAllUsuariosQueryHandler(IUnitOfWork _uow) : IRequestHandler<GetAllUsuariosQuery, ApiPaginationResponse<UsuarioResponseDto>>
 {
-    public async Task<ApiResponseDto<IEnumerable<UsuarioResponseDto>>> Handle(GetAllUsuariosQuery request, CancellationToken cancellationToken)
+    public async Task<ApiPaginationResponse<UsuarioResponseDto>> Handle(GetAllUsuariosQuery request, CancellationToken cancellationToken)
     {
-        var items = await _uow.Repository<UsuarioEntity>().GetAll();
+        var (items, total) = await _uow.Repository<UsuarioEntity>().GetPaged(request.Page, request.PageSize);
 
         if (!items.Any())
-            return ApiResponseDto<IEnumerable<UsuarioResponseDto>>.Fail("No se encontraron usuarios.");
+            return ApiPaginationResponse<UsuarioResponseDto>.Fail("No se encontraron usuarios.");
 
-        return ApiResponseDto<IEnumerable<UsuarioResponseDto>>.Ok(items.Select(u => new UsuarioResponseDto
+        return ApiPaginationResponse<UsuarioResponseDto>.Ok(items.Select(u => new UsuarioResponseDto
         {
             Id            = u.Id,
             NombreUsuario = u.NombreUsuario,
@@ -27,6 +30,6 @@ public class GetAllUsuariosQueryHandler(IUnitOfWork _uow) : IRequestHandler<GetA
             Activo        = u.Activo,
             CreatedAt     = u.CreatedAt,
             UpdatedAt     = u.UpdatedAt
-        }));
+        }), total, request.Page, request.PageSize);
     }
 }

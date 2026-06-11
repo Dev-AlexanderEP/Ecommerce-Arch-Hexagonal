@@ -11,9 +11,9 @@ namespace MixAndMatch.Api.Controllers;
 public class ProveedoresController(IMediator _mediator) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
-        return this.ToActionResult(await _mediator.Send(new GetAllProveedoresQuery()));
+        return this.ToActionResult(await _mediator.Send(new GetAllProveedoresQuery { Page = page, PageSize = pageSize }));
     }
 
     [HttpGet("{id}")]

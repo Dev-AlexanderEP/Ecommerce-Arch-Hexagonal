@@ -11,8 +11,8 @@ namespace MixAndMatch.Api.Controllers;
 public class PrendaTallasController(IMediator _mediator) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetAll() =>
-        this.ToActionResult(await _mediator.Send(new GetAllPrendaTallasQuery()));
+    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
+        this.ToActionResult(await _mediator.Send(new GetAllPrendaTallasQuery { Page = page, PageSize = pageSize }));
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(long id) =>

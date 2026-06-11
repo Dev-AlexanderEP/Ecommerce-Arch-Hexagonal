@@ -1,4 +1,5 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Carrito;
 using MixAndMatch.Domain.Ports.IRepositories;
@@ -6,22 +7,22 @@ using CarritoItemEntity = MixAndMatch.Domain.Entities.CarritoItem;
 
 namespace MixAndMatch.Application.UseCases.CarritoItem.Queries;
 
-public class GetCarritoItemByIdQuery : IRequest<ApiResponseDto<CarritoItemResponseDto>>
+public class GetCarritoItemByIdQuery : IRequest<ApiResponse<CarritoItemResponseDto>>
 {
     public required long CarritoItemId { get; set; }
 }
 
-public class GetCarritoItemByIdQueryHandler(IUnitOfWork _uow) : IRequestHandler<GetCarritoItemByIdQuery, ApiResponseDto<CarritoItemResponseDto>>
+public class GetCarritoItemByIdQueryHandler(IUnitOfWork _uow) : IRequestHandler<GetCarritoItemByIdQuery, ApiResponse<CarritoItemResponseDto>>
 {
-    public async Task<ApiResponseDto<CarritoItemResponseDto>> Handle(GetCarritoItemByIdQuery request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<CarritoItemResponseDto>> Handle(GetCarritoItemByIdQuery request, CancellationToken cancellationToken)
     {
         var entity = await _uow.Repository<CarritoItemEntity>().GetById(request.CarritoItemId);
         if (entity is null)
         {
-            return ApiResponseDto<CarritoItemResponseDto>.Fail($"CarritoItem no encontrado para id {request.CarritoItemId}.");
+            return ApiResponse<CarritoItemResponseDto>.Fail($"CarritoItem no encontrado para id {request.CarritoItemId}.");
         }
 
-        return ApiResponseDto<CarritoItemResponseDto>.Ok(new CarritoItemResponseDto
+        return ApiResponse<CarritoItemResponseDto>.Ok(new CarritoItemResponseDto
         {
             Id = entity.Id,
             CarritoId = entity.CarritoId,

@@ -1,4 +1,5 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Resenias;
 using MixAndMatch.Domain.Ports.IRepositories;
@@ -6,23 +7,23 @@ using ReseniaEntity = MixAndMatch.Domain.Entities.Resenia;
 
 namespace MixAndMatch.Application.UseCases.Resenias.Queries;
 
-public class GetReseniaByIdQuery : IRequest<ApiResponseDto<ReseniaResponseDto>>
+public class GetReseniaByIdQuery : IRequest<ApiResponse<ReseniaResponseDto>>
 {
     public required long ReseniaId { get; set; }
 }
 
 public class GetReseniaByIdQueryHandler(IUnitOfWork _uow)
-    : IRequestHandler<GetReseniaByIdQuery, ApiResponseDto<ReseniaResponseDto>>
+    : IRequestHandler<GetReseniaByIdQuery, ApiResponse<ReseniaResponseDto>>
 {
-    public async Task<ApiResponseDto<ReseniaResponseDto>> Handle(GetReseniaByIdQuery request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<ReseniaResponseDto>> Handle(GetReseniaByIdQuery request, CancellationToken cancellationToken)
     {
         var entity = await _uow.Repository<ReseniaEntity>().GetById(request.ReseniaId);
         if (entity is null)
         {
-            return ApiResponseDto<ReseniaResponseDto>.Fail($"Resenia no encontrada para id {request.ReseniaId}.");
+            return ApiResponse<ReseniaResponseDto>.Fail($"Resenia no encontrada para id {request.ReseniaId}.");
         }
 
-        return ApiResponseDto<ReseniaResponseDto>.Ok(new ReseniaResponseDto
+        return ApiResponse<ReseniaResponseDto>.Ok(new ReseniaResponseDto
         {
             Id = entity.Id,
             PrendaId = entity.PrendaId,

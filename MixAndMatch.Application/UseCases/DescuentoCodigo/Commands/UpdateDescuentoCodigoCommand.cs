@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Descuentos;
 using MixAndMatch.Domain.Ports.IRepositories;
@@ -6,7 +7,7 @@ using DescuentoCodigoEntity = MixAndMatch.Domain.Entities.DescuentoCodigo;
 
 namespace MixAndMatch.Application.UseCases.DescuentoCodigo.Commands;
 
-public class UpdateDescuentoCodigoCommand : IRequest<ApiResponseDto<DescuentoCodigoResponseDto>>
+public class UpdateDescuentoCodigoCommand : IRequest<ApiResponse<DescuentoCodigoResponseDto>>
 {
     public required long DescuentoCodigoId { get; set; }
     public required string Codigo { get; set; }
@@ -18,35 +19,35 @@ public class UpdateDescuentoCodigoCommand : IRequest<ApiResponseDto<DescuentoCod
     public required bool Activo { get; set; }
 }
 
-public class UpdateDescuentoCodigoCommandHandler(IUnitOfWork _uow) : IRequestHandler<UpdateDescuentoCodigoCommand, ApiResponseDto<DescuentoCodigoResponseDto>>
+public class UpdateDescuentoCodigoCommandHandler(IUnitOfWork _uow) : IRequestHandler<UpdateDescuentoCodigoCommand, ApiResponse<DescuentoCodigoResponseDto>>
 {
-    public async Task<ApiResponseDto<DescuentoCodigoResponseDto>> Handle(UpdateDescuentoCodigoCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<DescuentoCodigoResponseDto>> Handle(UpdateDescuentoCodigoCommand request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(request.Codigo))
         {
-            return ApiResponseDto<DescuentoCodigoResponseDto>.Fail("El código no puede estar vacío.");
+            return ApiResponse<DescuentoCodigoResponseDto>.Fail("El código no puede estar vacío.");
         }
 
         if (request.Porcentaje < 0 || request.Porcentaje > 100)
         {
-            return ApiResponseDto<DescuentoCodigoResponseDto>.Fail("El porcentaje debe estar entre 0 y 100.");
+            return ApiResponse<DescuentoCodigoResponseDto>.Fail("El porcentaje debe estar entre 0 y 100.");
         }
 
         if (request.UsoMaximo <= 0)
         {
-            return ApiResponseDto<DescuentoCodigoResponseDto>.Fail("El uso máximo debe ser mayor a 0.");
+            return ApiResponse<DescuentoCodigoResponseDto>.Fail("El uso máximo debe ser mayor a 0.");
         }
 
         if (request.FechaFin.HasValue && request.FechaFin.Value < request.FechaInicio)
         {
-            return ApiResponseDto<DescuentoCodigoResponseDto>.Fail("La fecha fin no puede ser menor a la fecha inicio.");
+            return ApiResponse<DescuentoCodigoResponseDto>.Fail("La fecha fin no puede ser menor a la fecha inicio.");
         }
 
         var repo = _uow.Repository<DescuentoCodigoEntity>();
         var entity = await repo.GetById(request.DescuentoCodigoId);
         if (entity is null)
         {
-            return ApiResponseDto<DescuentoCodigoResponseDto>.Fail($"Descuento de código no encontrado para id {request.DescuentoCodigoId}.");
+            return ApiResponse<DescuentoCodigoResponseDto>.Fail($"Descuento de código no encontrado para id {request.DescuentoCodigoId}.");
         }
 
         entity.Codigo = request.Codigo;
@@ -61,7 +62,7 @@ public class UpdateDescuentoCodigoCommandHandler(IUnitOfWork _uow) : IRequestHan
         await repo.Update(entity);
         await _uow.Complete();
 
-        return ApiResponseDto<DescuentoCodigoResponseDto>.Ok(new DescuentoCodigoResponseDto
+        return ApiResponse<DescuentoCodigoResponseDto>.Ok(new DescuentoCodigoResponseDto
         {
             Id = entity.Id,
             Codigo = entity.Codigo,

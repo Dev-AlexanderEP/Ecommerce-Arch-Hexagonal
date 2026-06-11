@@ -1,4 +1,5 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using DatosEnvioEntity = MixAndMatch.Domain.Entities.DatosEnvio;
@@ -6,7 +7,7 @@ using UsuarioEntity = MixAndMatch.Domain.Entities.Usuario;
 
 namespace MixAndMatch.Application.UseCases.DatosEnvio.Commands;
 
-public class CreateDatosEnvioCommand : IRequest<ApiResponseDto<DatosEnvioResponseDto>>
+public class CreateDatosEnvioCommand : IRequest<ApiResponse<DatosEnvioResponseDto>>
 {
     public required long UsuarioId { get; set; }
 
@@ -23,9 +24,9 @@ public class CreateDatosEnvioCommand : IRequest<ApiResponseDto<DatosEnvioRespons
 }
 
 public class CreateDatosEnvioCommandHandler(IUnitOfWork _uow)
-    : IRequestHandler<CreateDatosEnvioCommand, ApiResponseDto<DatosEnvioResponseDto>>
+    : IRequestHandler<CreateDatosEnvioCommand, ApiResponse<DatosEnvioResponseDto>>
 {
-    public async Task<ApiResponseDto<DatosEnvioResponseDto>> Handle(
+    public async Task<ApiResponse<DatosEnvioResponseDto>> Handle(
         CreateDatosEnvioCommand request,
         CancellationToken cancellationToken)
     {
@@ -33,15 +34,15 @@ public class CreateDatosEnvioCommandHandler(IUnitOfWork _uow)
             .GetById(request.UsuarioId);
 
         if (usuario is null)
-            return ApiResponseDto<DatosEnvioResponseDto>
+            return ApiResponse<DatosEnvioResponseDto>
                 .Fail($"Usuario no encontrado para id {request.UsuarioId}.");
 
         var existing = (await _uow.Repository<DatosEnvioEntity>().GetAll())
             .FirstOrDefault(x => x.UsuarioId == request.UsuarioId);
 
         if (existing is not null)
-            return ApiResponseDto<DatosEnvioResponseDto>
-                .Fail($"El usuario {request.UsuarioId} ya tiene datos de envío registrados.");
+            return ApiResponse<DatosEnvioResponseDto>
+                .Fail($"El usuario {request.UsuarioId} ya tiene datos de envÃ­o registrados.");
 
         var entity = new DatosEnvioEntity
         {
@@ -63,7 +64,7 @@ public class CreateDatosEnvioCommandHandler(IUnitOfWork _uow)
         await _uow.Repository<DatosEnvioEntity>().Add(entity);
         await _uow.Complete();
 
-        return ApiResponseDto<DatosEnvioResponseDto>.Ok(
+        return ApiResponse<DatosEnvioResponseDto>.Ok(
             new DatosEnvioResponseDto
             {
                 Id = entity.Id,

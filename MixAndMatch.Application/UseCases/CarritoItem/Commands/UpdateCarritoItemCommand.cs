@@ -1,4 +1,5 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Carrito;
 using MixAndMatch.Domain.Ports.IRepositories;
@@ -6,32 +7,32 @@ using CarritoItemEntity = MixAndMatch.Domain.Entities.CarritoItem;
 
 namespace MixAndMatch.Application.UseCases.CarritoItem.Commands;
 
-public class UpdateCarritoItemCommand : IRequest<ApiResponseDto<CarritoItemResponseDto>>
+public class UpdateCarritoItemCommand : IRequest<ApiResponse<CarritoItemResponseDto>>
 {
     public required long CarritoItemId { get; set; }
     public required decimal PrecioUnitario { get; set; }
     public required int Cantidad { get; set; }
 }
 
-public class UpdateCarritoItemCommandHandler(IUnitOfWork _uow) : IRequestHandler<UpdateCarritoItemCommand, ApiResponseDto<CarritoItemResponseDto>>
+public class UpdateCarritoItemCommandHandler(IUnitOfWork _uow) : IRequestHandler<UpdateCarritoItemCommand, ApiResponse<CarritoItemResponseDto>>
 {
-    public async Task<ApiResponseDto<CarritoItemResponseDto>> Handle(UpdateCarritoItemCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<CarritoItemResponseDto>> Handle(UpdateCarritoItemCommand request, CancellationToken cancellationToken)
     {
         var repo = _uow.Repository<CarritoItemEntity>();
         var entity = await repo.GetById(request.CarritoItemId);
         if (entity is null)
         {
-            return ApiResponseDto<CarritoItemResponseDto>.Fail($"CarritoItem no encontrado para id {request.CarritoItemId}.");
+            return ApiResponse<CarritoItemResponseDto>.Fail($"CarritoItem no encontrado para id {request.CarritoItemId}.");
         }
 
         if (request.Cantidad <= 0)
         {
-            return ApiResponseDto<CarritoItemResponseDto>.Fail("La cantidad debe ser mayor a cero.");
+            return ApiResponse<CarritoItemResponseDto>.Fail("La cantidad debe ser mayor a cero.");
         }
 
         if (request.PrecioUnitario <= 0)
         {
-            return ApiResponseDto<CarritoItemResponseDto>.Fail("El precio unitario debe ser mayor a cero.");
+            return ApiResponse<CarritoItemResponseDto>.Fail("El precio unitario debe ser mayor a cero.");
         }
 
         entity.Cantidad = request.Cantidad;
@@ -41,7 +42,7 @@ public class UpdateCarritoItemCommandHandler(IUnitOfWork _uow) : IRequestHandler
         await repo.Update(entity);
         await _uow.Complete();
 
-        return ApiResponseDto<CarritoItemResponseDto>.Ok(new CarritoItemResponseDto
+        return ApiResponse<CarritoItemResponseDto>.Ok(new CarritoItemResponseDto
         {
             Id = entity.Id,
             CarritoId = entity.CarritoId,

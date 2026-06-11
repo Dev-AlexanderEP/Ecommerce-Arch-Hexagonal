@@ -1,21 +1,26 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using PrendaImagenEntity = MixAndMatch.Domain.Entities.PrendaImagen;
 
 namespace MixAndMatch.Application.UseCases.PrendaImagen.Queries;
 
-public class GetAllPrendaImagenesQuery : IRequest<ApiResponseDto<IEnumerable<PrendaImagenResponseDto>>> { }
-
-public class GetAllPrendaImagenesQueryHandler(IUnitOfWork _uow) : IRequestHandler<GetAllPrendaImagenesQuery, ApiResponseDto<IEnumerable<PrendaImagenResponseDto>>>
+public class GetAllPrendaImagenesQuery : IRequest<ApiPaginationResponse<PrendaImagenResponseDto>>
 {
-    public async Task<ApiResponseDto<IEnumerable<PrendaImagenResponseDto>>> Handle(GetAllPrendaImagenesQuery request, CancellationToken cancellationToken)
-    {
-        var items = await _uow.Repository<PrendaImagenEntity>().GetAll();
-        if (!items.Any())
-            return ApiResponseDto<IEnumerable<PrendaImagenResponseDto>>.Fail("No se encontraron imágenes de prendas.");
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
+}
 
-        return ApiResponseDto<IEnumerable<PrendaImagenResponseDto>>.Ok(items.Select(x => new PrendaImagenResponseDto
+public class GetAllPrendaImagenesQueryHandler(IUnitOfWork _uow) : IRequestHandler<GetAllPrendaImagenesQuery, ApiPaginationResponse<PrendaImagenResponseDto>>
+{
+    public async Task<ApiPaginationResponse<PrendaImagenResponseDto>> Handle(GetAllPrendaImagenesQuery request, CancellationToken cancellationToken)
+    {
+        var (items, total) = await _uow.Repository<PrendaImagenEntity>().GetPaged(request.Page, request.PageSize);
+        if (!items.Any())
+            return ApiPaginationResponse<PrendaImagenResponseDto>.Fail("No se encontraron imágenes de prendas.");
+
+        return ApiPaginationResponse<PrendaImagenResponseDto>.Ok(items.Select(x => new PrendaImagenResponseDto
         {
             Id = x.Id,
             PrendaId = x.PrendaId,
@@ -24,6 +29,6 @@ public class GetAllPrendaImagenesQueryHandler(IUnitOfWork _uow) : IRequestHandle
             Orden = x.Orden,
             CreatedAt = x.CreatedAt,
             UpdatedAt = x.UpdatedAt
-        }));
+        }), total, request.Page, request.PageSize);
     }
 }

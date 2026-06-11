@@ -1,4 +1,5 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Ventas;
 using MixAndMatch.Domain.Ports.IRepositories;
@@ -7,19 +8,19 @@ using VentaEntity = MixAndMatch.Domain.Entities.Venta;
 
 namespace MixAndMatch.Application.UseCases.Venta.Commands;
 
-public class CreateVentaCommand : IRequest<ApiResponseDto<VentaResponseDto>>
+public class CreateVentaCommand : IRequest<ApiResponse<VentaResponseDto>>
 {
     public required long UsuarioId { get; set; }
 }
 
-public class CreateVentaCommandHandler(IUnitOfWork _uow) : IRequestHandler<CreateVentaCommand, ApiResponseDto<VentaResponseDto>>
+public class CreateVentaCommandHandler(IUnitOfWork _uow) : IRequestHandler<CreateVentaCommand, ApiResponse<VentaResponseDto>>
 {
-    public async Task<ApiResponseDto<VentaResponseDto>> Handle(CreateVentaCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<VentaResponseDto>> Handle(CreateVentaCommand request, CancellationToken cancellationToken)
     {
         var usuario = await _uow.Repository<UsuarioEntity>().GetById(request.UsuarioId);
         if (usuario is null)
         {
-            return ApiResponseDto<VentaResponseDto>.Fail($"Usuario no encontrado para id {request.UsuarioId}.");
+            return ApiResponse<VentaResponseDto>.Fail($"Usuario no encontrado para id {request.UsuarioId}.");
         }
 
         var entity = new VentaEntity
@@ -32,7 +33,7 @@ public class CreateVentaCommandHandler(IUnitOfWork _uow) : IRequestHandler<Creat
         await _uow.Repository<VentaEntity>().Add(entity);
         await _uow.Complete();
 
-        return ApiResponseDto<VentaResponseDto>.Ok(new VentaResponseDto
+        return ApiResponse<VentaResponseDto>.Ok(new VentaResponseDto
         {
             Id = entity.Id,
             UsuarioId = entity.UsuarioId,

@@ -1,4 +1,5 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Carrito;
 using MixAndMatch.Domain.Ports.IRepositories;
@@ -6,21 +7,21 @@ using CarritoEntity = MixAndMatch.Domain.Entities.Carrito;
 
 namespace MixAndMatch.Application.UseCases.Carrito.Commands;
 
-public class UpdateCarritoCommand : IRequest<ApiResponseDto<CarritoResponseDto>>
+public class UpdateCarritoCommand : IRequest<ApiResponse<CarritoResponseDto>>
 {
     public required long CarritoId { get; set; }
     public required string Estado { get; set; }
 }
 
-public class UpdateCarritoCommandHandler(IUnitOfWork _uow) : IRequestHandler<UpdateCarritoCommand, ApiResponseDto<CarritoResponseDto>>
+public class UpdateCarritoCommandHandler(IUnitOfWork _uow) : IRequestHandler<UpdateCarritoCommand, ApiResponse<CarritoResponseDto>>
 {
-    public async Task<ApiResponseDto<CarritoResponseDto>> Handle(UpdateCarritoCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<CarritoResponseDto>> Handle(UpdateCarritoCommand request, CancellationToken cancellationToken)
     {
         var repo = _uow.Repository<CarritoEntity>();
         var entity = await repo.GetById(request.CarritoId);
         if (entity is null)
         {
-            return ApiResponseDto<CarritoResponseDto>.Fail($"Carrito no encontrado para id {request.CarritoId}.");
+            return ApiResponse<CarritoResponseDto>.Fail($"Carrito no encontrado para id {request.CarritoId}.");
         }
 
         entity.Estado = request.Estado;
@@ -29,7 +30,7 @@ public class UpdateCarritoCommandHandler(IUnitOfWork _uow) : IRequestHandler<Upd
         await repo.Update(entity);
         await _uow.Complete();
 
-        return ApiResponseDto<CarritoResponseDto>.Ok(new CarritoResponseDto
+        return ApiResponse<CarritoResponseDto>.Ok(new CarritoResponseDto
         {
             Id = entity.Id,
             UsuarioId = entity.UsuarioId,

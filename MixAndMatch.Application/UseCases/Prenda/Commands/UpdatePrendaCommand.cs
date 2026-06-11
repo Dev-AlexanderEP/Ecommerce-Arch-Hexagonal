@@ -1,4 +1,5 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using CategoriaEntity = MixAndMatch.Domain.Entities.Categoria;
@@ -9,7 +10,7 @@ using ProveedorEntity = MixAndMatch.Domain.Entities.Proveedor;
 
 namespace MixAndMatch.Application.UseCases.Prenda.Commands;
 
-public class UpdatePrendaCommand : IRequest<ApiResponseDto<PrendaResponseDto>>
+public class UpdatePrendaCommand : IRequest<ApiResponse<PrendaResponseDto>>
 {
     public required long PrendaId { get; set; }
     public required string Nombre { get; set; }
@@ -22,32 +23,32 @@ public class UpdatePrendaCommand : IRequest<ApiResponseDto<PrendaResponseDto>>
     public required bool Activo { get; set; }
 }
 
-public class UpdatePrendaCommandHandler(IUnitOfWork _uow) : IRequestHandler<UpdatePrendaCommand, ApiResponseDto<PrendaResponseDto>>
+public class UpdatePrendaCommandHandler(IUnitOfWork _uow) : IRequestHandler<UpdatePrendaCommand, ApiResponse<PrendaResponseDto>>
 {
-    public async Task<ApiResponseDto<PrendaResponseDto>> Handle(UpdatePrendaCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<PrendaResponseDto>> Handle(UpdatePrendaCommand request, CancellationToken cancellationToken)
     {
         var repo = _uow.Repository<PrendaEntity>();
         var entity = await repo.GetById(request.PrendaId);
         if (entity is null)
         {
-            return ApiResponseDto<PrendaResponseDto>.Fail($"Prenda no encontrada para id {request.PrendaId}.");
+            return ApiResponse<PrendaResponseDto>.Fail($"Prenda no encontrada para id {request.PrendaId}.");
         }
 
         var nombre = (request.Nombre ?? string.Empty).Trim();
         if (string.IsNullOrWhiteSpace(nombre))
         {
-            return ApiResponseDto<PrendaResponseDto>.Fail("El nombre de la prenda es obligatorio.");
+            return ApiResponse<PrendaResponseDto>.Fail("El nombre de la prenda es obligatorio.");
         }
 
         if (request.Precio < 0)
         {
-            return ApiResponseDto<PrendaResponseDto>.Fail("El precio no puede ser negativo.");
+            return ApiResponse<PrendaResponseDto>.Fail("El precio no puede ser negativo.");
         }
 
-        if (await _uow.Repository<MarcaEntity>().GetById(request.MarcaId) is null) return ApiResponseDto<PrendaResponseDto>.Fail($"Marca no encontrada para id {request.MarcaId}.");
-        if (await _uow.Repository<CategoriaEntity>().GetById(request.CategoriaId) is null) return ApiResponseDto<PrendaResponseDto>.Fail($"Categoría no encontrada para id {request.CategoriaId}.");
-        if (await _uow.Repository<ProveedorEntity>().GetById(request.ProveedorId) is null) return ApiResponseDto<PrendaResponseDto>.Fail($"Proveedor no encontrado para id {request.ProveedorId}.");
-        if (await _uow.Repository<GeneroEntity>().GetById(request.GeneroId) is null) return ApiResponseDto<PrendaResponseDto>.Fail($"Género no encontrado para id {request.GeneroId}.");
+        if (await _uow.Repository<MarcaEntity>().GetById(request.MarcaId) is null) return ApiResponse<PrendaResponseDto>.Fail($"Marca no encontrada para id {request.MarcaId}.");
+        if (await _uow.Repository<CategoriaEntity>().GetById(request.CategoriaId) is null) return ApiResponse<PrendaResponseDto>.Fail($"CategorÃ­a no encontrada para id {request.CategoriaId}.");
+        if (await _uow.Repository<ProveedorEntity>().GetById(request.ProveedorId) is null) return ApiResponse<PrendaResponseDto>.Fail($"Proveedor no encontrado para id {request.ProveedorId}.");
+        if (await _uow.Repository<GeneroEntity>().GetById(request.GeneroId) is null) return ApiResponse<PrendaResponseDto>.Fail($"GÃ©nero no encontrado para id {request.GeneroId}.");
 
         entity.Nombre = nombre;
         entity.Descripcion = request.Descripcion;
@@ -62,7 +63,7 @@ public class UpdatePrendaCommandHandler(IUnitOfWork _uow) : IRequestHandler<Upda
         await repo.Update(entity);
         await _uow.Complete();
 
-        return ApiResponseDto<PrendaResponseDto>.Ok(new PrendaResponseDto
+        return ApiResponse<PrendaResponseDto>.Ok(new PrendaResponseDto
         {
             Id = entity.Id,
             Nombre = entity.Nombre,

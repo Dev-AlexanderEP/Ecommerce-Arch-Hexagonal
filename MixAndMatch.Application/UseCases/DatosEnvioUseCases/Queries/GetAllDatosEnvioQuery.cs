@@ -1,28 +1,31 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using DatosEnvioEntity = MixAndMatch.Domain.Entities.DatosEnvio;
 
 namespace MixAndMatch.Application.UseCases.DatosEnvio.Queries;
 
-public class GetAllDatosEnvioQuery : IRequest<ApiResponseDto<IEnumerable<DatosEnvioResponseDto>>>
+public class GetAllDatosEnvioQuery : IRequest<ApiPaginationResponse<DatosEnvioResponseDto>>
 {
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
 }
 
 public class GetAllDatosEnvioQueryHandler(IUnitOfWork _uow)
-    : IRequestHandler<GetAllDatosEnvioQuery, ApiResponseDto<IEnumerable<DatosEnvioResponseDto>>>
+    : IRequestHandler<GetAllDatosEnvioQuery, ApiPaginationResponse<DatosEnvioResponseDto>>
 {
-    public async Task<ApiResponseDto<IEnumerable<DatosEnvioResponseDto>>> Handle(
+    public async Task<ApiPaginationResponse<DatosEnvioResponseDto>> Handle(
         GetAllDatosEnvioQuery request,
         CancellationToken cancellationToken)
     {
-        var items = await _uow.Repository<DatosEnvioEntity>().GetAll();
+        var (items, total) = await _uow.Repository<DatosEnvioEntity>().GetPaged(request.Page, request.PageSize);
 
         if (!items.Any())
-            return ApiResponseDto<IEnumerable<DatosEnvioResponseDto>>
+            return ApiPaginationResponse<DatosEnvioResponseDto>
                 .Fail("No se encontraron datos de envío.");
 
-        return ApiResponseDto<IEnumerable<DatosEnvioResponseDto>>.Ok(
+        return ApiPaginationResponse<DatosEnvioResponseDto>.Ok(
             items.Select(entity => new DatosEnvioResponseDto
             {
                 Id = entity.Id,
@@ -40,6 +43,6 @@ public class GetAllDatosEnvioQueryHandler(IUnitOfWork _uow)
                 EsPrincipal = entity.EsPrincipal,
                 CreatedAt = entity.CreatedAt,
                 UpdatedAt = entity.UpdatedAt
-            }));
+            }), total, request.Page, request.PageSize);
     }
 }

@@ -1,18 +1,19 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 
 namespace MixAndMatch.Application.UseCases.MetodoPago.Commands;
 
-public class DeleteMetodoPagoCommand : IRequest<ApiResponseDto<bool>>
+public class DeleteMetodoPagoCommand : IRequest<ApiResponse<bool>>
 {
     public long Id { get; set; }
 }
 
 public class DeleteMetodoPagoCommandHandler(IUnitOfWork _uow)
-    : IRequestHandler<DeleteMetodoPagoCommand, ApiResponseDto<bool>>
+    : IRequestHandler<DeleteMetodoPagoCommand, ApiResponse<bool>>
 {
-    public async Task<ApiResponseDto<bool>> Handle(
+    public async Task<ApiResponse<bool>> Handle(
         DeleteMetodoPagoCommand request,
         CancellationToken cancellationToken)
     {
@@ -23,8 +24,8 @@ public class DeleteMetodoPagoCommandHandler(IUnitOfWork _uow)
 
             if (entity is null)
             {
-                return ApiResponseDto<bool>
-                    .Fail($"Método de pago no encontrado para id {request.Id}");
+                return ApiResponse<bool>
+                    .Fail($"MÃ©todo de pago no encontrado para id {request.Id}");
             }
 
             await _uow.Repository<Domain.Entities.MetodoPago>()
@@ -32,11 +33,11 @@ public class DeleteMetodoPagoCommandHandler(IUnitOfWork _uow)
 
             await _uow.Complete();
 
-            return ApiResponseDto<bool>.Ok(true);
+            return ApiResponse<bool>.Ok(true);
         }
         catch (Exception ex)
         {
-            return ApiResponseDto<bool>
+            return ApiResponse<bool>
                 .Fail(ex.Message);
         }
     }

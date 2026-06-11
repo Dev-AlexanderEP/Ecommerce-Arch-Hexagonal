@@ -1,4 +1,5 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using MixAndMatch.Domain.Ports.IServices;
@@ -6,7 +7,7 @@ using UsuarioEntity = MixAndMatch.Domain.Entities.Usuario;
 
 namespace MixAndMatch.Application.UseCases.Usuario.Commands;
 
-public class CreateUsuarioCommand : IRequest<ApiResponseDto<UsuarioResponseDto>>
+public class CreateUsuarioCommand : IRequest<ApiResponse<UsuarioResponseDto>>
 {
     public required string NombreUsuario { get; set; }
     public required string Email { get; set; }
@@ -16,15 +17,15 @@ public class CreateUsuarioCommand : IRequest<ApiResponseDto<UsuarioResponseDto>>
 }
 
 public class CreateUsuarioCommandHandler(IUnitOfWork _uow, IPasswordService _passwordService)
-    : IRequestHandler<CreateUsuarioCommand, ApiResponseDto<UsuarioResponseDto>>
+    : IRequestHandler<CreateUsuarioCommand, ApiResponse<UsuarioResponseDto>>
 {
-    public async Task<ApiResponseDto<UsuarioResponseDto>> Handle(CreateUsuarioCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<UsuarioResponseDto>> Handle(CreateUsuarioCommand request, CancellationToken cancellationToken)
     {
         var repo = _uow.Repository<UsuarioEntity>();
 
         var existing = (await repo.GetAll()).FirstOrDefault(u => u.Email == request.Email);
         if (existing is not null)
-            return ApiResponseDto<UsuarioResponseDto>.Fail($"Ya existe un usuario con el email {request.Email}.");
+            return ApiResponse<UsuarioResponseDto>.Fail($"Ya existe un usuario con el email {request.Email}.");
 
         var entity = new UsuarioEntity
         {
@@ -39,7 +40,7 @@ public class CreateUsuarioCommandHandler(IUnitOfWork _uow, IPasswordService _pas
         await repo.Add(entity);
         await _uow.Complete();
 
-        return ApiResponseDto<UsuarioResponseDto>.Ok(new UsuarioResponseDto
+        return ApiResponse<UsuarioResponseDto>.Ok(new UsuarioResponseDto
         {
             Id            = entity.Id,
             NombreUsuario = entity.NombreUsuario,

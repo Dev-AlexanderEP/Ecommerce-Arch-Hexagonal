@@ -1,4 +1,5 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using CategoriaEntity = MixAndMatch.Domain.Entities.Categoria;
@@ -9,7 +10,7 @@ using ProveedorEntity = MixAndMatch.Domain.Entities.Proveedor;
 
 namespace MixAndMatch.Application.UseCases.Prenda.Commands;
 
-public class CreatePrendaCommand : IRequest<ApiResponseDto<PrendaResponseDto>>
+public class CreatePrendaCommand : IRequest<ApiResponse<PrendaResponseDto>>
 {
     public required string Nombre { get; set; }
     public string? Descripcion { get; set; }
@@ -21,32 +22,32 @@ public class CreatePrendaCommand : IRequest<ApiResponseDto<PrendaResponseDto>>
     public required bool Activo { get; set; }
 }
 
-public class CreatePrendaCommandHandler(IUnitOfWork _uow) : IRequestHandler<CreatePrendaCommand, ApiResponseDto<PrendaResponseDto>>
+public class CreatePrendaCommandHandler(IUnitOfWork _uow) : IRequestHandler<CreatePrendaCommand, ApiResponse<PrendaResponseDto>>
 {
-    public async Task<ApiResponseDto<PrendaResponseDto>> Handle(CreatePrendaCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<PrendaResponseDto>> Handle(CreatePrendaCommand request, CancellationToken cancellationToken)
     {
         var nombre = (request.Nombre ?? string.Empty).Trim();
         if (string.IsNullOrWhiteSpace(nombre))
         {
-            return ApiResponseDto<PrendaResponseDto>.Fail("El nombre de la prenda es obligatorio.");
+            return ApiResponse<PrendaResponseDto>.Fail("El nombre de la prenda es obligatorio.");
         }
 
         if (request.Precio < 0)
         {
-            return ApiResponseDto<PrendaResponseDto>.Fail("El precio no puede ser negativo.");
+            return ApiResponse<PrendaResponseDto>.Fail("El precio no puede ser negativo.");
         }
 
         var marca = await _uow.Repository<MarcaEntity>().GetById(request.MarcaId);
-        if (marca is null) return ApiResponseDto<PrendaResponseDto>.Fail($"Marca no encontrada para id {request.MarcaId}.");
+        if (marca is null) return ApiResponse<PrendaResponseDto>.Fail($"Marca no encontrada para id {request.MarcaId}.");
 
         var categoria = await _uow.Repository<CategoriaEntity>().GetById(request.CategoriaId);
-        if (categoria is null) return ApiResponseDto<PrendaResponseDto>.Fail($"Categoría no encontrada para id {request.CategoriaId}.");
+        if (categoria is null) return ApiResponse<PrendaResponseDto>.Fail($"CategorÃ­a no encontrada para id {request.CategoriaId}.");
 
         var proveedor = await _uow.Repository<ProveedorEntity>().GetById(request.ProveedorId);
-        if (proveedor is null) return ApiResponseDto<PrendaResponseDto>.Fail($"Proveedor no encontrado para id {request.ProveedorId}.");
+        if (proveedor is null) return ApiResponse<PrendaResponseDto>.Fail($"Proveedor no encontrado para id {request.ProveedorId}.");
 
         var genero = await _uow.Repository<GeneroEntity>().GetById(request.GeneroId);
-        if (genero is null) return ApiResponseDto<PrendaResponseDto>.Fail($"Género no encontrado para id {request.GeneroId}.");
+        if (genero is null) return ApiResponse<PrendaResponseDto>.Fail($"GÃ©nero no encontrado para id {request.GeneroId}.");
 
         var entity = new PrendaEntity
         {
@@ -65,7 +66,7 @@ public class CreatePrendaCommandHandler(IUnitOfWork _uow) : IRequestHandler<Crea
         await repo.Add(entity);
         await _uow.Complete();
 
-        return ApiResponseDto<PrendaResponseDto>.Ok(new PrendaResponseDto
+        return ApiResponse<PrendaResponseDto>.Ok(new PrendaResponseDto
         {
             Id = entity.Id,
             Nombre = entity.Nombre,

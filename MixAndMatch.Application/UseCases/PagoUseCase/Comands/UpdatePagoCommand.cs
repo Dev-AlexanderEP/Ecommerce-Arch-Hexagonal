@@ -1,4 +1,5 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.MetodoPago;
 using MixAndMatch.Domain.Ports.IRepositories;
@@ -8,7 +9,7 @@ using MetodoPagoEntity = MixAndMatch.Domain.Entities.MetodoPago;
 
 namespace MixAndMatch.Application.UseCases.Pago.Commands;
 
-public class UpdatePagoCommand : IRequest<ApiResponseDto<PagoResponseDto>>
+public class UpdatePagoCommand : IRequest<ApiResponse<PagoResponseDto>>
 {
     public long Id { get; set; }
     public long VentaId { get; set; }
@@ -18,9 +19,9 @@ public class UpdatePagoCommand : IRequest<ApiResponseDto<PagoResponseDto>>
 }
 
 public class UpdatePagoCommandHandler(IUnitOfWork _uow)
-    : IRequestHandler<UpdatePagoCommand, ApiResponseDto<PagoResponseDto>>
+    : IRequestHandler<UpdatePagoCommand, ApiResponse<PagoResponseDto>>
 {
-    public async Task<ApiResponseDto<PagoResponseDto>> Handle(
+    public async Task<ApiResponse<PagoResponseDto>> Handle(
         UpdatePagoCommand request,
         CancellationToken cancellationToken)
     {
@@ -30,22 +31,22 @@ public class UpdatePagoCommandHandler(IUnitOfWork _uow)
                 .GetById(request.Id);
 
             if (entity is null)
-                return ApiResponseDto<PagoResponseDto>
+                return ApiResponse<PagoResponseDto>
                     .Fail($"Pago no encontrado para id {request.Id}");
 
             var venta = await _uow.Repository<VentaEntity>()
                 .GetById(request.VentaId);
 
             if (venta is null)
-                return ApiResponseDto<PagoResponseDto>
+                return ApiResponse<PagoResponseDto>
                     .Fail($"Venta no encontrada para id {request.VentaId}");
 
             var metodo = await _uow.Repository<MetodoPagoEntity>()
                 .GetById(request.MetodoId);
 
             if (metodo is null)
-                return ApiResponseDto<PagoResponseDto>
-                    .Fail($"Método de pago no encontrado para id {request.MetodoId}");
+                return ApiResponse<PagoResponseDto>
+                    .Fail($"MÃ©todo de pago no encontrado para id {request.MetodoId}");
 
             entity.VentaId = request.VentaId;
             entity.MetodoId = request.MetodoId;
@@ -56,7 +57,7 @@ public class UpdatePagoCommandHandler(IUnitOfWork _uow)
             await _uow.Repository<PagoEntity>().Update(entity);
             await _uow.Complete();
 
-            return ApiResponseDto<PagoResponseDto>.Ok(
+            return ApiResponse<PagoResponseDto>.Ok(
                 new PagoResponseDto
                 {
                     Id = entity.Id,
@@ -70,7 +71,7 @@ public class UpdatePagoCommandHandler(IUnitOfWork _uow)
         }
         catch (Exception ex)
         {
-            return ApiResponseDto<PagoResponseDto>.Fail(ex.Message);
+            return ApiResponse<PagoResponseDto>.Fail(ex.Message);
         }
     }
 }

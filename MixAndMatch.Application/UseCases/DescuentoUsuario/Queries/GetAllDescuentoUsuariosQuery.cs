@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Descuentos;
 using MixAndMatch.Domain.Ports.IRepositories;
@@ -6,21 +7,23 @@ using DescuentoUsuarioEntity = MixAndMatch.Domain.Entities.DescuentoUsuario;
 
 namespace MixAndMatch.Application.UseCases.DescuentoUsuario.Queries;
 
-public class GetAllDescuentoUsuariosQuery : IRequest<ApiResponseDto<IEnumerable<DescuentoUsuarioResponseDto>>>
+public class GetAllDescuentoUsuariosQuery : IRequest<ApiPaginationResponse<DescuentoUsuarioResponseDto>>
 {
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
 }
 
-public class GetAllDescuentoUsuariosQueryHandler(IUnitOfWork _uow) : IRequestHandler<GetAllDescuentoUsuariosQuery, ApiResponseDto<IEnumerable<DescuentoUsuarioResponseDto>>>
+public class GetAllDescuentoUsuariosQueryHandler(IUnitOfWork _uow) : IRequestHandler<GetAllDescuentoUsuariosQuery, ApiPaginationResponse<DescuentoUsuarioResponseDto>>
 {
-    public async Task<ApiResponseDto<IEnumerable<DescuentoUsuarioResponseDto>>> Handle(GetAllDescuentoUsuariosQuery request, CancellationToken cancellationToken)
+    public async Task<ApiPaginationResponse<DescuentoUsuarioResponseDto>> Handle(GetAllDescuentoUsuariosQuery request, CancellationToken cancellationToken)
     {
-        var items = await _uow.Repository<DescuentoUsuarioEntity>().GetAll();
+        var (items, total) = await _uow.Repository<DescuentoUsuarioEntity>().GetPaged(request.Page, request.PageSize);
         if (!items.Any())
         {
-            return ApiResponseDto<IEnumerable<DescuentoUsuarioResponseDto>>.Fail("No se encontraron registros de uso de descuentos.");
+            return ApiPaginationResponse<DescuentoUsuarioResponseDto>.Fail("No se encontraron registros de uso de descuentos.");
         }
 
-        return ApiResponseDto<IEnumerable<DescuentoUsuarioResponseDto>>.Ok(items.Select(x => new DescuentoUsuarioResponseDto
+        return ApiPaginationResponse<DescuentoUsuarioResponseDto>.Ok(items.Select(x => new DescuentoUsuarioResponseDto
         {
             Id = x.Id,
             DescuentoCodigoId = x.DescuentoCodigoId,
@@ -28,6 +31,6 @@ public class GetAllDescuentoUsuariosQueryHandler(IUnitOfWork _uow) : IRequestHan
             FechaUso = x.FechaUso,
             CreatedAt = x.CreatedAt,
             UpdatedAt = x.UpdatedAt
-        }));
+        }), total, request.Page, request.PageSize);
     }
 }

@@ -1,19 +1,20 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.MetodoPago;
 using MixAndMatch.Domain.Ports.IRepositories;
 
 namespace MixAndMatch.Application.UseCases.MetodoPago.Queries;
 
-public class GetMetodoPagoByIdQuery : IRequest<ApiResponseDto<MetodoPagoResponseDto>>
+public class GetMetodoPagoByIdQuery : IRequest<ApiResponse<MetodoPagoResponseDto>>
 {
     public long Id { get; set; }
 }
 
 public class GetMetodoPagoByIdQueryHandler(IUnitOfWork _uow)
-    : IRequestHandler<GetMetodoPagoByIdQuery, ApiResponseDto<MetodoPagoResponseDto>>
+    : IRequestHandler<GetMetodoPagoByIdQuery, ApiResponse<MetodoPagoResponseDto>>
 {
-    public async Task<ApiResponseDto<MetodoPagoResponseDto>> Handle(
+    public async Task<ApiResponse<MetodoPagoResponseDto>> Handle(
         GetMetodoPagoByIdQuery request,
         CancellationToken cancellationToken)
     {
@@ -24,11 +25,11 @@ public class GetMetodoPagoByIdQueryHandler(IUnitOfWork _uow)
 
             if (entity is null)
             {
-                return ApiResponseDto<MetodoPagoResponseDto>
-                    .Fail($"Método de pago no encontrado para id {request.Id}");
+                return ApiResponse<MetodoPagoResponseDto>
+                    .Fail($"MÃ©todo de pago no encontrado para id {request.Id}");
             }
 
-            return ApiResponseDto<MetodoPagoResponseDto>.Ok(
+            return ApiResponse<MetodoPagoResponseDto>.Ok(
                 new MetodoPagoResponseDto
                 {
                     Id = entity.Id,
@@ -39,7 +40,7 @@ public class GetMetodoPagoByIdQueryHandler(IUnitOfWork _uow)
         }
         catch (Exception ex)
         {
-            return ApiResponseDto<MetodoPagoResponseDto>
+            return ApiResponse<MetodoPagoResponseDto>
                 .Fail(ex.Message);
         }
     }

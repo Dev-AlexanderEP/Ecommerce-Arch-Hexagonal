@@ -1,19 +1,20 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using DatosEnvioEntity = MixAndMatch.Domain.Entities.DatosEnvio;
 
 namespace MixAndMatch.Application.UseCases.DatosEnvio.Queries;
 
-public class GetDatosEnvioByIdQuery : IRequest<ApiResponseDto<DatosEnvioResponseDto>>
+public class GetDatosEnvioByIdQuery : IRequest<ApiResponse<DatosEnvioResponseDto>>
 {
     public required long DatosEnvioId { get; set; }
 }
 
 public class GetDatosEnvioByIdQueryHandler(IUnitOfWork _uow)
-    : IRequestHandler<GetDatosEnvioByIdQuery, ApiResponseDto<DatosEnvioResponseDto>>
+    : IRequestHandler<GetDatosEnvioByIdQuery, ApiResponse<DatosEnvioResponseDto>>
 {
-    public async Task<ApiResponseDto<DatosEnvioResponseDto>> Handle(
+    public async Task<ApiResponse<DatosEnvioResponseDto>> Handle(
         GetDatosEnvioByIdQuery request,
         CancellationToken cancellationToken)
     {
@@ -21,10 +22,10 @@ public class GetDatosEnvioByIdQueryHandler(IUnitOfWork _uow)
             .GetById(request.DatosEnvioId);
 
         if (entity is null)
-            return ApiResponseDto<DatosEnvioResponseDto>
-                .Fail($"Datos de envío no encontrados para id {request.DatosEnvioId}.");
+            return ApiResponse<DatosEnvioResponseDto>
+                .Fail($"Datos de envÃ­o no encontrados para id {request.DatosEnvioId}.");
 
-        return ApiResponseDto<DatosEnvioResponseDto>.Ok(
+        return ApiResponse<DatosEnvioResponseDto>.Ok(
             new DatosEnvioResponseDto
             {
                 Id = entity.Id,

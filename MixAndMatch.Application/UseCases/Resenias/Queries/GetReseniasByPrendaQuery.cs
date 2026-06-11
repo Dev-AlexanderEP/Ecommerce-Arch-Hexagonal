@@ -1,11 +1,12 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Resenias;
 using MixAndMatch.Domain.Ports;
 
 namespace MixAndMatch.Application.UseCases.Resenias.Queries;
 
-public class GetReseniasByPrendaQuery : IRequest<ApiResponseDto<ReseniaResumenDto>>
+public class GetReseniasByPrendaQuery : IRequest<ApiResponse<ReseniaResumenDto>>
 {
     public required long PrendaId { get; set; }
 
@@ -15,13 +16,13 @@ public class GetReseniasByPrendaQuery : IRequest<ApiResponseDto<ReseniaResumenDt
 }
 
 public class GetReseniasByPrendaQueryHandler(IReseniaRepository _reseniaRepository)
-    : IRequestHandler<GetReseniasByPrendaQuery, ApiResponseDto<ReseniaResumenDto>>
+    : IRequestHandler<GetReseniasByPrendaQuery, ApiResponse<ReseniaResumenDto>>
 {
-    public async Task<ApiResponseDto<ReseniaResumenDto>> Handle(GetReseniasByPrendaQuery request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<ReseniaResumenDto>> Handle(GetReseniasByPrendaQuery request, CancellationToken cancellationToken)
     {
         if (request.Page <= 0 || request.PageSize <= 0)
         {
-            return ApiResponseDto<ReseniaResumenDto>.Fail("Page y pageSize deben ser mayores a 0.");
+            return ApiResponse<ReseniaResumenDto>.Fail("Page y pageSize deben ser mayores a 0.");
         }
 
         var (items, totalCount) = await _reseniaRepository.GetPaginatedByPrendaIdAsync(
@@ -31,7 +32,7 @@ public class GetReseniasByPrendaQueryHandler(IReseniaRepository _reseniaReposito
 
         if (totalCount == 0)
         {
-            return ApiResponseDto<ReseniaResumenDto>.Fail("No se encontraron resenias para la prenda.");
+            return ApiResponse<ReseniaResumenDto>.Fail("No se encontraron resenias para la prenda.");
         }
 
         var promedio = await _reseniaRepository.GetPromedioByPrendaIdAsync(request.PrendaId);
@@ -63,6 +64,6 @@ public class GetReseniasByPrendaQueryHandler(IReseniaRepository _reseniaReposito
             HasPrev = request.Page > 1
         };
 
-        return ApiResponseDto<ReseniaResumenDto>.Ok(resumen);
+        return ApiResponse<ReseniaResumenDto>.Ok(resumen);
     }
 }

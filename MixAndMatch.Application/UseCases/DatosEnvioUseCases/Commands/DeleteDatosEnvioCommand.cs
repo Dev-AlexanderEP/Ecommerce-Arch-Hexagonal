@@ -1,19 +1,20 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using DatosEnvioEntity = MixAndMatch.Domain.Entities.DatosEnvio;
 
 namespace MixAndMatch.Application.UseCases.DatosEnvio.Commands;
 
-public class DeleteDatosEnvioCommand : IRequest<ApiResponseDto<bool>>
+public class DeleteDatosEnvioCommand : IRequest<ApiResponse<bool>>
 {
     public required long DatosEnvioId { get; set; }
 }
 
 public class DeleteDatosEnvioCommandHandler(IUnitOfWork _uow)
-    : IRequestHandler<DeleteDatosEnvioCommand, ApiResponseDto<bool>>
+    : IRequestHandler<DeleteDatosEnvioCommand, ApiResponse<bool>>
 {
-    public async Task<ApiResponseDto<bool>> Handle(
+    public async Task<ApiResponse<bool>> Handle(
         DeleteDatosEnvioCommand request,
         CancellationToken cancellationToken)
     {
@@ -22,12 +23,12 @@ public class DeleteDatosEnvioCommandHandler(IUnitOfWork _uow)
         var entity = await repo.GetById(request.DatosEnvioId);
 
         if (entity is null)
-            return ApiResponseDto<bool>
-                .Fail($"Datos de envío no encontrados para id {request.DatosEnvioId}.");
+            return ApiResponse<bool>
+                .Fail($"Datos de envÃ­o no encontrados para id {request.DatosEnvioId}.");
 
         await repo.Delete(request.DatosEnvioId);
         await _uow.Complete();
 
-        return ApiResponseDto<bool>.Ok(true, "Datos de envío eliminados correctamente.");
+        return ApiResponse<bool>.Ok(true, "Datos de envÃ­o eliminados correctamente.");
     }
 }

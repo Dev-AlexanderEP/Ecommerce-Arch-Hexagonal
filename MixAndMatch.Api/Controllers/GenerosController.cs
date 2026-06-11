@@ -11,9 +11,9 @@ namespace MixAndMatch.Api.Controllers;
 public class GenerosController(IMediator _mediator) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
-        return this.ToActionResult(await _mediator.Send(new GetAllGenerosQuery()));
+        return this.ToActionResult(await _mediator.Send(new GetAllGenerosQuery { Page = page, PageSize = pageSize }));
     }
 
     [HttpGet("{id}")]

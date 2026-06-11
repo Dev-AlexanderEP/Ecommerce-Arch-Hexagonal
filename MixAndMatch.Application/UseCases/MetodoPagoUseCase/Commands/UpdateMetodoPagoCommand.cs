@@ -1,21 +1,22 @@
-
+﻿
 using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.MetodoPago;
 using MixAndMatch.Domain.Ports.IRepositories;
 
 namespace MixAndMatch.Application.UseCases.MetodoPago.Commands;
 
-public class UpdateMetodoPagoCommand : IRequest<ApiResponseDto<MetodoPagoResponseDto>>
+public class UpdateMetodoPagoCommand : IRequest<ApiResponse<MetodoPagoResponseDto>>
 {
     public long Id { get; set; }
     public required string TipoPago { get; set; }
 }
 
 public class UpdateMetodoPagoCommandHandler(IUnitOfWork _uow)
-    : IRequestHandler<UpdateMetodoPagoCommand, ApiResponseDto<MetodoPagoResponseDto>>
+    : IRequestHandler<UpdateMetodoPagoCommand, ApiResponse<MetodoPagoResponseDto>>
 {
-    public async Task<ApiResponseDto<MetodoPagoResponseDto>> Handle(
+    public async Task<ApiResponse<MetodoPagoResponseDto>> Handle(
         UpdateMetodoPagoCommand request,
         CancellationToken cancellationToken)
     {
@@ -26,8 +27,8 @@ public class UpdateMetodoPagoCommandHandler(IUnitOfWork _uow)
 
             if (entity is null)
             {
-                return ApiResponseDto<MetodoPagoResponseDto>
-                    .Fail($"Método de pago no encontrado para id {request.Id}");
+                return ApiResponse<MetodoPagoResponseDto>
+                    .Fail($"MÃ©todo de pago no encontrado para id {request.Id}");
             }
 
             entity.TipoPago = request.TipoPago;
@@ -36,7 +37,7 @@ public class UpdateMetodoPagoCommandHandler(IUnitOfWork _uow)
             await _uow.Repository<Domain.Entities.MetodoPago>().Update(entity);
             await _uow.Complete();
 
-            return ApiResponseDto<MetodoPagoResponseDto>.Ok(
+            return ApiResponse<MetodoPagoResponseDto>.Ok(
                 new MetodoPagoResponseDto
                 {
                     Id = entity.Id,
@@ -47,7 +48,7 @@ public class UpdateMetodoPagoCommandHandler(IUnitOfWork _uow)
         }
         catch (Exception ex)
         {
-            return ApiResponseDto<MetodoPagoResponseDto>
+            return ApiResponse<MetodoPagoResponseDto>
                 .Fail(ex.Message);
         }
     }

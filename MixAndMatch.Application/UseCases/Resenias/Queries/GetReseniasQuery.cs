@@ -1,11 +1,12 @@
-using MediatR;
+﻿using MediatR;
+using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Resenias;
 using MixAndMatch.Domain.Ports;
 
 namespace MixAndMatch.Application.UseCases.Resenias.Queries;
 
-public class GetReseniasQuery : IRequest<ApiResponseDto<object>>
+public class GetReseniasQuery : IRequest<ApiResponse<object>>
 {
     public long? PrendaId { get; set; }
 
@@ -17,20 +18,20 @@ public class GetReseniasQuery : IRequest<ApiResponseDto<object>>
 }
 
 public class GetReseniasQueryHandler(IReseniaRepository _reseniaRepository)
-    : IRequestHandler<GetReseniasQuery, ApiResponseDto<object>>
+    : IRequestHandler<GetReseniasQuery, ApiResponse<object>>
 {
-    public async Task<ApiResponseDto<object>> Handle(GetReseniasQuery request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<object>> Handle(GetReseniasQuery request, CancellationToken cancellationToken)
     {
         if (request.PrendaId.HasValue == request.UsuarioId.HasValue)
         {
-            return ApiResponseDto<object>.Fail("Debe enviar prendaId o usuarioId.");
+            return ApiResponse<object>.Fail("Debe enviar prendaId o usuarioId.");
         }
 
         if (request.PrendaId.HasValue)
         {
             if (request.Page <= 0 || request.PageSize <= 0)
             {
-                return ApiResponseDto<object>.Fail("Page y pageSize deben ser mayores a 0.");
+                return ApiResponse<object>.Fail("Page y pageSize deben ser mayores a 0.");
             }
 
             var (items, totalCount) = await _reseniaRepository.GetPaginatedByPrendaIdAsync(
@@ -40,7 +41,7 @@ public class GetReseniasQueryHandler(IReseniaRepository _reseniaRepository)
 
             if (totalCount == 0)
             {
-                return ApiResponseDto<object>.Fail("No se encontraron resenias para la prenda.");
+                return ApiResponse<object>.Fail("No se encontraron resenias para la prenda.");
             }
 
             var promedio = await _reseniaRepository.GetPromedioByPrendaIdAsync(request.PrendaId.Value);
@@ -72,16 +73,16 @@ public class GetReseniasQueryHandler(IReseniaRepository _reseniaRepository)
                 HasPrev = request.Page > 1
             };
 
-            return ApiResponseDto<object>.Ok(resumen);
+            return ApiResponse<object>.Ok(resumen);
         }
 
         var itemsByUsuario = await _reseniaRepository.GetByUsuarioIdAsync(request.UsuarioId!.Value);
         if (!itemsByUsuario.Any())
         {
-            return ApiResponseDto<object>.Fail("No se encontraron resenias para el usuario.");
+            return ApiResponse<object>.Fail("No se encontraron resenias para el usuario.");
         }
 
-        return ApiResponseDto<object>.Ok(itemsByUsuario.Select(x => new ReseniaResponseDto
+        return ApiResponse<object>.Ok(itemsByUsuario.Select(x => new ReseniaResponseDto
         {
             Id = x.Id,
             PrendaId = x.PrendaId,
