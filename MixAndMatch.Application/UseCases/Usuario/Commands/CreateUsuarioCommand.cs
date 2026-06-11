@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using MixAndMatch.Application.Common;
+using MixAndMatch.Domain.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using MixAndMatch.Domain.Ports.IServices;
@@ -27,12 +28,15 @@ public class CreateUsuarioCommandHandler(IUnitOfWork _uow, IPasswordService _pas
         if (existing is not null)
             return ApiResponse<UsuarioResponseDto>.Fail($"Ya existe un usuario con el email {request.Email}.");
 
+        if (request.Rol is not null && !Roles.IsValid(request.Rol))
+            return ApiResponse<UsuarioResponseDto>.Fail($"Rol inválido: {request.Rol}. Roles permitidos: {string.Join(", ", Roles.All)}.");
+
         var entity = new UsuarioEntity
         {
             NombreUsuario = request.NombreUsuario,
             Email         = request.Email,
             Contrasenia   = _passwordService.Hash(request.Contrasenia),
-            Rol           = request.Rol,
+            Rol           = request.Rol ?? Roles.User,
             Activo        = request.Activo,
             CreatedAt     = DateTime.UtcNow
         };

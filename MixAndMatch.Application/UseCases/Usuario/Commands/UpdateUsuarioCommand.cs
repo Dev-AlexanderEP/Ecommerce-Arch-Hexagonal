@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using MixAndMatch.Application.Common;
+using MixAndMatch.Domain.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using MixAndMatch.Domain.Ports.IServices;
@@ -32,6 +33,9 @@ public class UpdateUsuarioCommandHandler(IUnitOfWork _uow, IPasswordService _pas
             .Any(u => u.Email == request.Email && u.Id != request.UsuarioId);
         if (emailTaken)
             return ApiResponse<UsuarioResponseDto>.Fail($"El email {request.Email} ya está en uso por otro usuario.");
+
+        if (request.Rol is not null && !Roles.IsValid(request.Rol))
+            return ApiResponse<UsuarioResponseDto>.Fail($"Rol inválido: {request.Rol}. Roles permitidos: {string.Join(", ", Roles.All)}.");
 
         entity.NombreUsuario = request.NombreUsuario;
         entity.Email         = request.Email;
