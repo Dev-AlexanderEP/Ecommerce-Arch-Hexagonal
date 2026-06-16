@@ -15,19 +15,16 @@ public class RegisterUsuarioCommand : IRequest<ApiResponse<AuthResponseDto>>
     public required string Contrasenia { get; set; }
 }
 
-public class RegisterUsuarioCommandHandler(IUnitOfWork _uow, IPasswordService _passwordService, IJwtService _jwtService)
+public class RegisterUsuarioCommandHandler(IUsuarioRepository _usuarios, IUnitOfWork _uow, IPasswordService _passwordService, IJwtService _jwtService)
     : IRequestHandler<RegisterUsuarioCommand, ApiResponse<AuthResponseDto>>
 {
     public async Task<ApiResponse<AuthResponseDto>> Handle(RegisterUsuarioCommand request, CancellationToken cancellationToken)
     {
-        var repo     = _uow.Repository<UsuarioEntity>();
-        var usuarios = await repo.GetAll();
+        if (await _usuarios.ExistsByEmail(request.Email))
+            return ApiResponse<AuthResponseDto>.Fail($"Ya existe un usuario con el email {request.Email}.", ErrorType.Conflict);
 
-        if (usuarios.Any(u => u.Email == request.Email))
-            return ApiResponse<AuthResponseDto>.Fail($"Ya existe un usuario con el email {request.Email}.");
-
-        if (usuarios.Any(u => u.NombreUsuario == request.NombreUsuario))
-            return ApiResponse<AuthResponseDto>.Fail($"El nombre de usuario {request.NombreUsuario} ya está en uso.");
+        if (await _usuarios.ExistsByNombreUsuario(request.NombreUsuario))
+            return ApiResponse<AuthResponseDto>.Fail($"El nombre de usuario {request.NombreUsuario} ya está en uso.", ErrorType.Conflict);
 
         var entity = new UsuarioEntity
         {
@@ -39,12 +36,12 @@ public class RegisterUsuarioCommandHandler(IUnitOfWork _uow, IPasswordService _p
             CreatedAt     = DateTime.UtcNow
         };
 
-        await repo.Add(entity);
+        await _usuarios.Add(entity);
         await _uow.Complete();
 
         var jwt = _jwtService.GenerateToken(entity);
 
-        return ApiResponse<AuthResponseDto>.Ok(new AuthResponseDto
+        return ApiResponse<AuthResponseDto>.Created(new AuthResponseDto
         {
             Token         = jwt.Token,
             ExpiraEn      = jwt.ExpiresAt,
