@@ -70,13 +70,12 @@ public partial class MixAndMatchDbContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Estado)
-                .HasMaxLength(50)
                 .HasColumnName("estado");
             entity.Property(e => e.FechaCreacion)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("fecha_creacion");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_at");
             entity.Property(e => e.UsuarioId).HasColumnName("usuario_id");
 
@@ -98,14 +97,14 @@ public partial class MixAndMatchDbContext : DbContext
             entity.Property(e => e.Cantidad).HasColumnName("cantidad");
             entity.Property(e => e.CarritoId).HasColumnName("carrito_id");
             entity.Property(e => e.CreatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.PrecioUnitario)
                 .HasPrecision(10, 2)
                 .HasColumnName("precio_unitario");
             entity.Property(e => e.PrendaTallaId).HasColumnName("prenda_talla_id");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_at");
 
             entity.HasOne(d => d.Carrito).WithMany(p => p.CarritoItems)
@@ -151,7 +150,7 @@ public partial class MixAndMatchDbContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("calle");
             entity.Property(e => e.CreatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.Departamento)
                 .HasMaxLength(100)
@@ -181,7 +180,7 @@ public partial class MixAndMatchDbContext : DbContext
                 .HasMaxLength(20)
                 .HasColumnName("telefono");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_at");
             entity.Property(e => e.UsuarioId).HasColumnName("usuario_id");
 
@@ -201,7 +200,7 @@ public partial class MixAndMatchDbContext : DbContext
             entity.Property(e => e.Activo).HasColumnName("activo");
             entity.Property(e => e.CategoriaId).HasColumnName("categoria_id");
             entity.Property(e => e.CreatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.FechaFin).HasColumnName("fecha_fin");
             entity.Property(e => e.FechaInicio).HasColumnName("fecha_inicio");
@@ -209,7 +208,7 @@ public partial class MixAndMatchDbContext : DbContext
                 .HasPrecision(5, 2)
                 .HasColumnName("porcentaje");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_at");
 
             entity.HasOne(d => d.Categoria).WithMany(p => p.DescuentoCategoria)
@@ -232,7 +231,7 @@ public partial class MixAndMatchDbContext : DbContext
                 .HasMaxLength(50)
                 .HasColumnName("codigo");
             entity.Property(e => e.CreatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.Descripcion)
                 .HasMaxLength(255)
@@ -243,7 +242,7 @@ public partial class MixAndMatchDbContext : DbContext
                 .HasPrecision(5, 2)
                 .HasColumnName("porcentaje");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_at");
             entity.Property(e => e.UsoMaximo).HasColumnName("uso_maximo");
         });
@@ -257,7 +256,7 @@ public partial class MixAndMatchDbContext : DbContext
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Activo).HasColumnName("activo");
             entity.Property(e => e.CreatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.FechaFin).HasColumnName("fecha_fin");
             entity.Property(e => e.FechaInicio).HasColumnName("fecha_inicio");
@@ -266,7 +265,7 @@ public partial class MixAndMatchDbContext : DbContext
                 .HasColumnName("porcentaje");
             entity.Property(e => e.PrendaId).HasColumnName("prenda_id");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_at");
 
             entity.HasOne(d => d.Prenda).WithMany(p => p.DescuentoPrenda)
@@ -285,12 +284,12 @@ public partial class MixAndMatchDbContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.DescuentoCodigoId).HasColumnName("descuento_codigo_id");
             entity.Property(e => e.FechaUso).HasColumnName("fecha_uso");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_at");
             entity.Property(e => e.UsuarioId).HasColumnName("usuario_id");
 
@@ -316,11 +315,10 @@ public partial class MixAndMatchDbContext : DbContext
                 .HasPrecision(10, 2)
                 .HasColumnName("costo_envio");
             entity.Property(e => e.CreatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.DatosEnvioId).HasColumnName("datos_envio_id");
             entity.Property(e => e.Estado)
-                .HasMaxLength(50)
                 .HasColumnName("estado");
             entity.Property(e => e.FechaEntrega).HasColumnName("fecha_entrega");
             entity.Property(e => e.FechaEnvio).HasColumnName("fecha_envio");
@@ -331,7 +329,7 @@ public partial class MixAndMatchDbContext : DbContext
                 .HasMaxLength(100)
                 .HasColumnName("tracking_number");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_at");
             entity.Property(e => e.VentaId).HasColumnName("venta_id");
 
@@ -384,13 +382,13 @@ public partial class MixAndMatchDbContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.TipoPago)
                 .HasMaxLength(50)
                 .HasColumnName("tipo_pago");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_at");
         });
 
@@ -402,17 +400,16 @@ public partial class MixAndMatchDbContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Estado)
-                .HasMaxLength(50)
                 .HasColumnName("estado");
             entity.Property(e => e.FechaCreacion)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("fecha_creacion");
             entity.Property(e => e.MetodoId).HasColumnName("metodo_id");
             entity.Property(e => e.Monto)
                 .HasPrecision(10, 2)
                 .HasColumnName("monto");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_at");
             entity.Property(e => e.VentaId).HasColumnName("venta_id");
 
@@ -435,17 +432,16 @@ public partial class MixAndMatchDbContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.Orden)
                 .HasDefaultValue(0)
                 .HasColumnName("orden");
             entity.Property(e => e.PrendaId).HasColumnName("prenda_id");
             entity.Property(e => e.Tipo)
-                .HasMaxLength(20)
                 .HasColumnName("tipo");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_at");
             entity.Property(e => e.Url)
                 .HasMaxLength(500)
@@ -467,7 +463,7 @@ public partial class MixAndMatchDbContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.PrendaId).HasColumnName("prenda_id");
             entity.Property(e => e.Stock)
@@ -475,7 +471,7 @@ public partial class MixAndMatchDbContext : DbContext
                 .HasColumnName("stock");
             entity.Property(e => e.TallaId).HasColumnName("talla_id");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_at");
 
             entity.HasOne(d => d.Prenda).WithMany(p => p.PrendaTallas)
@@ -501,7 +497,7 @@ public partial class MixAndMatchDbContext : DbContext
                 .HasColumnName("activo");
             entity.Property(e => e.CategoriaId).HasColumnName("categoria_id");
             entity.Property(e => e.CreatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.Descripcion).HasColumnName("descripcion");
             entity.Property(e => e.GeneroId).HasColumnName("genero_id");
@@ -514,7 +510,7 @@ public partial class MixAndMatchDbContext : DbContext
                 .HasColumnName("precio");
             entity.Property(e => e.ProveedorId).HasColumnName("proveedor_id");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_at");
 
             entity.HasOne(d => d.Categoria).WithMany(p => p.Prenda)
@@ -564,11 +560,11 @@ public partial class MixAndMatchDbContext : DbContext
             entity.Property(e => e.Calificacion).HasColumnName("calificacion");
             entity.Property(e => e.Comentario).HasColumnName("comentario");
             entity.Property(e => e.CreatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.PrendaId).HasColumnName("prenda_id");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_at");
             entity.Property(e => e.UsuarioId).HasColumnName("usuario_id");
 
@@ -615,7 +611,7 @@ public partial class MixAndMatchDbContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("contrasenia");
             entity.Property(e => e.CreatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.Email)
                 .HasMaxLength(255)
@@ -624,10 +620,9 @@ public partial class MixAndMatchDbContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("nombre_usuario");
             entity.Property(e => e.Rol)
-                .HasMaxLength(50)
                 .HasColumnName("rol");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_at");
         });
 
@@ -639,13 +634,12 @@ public partial class MixAndMatchDbContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Estado)
-                .HasMaxLength(50)
                 .HasColumnName("estado");
             entity.Property(e => e.FechaCreacion)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("fecha_creacion");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_at");
             entity.Property(e => e.UsuarioId).HasColumnName("usuario_id");
 
@@ -666,14 +660,14 @@ public partial class MixAndMatchDbContext : DbContext
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Cantidad).HasColumnName("cantidad");
             entity.Property(e => e.CreatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.PrecioUnitario)
                 .HasPrecision(10, 2)
                 .HasColumnName("precio_unitario");
             entity.Property(e => e.PrendaTallaId).HasColumnName("prenda_talla_id");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_at");
             entity.Property(e => e.VentaId).HasColumnName("venta_id");
 

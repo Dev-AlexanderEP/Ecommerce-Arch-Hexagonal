@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using MixAndMatch.Domain.Common;
 using MixAndMatch.Domain.Ports;
 using MixAndMatch.Domain.Ports.IRepositories;
 using MixAndMatch.Domain.Ports.IServices;
@@ -21,12 +22,22 @@ public static class InfrastructureServicesExtensions
         services.AddDbContext<MixAndMatchDbContext>(options =>
         {
             var connectionString = configuration.GetConnectionString("DefaultConnection");
-            options.UseNpgsql(connectionString);
+            options.UseNpgsql(connectionString, npgsql =>
+            {
+                var translator = new ExactNameTranslator();
+                npgsql.MapEnum<RolUsuario>("rol_usuario", nameTranslator: translator);
+                npgsql.MapEnum<TipoImagen>("tipo_imagen", nameTranslator: translator);
+                npgsql.MapEnum<EstadoCarrito>("estado_carrito", nameTranslator: translator);
+                npgsql.MapEnum<EstadoVenta>("estado_venta", nameTranslator: translator);
+                npgsql.MapEnum<EstadoPago>("estado_pago", nameTranslator: translator);
+                npgsql.MapEnum<EstadoEnvio>("estado_envio", nameTranslator: translator);
+            });
         });
 
         // Services Register
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IReseniaRepository, ReseniaRepository>();
+        services.AddScoped<IUsuarioRepository, UsuarioRepository>();
         services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<IJwtService, JwtService>();
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MixAndMatch.Domain.Common;
 
 namespace MixAndMatch.Domain.Entities;
 
@@ -17,7 +18,7 @@ public partial class Envio
 
     public DateOnly? FechaEntrega { get; set; }
 
-    public string Estado { get; set; } = null!;
+    public EstadoEnvio Estado { get; set; }
 
     public string MetodoEnvio { get; set; } = null!;
 
