@@ -41,7 +41,7 @@ public class LoginUsuarioQueryHandler(IUnitOfWork _uow, IPasswordService _passwo
             Id            = usuario.Id,
             NombreUsuario = usuario.NombreUsuario,
             Email         = usuario.Email,
-            Rol           = usuario.Rol
+            Rol           = usuario.Rol?.ToString()
         });
     }
 }

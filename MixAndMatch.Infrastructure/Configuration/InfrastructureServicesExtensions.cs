@@ -30,6 +30,10 @@ public static class InfrastructureServicesExtensions
         services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<IJwtService, JwtService>();
 
+        // Google OAuth
+        services.Configure<GoogleSettings>(configuration.GetSection(GoogleSettings.SectionName));
+        services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+
         // JWT Authentication
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
 

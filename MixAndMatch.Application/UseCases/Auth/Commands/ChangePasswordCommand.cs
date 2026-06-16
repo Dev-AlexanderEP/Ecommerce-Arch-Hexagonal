@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using MediatR;
 using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.Ports.IRepositories;
@@ -8,6 +9,7 @@ namespace MixAndMatch.Application.UseCases.Auth.Commands;
 
 public class ChangePasswordCommand : IRequest<ApiResponse<bool>>
 {
+    [JsonIgnore]   // lo asigna el controller desde el token, nunca el body
     public long UsuarioId { get; set; }
     public required string ContraseniaActual { get; set; }
     public required string ContraseniaNueva { get; set; }

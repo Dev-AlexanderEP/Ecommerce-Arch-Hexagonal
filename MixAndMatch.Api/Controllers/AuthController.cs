@@ -1,16 +1,15 @@
-using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MixAndMatch.Api.Common;
 using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.Auth.Commands;
 using MixAndMatch.Application.UseCases.Auth.Queries;
 
 namespace MixAndMatch.Api.Controllers;
 
-[ApiController]
 [Route("api/[controller]")]
-public class AuthController(IMediator _mediator) : ControllerBase
+public class AuthController(IMediator _mediator) : ApiControllerBase
 {
     [HttpPost("register")]
     [AllowAnonymous]
@@ -26,16 +25,18 @@ public class AuthController(IMediator _mediator) : ControllerBase
         return this.ToActionResult(await _mediator.Send(query));
     }
 
+    [HttpPost("google")]
+    [AllowAnonymous]
+    public async Task<IActionResult> LoginGoogle([FromBody] string idToken)
+    {
+        return this.ToActionResult(await _mediator.Send(new LoginGoogleQuery { IdToken = idToken }));
+    }
+
     [HttpPost("change-password")]
     [Authorize]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command)
     {
-        // El id viene del token, nunca del body
-        var sub = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!long.TryParse(sub, out var usuarioId))
-            return Unauthorized();
-
-        command.UsuarioId = usuarioId;
+        command.UsuarioId = CurrentUser.Id;
         return this.ToActionResult(await _mediator.Send(command));
     }
 }

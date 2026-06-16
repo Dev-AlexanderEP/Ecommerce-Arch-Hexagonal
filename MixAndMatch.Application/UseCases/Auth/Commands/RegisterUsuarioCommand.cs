@@ -34,7 +34,7 @@ public class RegisterUsuarioCommandHandler(IUnitOfWork _uow, IPasswordService _p
             NombreUsuario = request.NombreUsuario,
             Email         = request.Email,
             Contrasenia   = _passwordService.Hash(request.Contrasenia),
-            Rol           = Roles.User,
+            Rol           = RolUsuario.CLIENTE,
             Activo        = true,
             CreatedAt     = DateTime.UtcNow
         };
@@ -51,7 +51,7 @@ public class RegisterUsuarioCommandHandler(IUnitOfWork _uow, IPasswordService _p
             Id            = entity.Id,
             NombreUsuario = entity.NombreUsuario,
             Email         = entity.Email,
-            Rol           = entity.Rol
+            Rol           = entity.Rol?.ToString()
         });
     }
 }

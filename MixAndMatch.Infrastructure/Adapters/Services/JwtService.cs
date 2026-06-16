@@ -25,8 +25,8 @@ public class JwtService(IOptions<JwtSettings> options) : IJwtService
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
-        if (!string.IsNullOrWhiteSpace(usuario.Rol))
-            claims.Add(new Claim(ClaimTypes.Role, usuario.Rol));
+        if (usuario.Rol is not null)
+            claims.Add(new Claim(ClaimTypes.Role, usuario.Rol.Value.ToString()));
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Key));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
