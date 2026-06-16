@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,27 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
         Exception exception,
         CancellationToken cancellationToken)
     {
+        // Errores de FluentValidation → 400 con el detalle por campo
+        if (exception is ValidationException validationException)
+        {
+            logger.LogWarning("Validación fallida: {Message}", validationException.Message);
+
+            var errores = validationException.Errors
+                .GroupBy(e => e.PropertyName)
+                .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
+
+            var validationProblem = new ProblemDetails
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title  = "Error de validación"
+            };
+            validationProblem.Extensions["errors"] = errores;
+
+            httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await httpContext.Response.WriteAsJsonAsync(validationProblem, cancellationToken);
+            return true;
+        }
+
         var (statusCode, title) = exception switch
         {
             KeyNotFoundException     => (StatusCodes.Status404NotFound,      "Recurso no encontrado"),
