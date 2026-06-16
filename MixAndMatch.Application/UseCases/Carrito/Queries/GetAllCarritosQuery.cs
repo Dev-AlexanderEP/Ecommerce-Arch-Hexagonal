@@ -18,17 +18,14 @@ public class GetAllCarritosQueryHandler(IUnitOfWork _uow) : IRequestHandler<GetA
     public async Task<ApiPaginationResponse<CarritoResponseDto>> Handle(GetAllCarritosQuery request, CancellationToken cancellationToken)
     {
         var (items, total) = await _uow.Repository<CarritoEntity>().GetPaged(request.Page, request.PageSize);
-        if (!items.Any())
-        {
-            return ApiPaginationResponse<CarritoResponseDto>.Fail("No se encontraron carritos.");
-        }
 
+        // Una lista vacia no es un error: se devuelve 200 con data: [].
         return ApiPaginationResponse<CarritoResponseDto>.Ok(items.Select(x => new CarritoResponseDto
         {
             Id = x.Id,
             UsuarioId = x.UsuarioId,
             FechaCreacion = x.FechaCreacion,
-            Estado = x.Estado,
+            Estado = x.Estado?.ToString(),
             UpdatedAt = x.UpdatedAt
         }), total, request.Page, request.PageSize);
     }
