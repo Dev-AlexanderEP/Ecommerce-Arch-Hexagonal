@@ -14,12 +14,12 @@ public class ChangePasswordCommand : IRequest<ApiResponse<bool>>
     public required string ContraseniaNueva { get; set; }
 }
 
-public class ChangePasswordCommandHandler(IUsuarioRepository _usuarios, IUnitOfWork _uow, IPasswordService _passwordService)
+public class ChangePasswordCommandHandler(IUnitOfWork _uow, IPasswordService _passwordService)
     : IRequestHandler<ChangePasswordCommand, ApiResponse<bool>>
 {
     public async Task<ApiResponse<bool>> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _usuarios.GetById(request.UsuarioId);
+        var entity = await _uow.Usuarios.GetById(request.UsuarioId);
 
         if (entity is null)
             return ApiResponse<bool>.Fail($"Usuario no encontrado para id {request.UsuarioId}.", ErrorType.NotFound);
@@ -34,7 +34,7 @@ public class ChangePasswordCommandHandler(IUsuarioRepository _usuarios, IUnitOfW
         entity.Contrasenia = _passwordService.Hash(request.ContraseniaNueva);
         entity.UpdatedAt   = DateTime.UtcNow;
 
-        await _usuarios.Update(entity);
+        await _uow.Usuarios.Update(entity);
         await _uow.Complete();
 
         return ApiResponse<bool>.Ok(true);

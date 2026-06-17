@@ -15,15 +15,15 @@ public class RegisterUsuarioCommand : IRequest<ApiResponse<AuthResponseDto>>
     public required string Contrasenia { get; set; }
 }
 
-public class RegisterUsuarioCommandHandler(IUsuarioRepository _usuarios, IUnitOfWork _uow, IPasswordService _passwordService, IJwtService _jwtService)
+public class RegisterUsuarioCommandHandler(IUnitOfWork _uow, IPasswordService _passwordService, IJwtService _jwtService)
     : IRequestHandler<RegisterUsuarioCommand, ApiResponse<AuthResponseDto>>
 {
     public async Task<ApiResponse<AuthResponseDto>> Handle(RegisterUsuarioCommand request, CancellationToken cancellationToken)
     {
-        if (await _usuarios.ExistsByEmail(request.Email))
+        if (await _uow.Usuarios.ExistsByEmail(request.Email))
             return ApiResponse<AuthResponseDto>.Fail($"Ya existe un usuario con el email {request.Email}.", ErrorType.Conflict);
 
-        if (await _usuarios.ExistsByNombreUsuario(request.NombreUsuario))
+        if (await _uow.Usuarios.ExistsByNombreUsuario(request.NombreUsuario))
             return ApiResponse<AuthResponseDto>.Fail($"El nombre de usuario {request.NombreUsuario} ya está en uso.", ErrorType.Conflict);
 
         var entity = new UsuarioEntity
@@ -36,7 +36,7 @@ public class RegisterUsuarioCommandHandler(IUsuarioRepository _usuarios, IUnitOf
             CreatedAt     = DateTime.UtcNow
         };
 
-        await _usuarios.Add(entity);
+        await _uow.Usuarios.Add(entity);
         await _uow.Complete();
 
         var jwt = _jwtService.GenerateToken(entity);

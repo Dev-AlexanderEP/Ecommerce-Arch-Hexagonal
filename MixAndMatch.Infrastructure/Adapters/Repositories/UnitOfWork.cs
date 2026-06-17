@@ -1,4 +1,5 @@
 using System.Collections;
+using MixAndMatch.Domain.Ports;
 using MixAndMatch.Domain.Ports.IRepositories;
 using MixAndMatch.Infrastructure.Configuration;
 
@@ -13,6 +14,16 @@ public class UnitOfWork : IUnitOfWork
     {
         _context = context;
     }
+
+    // Repos especificos: se crean perezosamente y comparten el mismo _context.
+    private IUsuarioRepository? _usuarios;
+    public IUsuarioRepository Usuarios => _usuarios ??= new UsuarioRepository(_context);
+
+    private ICarritoRepository? _carritos;
+    public ICarritoRepository Carritos => _carritos ??= new CarritoRepository(_context);
+
+    private IReseniaRepository? _resenias;
+    public IReseniaRepository Resenias => _resenias ??= new ReseniaRepository(_context);
 
     public Task<int> Complete() => _context.SaveChangesAsync();
 

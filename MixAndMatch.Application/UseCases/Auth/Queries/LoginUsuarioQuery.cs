@@ -12,14 +12,14 @@ public class LoginUsuarioQuery : IRequest<ApiResponse<AuthResponseDto>>
     public required string Contrasenia { get; set; }
 }
 
-public class LoginUsuarioQueryHandler(IUsuarioRepository _usuarios, IPasswordService _passwordService, IJwtService _jwtService)
+public class LoginUsuarioQueryHandler(IUnitOfWork _uow, IPasswordService _passwordService, IJwtService _jwtService)
     : IRequestHandler<LoginUsuarioQuery, ApiResponse<AuthResponseDto>>
 {
     private const string CredencialesInvalidas = "Credenciales inválidas.";
 
     public async Task<ApiResponse<AuthResponseDto>> Handle(LoginUsuarioQuery request, CancellationToken cancellationToken)
     {
-        var usuario = await _usuarios.GetByEmail(request.Email);
+        var usuario = await _uow.Usuarios.GetByEmail(request.Email);
 
         if (usuario is null || string.IsNullOrEmpty(usuario.Contrasenia))
             return ApiResponse<AuthResponseDto>.Fail(CredencialesInvalidas, ErrorType.Unauthorized);

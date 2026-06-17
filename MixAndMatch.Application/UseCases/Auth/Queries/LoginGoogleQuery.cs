@@ -13,7 +13,7 @@ public class LoginGoogleQuery : IRequest<ApiResponse<AuthResponseDto>>
     public required string IdToken { get; set; }
 }
 
-public class LoginGoogleQueryHandler(IUsuarioRepository _usuarios, IUnitOfWork _uow, IGoogleAuthService _googleAuth, IJwtService _jwtService)
+public class LoginGoogleQueryHandler(IUnitOfWork _uow, IGoogleAuthService _googleAuth, IJwtService _jwtService)
     : IRequestHandler<LoginGoogleQuery, ApiResponse<AuthResponseDto>>
 {
     public async Task<ApiResponse<AuthResponseDto>> Handle(LoginGoogleQuery request, CancellationToken cancellationToken)
@@ -22,7 +22,7 @@ public class LoginGoogleQueryHandler(IUsuarioRepository _usuarios, IUnitOfWork _
         if (info is null)
             return ApiResponse<AuthResponseDto>.Fail("Token de Google inválido.", ErrorType.Unauthorized);
 
-        var usuario = await _usuarios.GetByEmail(info.Email);
+        var usuario = await _uow.Usuarios.GetByEmail(info.Email);
 
         if (usuario is null)
         {
@@ -36,7 +36,7 @@ public class LoginGoogleQueryHandler(IUsuarioRepository _usuarios, IUnitOfWork _
                 CreatedAt     = DateTime.UtcNow
             };
 
-            await _usuarios.Add(usuario);
+            await _uow.Usuarios.Add(usuario);
             await _uow.Complete();
         }
         else if (usuario.Activo != true)
@@ -64,7 +64,7 @@ public class LoginGoogleQueryHandler(IUsuarioRepository _usuarios, IUnitOfWork _
         var candidato = baseName;
         var sufijo    = 1;
 
-        while (await _usuarios.ExistsByNombreUsuario(candidato))
+        while (await _uow.Usuarios.ExistsByNombreUsuario(candidato))
             candidato = $"{baseName}{sufijo++}";
 
         return candidato;

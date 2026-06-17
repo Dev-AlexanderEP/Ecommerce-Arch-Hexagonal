@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using MixAndMatch.Domain.Common;
-using MixAndMatch.Domain.Ports;
 using MixAndMatch.Domain.Ports.IRepositories;
 using MixAndMatch.Domain.Ports.IServices;
 using MixAndMatch.Infrastructure.Adapters;
@@ -35,10 +34,8 @@ public static class InfrastructureServicesExtensions
         });
 
         // Services Register
+        // Los repositorios especificos los expone el propio UnitOfWork (no se registran aparte).
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<IReseniaRepository, ReseniaRepository>();
-        services.AddScoped<IUsuarioRepository, UsuarioRepository>();
-        services.AddScoped<ICarritoRepository, CarritoRepository>();
         services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<IJwtService, JwtService>();
 
