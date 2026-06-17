@@ -1,9 +1,7 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
-using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Resenias;
 using MixAndMatch.Domain.Ports.IRepositories;
-using ReseniaEntity = MixAndMatch.Domain.Entities.Resenia;
 
 namespace MixAndMatch.Application.UseCases.Resenias.Queries;
 
@@ -17,7 +15,7 @@ public class GetReseniaByIdQueryHandler(IUnitOfWork _uow)
 {
     public async Task<ApiResponse<ReseniaResponseDto>> Handle(GetReseniaByIdQuery request, CancellationToken cancellationToken)
     {
-        var entity = await _uow.Repository<ReseniaEntity>().GetById(request.ReseniaId);
+        var entity = await _uow.Resenias.GetById(request.ReseniaId);
         if (entity is null)
         {
             return ApiResponse<ReseniaResponseDto>.Fail($"Resenia no encontrada para id {request.ReseniaId}.");

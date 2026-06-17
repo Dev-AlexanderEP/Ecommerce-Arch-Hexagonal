@@ -2,7 +2,6 @@
 using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
-using CategoriaEntity = MixAndMatch.Domain.Entities.Categoria;
 
 namespace MixAndMatch.Application.UseCases.Categoria.Queries;
 
@@ -15,10 +14,10 @@ public class GetCategoriaByIdQueryHandler(IUnitOfWork _uow) : IRequestHandler<Ge
 {
     public async Task<ApiResponse<CategoriaResponseDto>> Handle(GetCategoriaByIdQuery request, CancellationToken cancellationToken)
     {
-        var entity = await _uow.Repository<CategoriaEntity>().GetById(request.CategoriaId);
+        var entity = await _uow.Categorias.GetById(request.CategoriaId);
         if (entity is null)
         {
-            return ApiResponse<CategoriaResponseDto>.Fail($"CategorÃ­a no encontrada para id {request.CategoriaId}.");
+            return ApiResponse<CategoriaResponseDto>.Fail($"Categoría no encontrada para id {request.CategoriaId}.");
         }
 
         return ApiResponse<CategoriaResponseDto>.Ok(new CategoriaResponseDto

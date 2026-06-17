@@ -1,9 +1,7 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
-using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Descuentos;
 using MixAndMatch.Domain.Ports.IRepositories;
-using CategoriaEntity = MixAndMatch.Domain.Entities.Categoria;
 using DescuentoCategoriaEntity = MixAndMatch.Domain.Entities.DescuentoCategoria;
 
 namespace MixAndMatch.Application.UseCases.DescuentoCategoria.Commands;
@@ -21,20 +19,10 @@ public class CreateDescuentoCategoriaCommandHandler(IUnitOfWork _uow) : IRequest
 {
     public async Task<ApiResponse<DescuentoCategoriaResponseDto>> Handle(CreateDescuentoCategoriaCommand request, CancellationToken cancellationToken)
     {
-        if (request.Porcentaje < 0 || request.Porcentaje > 100)
-        {
-            return ApiResponse<DescuentoCategoriaResponseDto>.Fail("El porcentaje debe estar entre 0 y 100.");
-        }
-
-        if (request.FechaFin.HasValue && request.FechaFin.Value < request.FechaInicio)
-        {
-            return ApiResponse<DescuentoCategoriaResponseDto>.Fail("La fecha fin no puede ser menor a la fecha inicio.");
-        }
-
-        var categoria = await _uow.Repository<CategoriaEntity>().GetById(request.CategoriaId);
+        var categoria = await _uow.Categorias.GetById(request.CategoriaId);
         if (categoria is null)
         {
-            return ApiResponse<DescuentoCategoriaResponseDto>.Fail($"categorÃ­a no encontrada para id {request.CategoriaId}.");
+            return ApiResponse<DescuentoCategoriaResponseDto>.Fail($"Categoría no encontrada para id {request.CategoriaId}.", ErrorType.Validation);
         }
 
         var entity = new DescuentoCategoriaEntity
@@ -47,11 +35,10 @@ public class CreateDescuentoCategoriaCommandHandler(IUnitOfWork _uow) : IRequest
             CreatedAt = DateTime.UtcNow
         };
 
-        var repo = _uow.Repository<DescuentoCategoriaEntity>();
-        await repo.Add(entity);
+        await _uow.Repository<DescuentoCategoriaEntity>().Add(entity);
         await _uow.Complete();
 
-        return ApiResponse<DescuentoCategoriaResponseDto>.Ok(new DescuentoCategoriaResponseDto
+        return ApiResponse<DescuentoCategoriaResponseDto>.Created(new DescuentoCategoriaResponseDto
         {
             Id = entity.Id,
             CategoriaId = entity.CategoriaId,

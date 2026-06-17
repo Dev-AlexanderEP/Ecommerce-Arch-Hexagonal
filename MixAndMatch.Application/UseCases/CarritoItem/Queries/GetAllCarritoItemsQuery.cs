@@ -3,7 +3,6 @@ using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Carrito;
 using MixAndMatch.Domain.Ports.IRepositories;
-using CarritoItemEntity = MixAndMatch.Domain.Entities.CarritoItem;
 
 namespace MixAndMatch.Application.UseCases.CarritoItem.Queries;
 
@@ -17,12 +16,9 @@ public class GetAllCarritoItemsQueryHandler(IUnitOfWork _uow) : IRequestHandler<
 {
     public async Task<ApiPaginationResponse<CarritoItemResponseDto>> Handle(GetAllCarritoItemsQuery request, CancellationToken cancellationToken)
     {
-        var (items, total) = await _uow.Repository<CarritoItemEntity>().GetPaged(request.Page, request.PageSize);
-        if (!items.Any())
-        {
-            return ApiPaginationResponse<CarritoItemResponseDto>.Fail("No se encontraron ítems de carrito.");
-        }
+        var (items, total) = await _uow.CarritoItems.GetPaged(request.Page, request.PageSize);
 
+        // Una lista vacia no es un error: se devuelve 200 con data: [].
         return ApiPaginationResponse<CarritoItemResponseDto>.Ok(items.Select(x => new CarritoItemResponseDto
         {
             Id = x.Id,

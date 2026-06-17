@@ -1,4 +1,5 @@
-﻿using MediatR;
+using System.Text.Json.Serialization;
+using MediatR;
 using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.Common;
 using MixAndMatch.Domain.DTOs;
@@ -10,7 +11,8 @@ namespace MixAndMatch.Application.UseCases.Usuario.Commands;
 
 public class UpdateUsuarioCommand : IRequest<ApiResponse<UsuarioResponseDto>>
 {
-    public required long UsuarioId { get; set; }
+    [JsonIgnore]   // lo asigna el controller desde la ruta
+    public long UsuarioId { get; set; }
     public required string NombreUsuario { get; set; }
     public required string Email { get; set; }
     public string? Rol { get; set; }
@@ -23,30 +25,43 @@ public class UpdateUsuarioCommandHandler(IUnitOfWork _uow, IPasswordService _pas
 {
     public async Task<ApiResponse<UsuarioResponseDto>> Handle(UpdateUsuarioCommand request, CancellationToken cancellationToken)
     {
-        var repo   = _uow.Repository<UsuarioEntity>();
-        var entity = await repo.GetById(request.UsuarioId);
-
+        var entity = await _uow.Usuarios.GetById(request.UsuarioId);
         if (entity is null)
+        {
             return ApiResponse<UsuarioResponseDto>.Fail($"Usuario no encontrado para id {request.UsuarioId}.");
+        }
 
-        var emailTaken = (await repo.GetAll())
-            .Any(u => u.Email == request.Email && u.Id != request.UsuarioId);
-        if (emailTaken)
-            return ApiResponse<UsuarioResponseDto>.Fail($"El email {request.Email} ya está en uso por otro usuario.");
+        var nombreUsuario = request.NombreUsuario.Trim();
+        var email = request.Email.Trim();
 
-        if (request.Rol is not null && !Roles.IsValid(request.Rol))
-            return ApiResponse<UsuarioResponseDto>.Fail($"Rol inválido: {request.Rol}. Roles permitidos: {string.Join(", ", Roles.All)}.");
+        if (await _uow.Usuarios.ExistsByEmail(email, request.UsuarioId))
+        {
+            return ApiResponse<UsuarioResponseDto>.Fail($"El email {email} ya esta en uso por otro usuario.", ErrorType.Conflict);
+        }
 
-        entity.NombreUsuario = request.NombreUsuario;
-        entity.Email         = request.Email;
-        entity.Rol           = request.Rol;
+        if (await _uow.Usuarios.ExistsByNombreUsuario(nombreUsuario, request.UsuarioId))
+        {
+            return ApiResponse<UsuarioResponseDto>.Fail($"El nombre {nombreUsuario} ya esta en uso por otro usuario.", ErrorType.Conflict);
+        }
+
+        entity.NombreUsuario = nombreUsuario;
+        entity.Email         = email;
         entity.Activo        = request.Activo;
         entity.UpdatedAt     = DateTime.UtcNow;
 
-        if (!string.IsNullOrWhiteSpace(request.NuevaContrasenia))
-            entity.Contrasenia = _passwordService.Hash(request.NuevaContrasenia);
+        // El rol solo cambia si se envia; si se omite se conserva el actual.
+        if (!string.IsNullOrWhiteSpace(request.Rol))
+        {
+            Enum.TryParse<RolUsuario>(request.Rol, ignoreCase: true, out var parsedRol);
+            entity.Rol = parsedRol;
+        }
 
-        await repo.Update(entity);
+        if (!string.IsNullOrWhiteSpace(request.NuevaContrasenia))
+        {
+            entity.Contrasenia = _passwordService.Hash(request.NuevaContrasenia);
+        }
+
+        await _uow.Usuarios.Update(entity);
         await _uow.Complete();
 
         return ApiResponse<UsuarioResponseDto>.Ok(new UsuarioResponseDto
@@ -54,7 +69,7 @@ public class UpdateUsuarioCommandHandler(IUnitOfWork _uow, IPasswordService _pas
             Id            = entity.Id,
             NombreUsuario = entity.NombreUsuario,
             Email         = entity.Email,
-            Rol           = entity.Rol,
+            Rol           = entity.Rol?.ToString(),
             Activo        = entity.Activo,
             CreatedAt     = entity.CreatedAt,
             UpdatedAt     = entity.UpdatedAt

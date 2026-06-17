@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.Common;
 using MixAndMatch.Domain.DTOs;
@@ -22,34 +22,45 @@ public class CreateUsuarioCommandHandler(IUnitOfWork _uow, IPasswordService _pas
 {
     public async Task<ApiResponse<UsuarioResponseDto>> Handle(CreateUsuarioCommand request, CancellationToken cancellationToken)
     {
-        var repo = _uow.Repository<UsuarioEntity>();
+        var nombreUsuario = request.NombreUsuario.Trim();
+        var email = request.Email.Trim();
 
-        var existing = (await repo.GetAll()).FirstOrDefault(u => u.Email == request.Email);
-        if (existing is not null)
-            return ApiResponse<UsuarioResponseDto>.Fail($"Ya existe un usuario con el email {request.Email}.");
+        if (await _uow.Usuarios.ExistsByEmail(email))
+        {
+            return ApiResponse<UsuarioResponseDto>.Fail($"Ya existe un usuario con el email {email}.", ErrorType.Conflict);
+        }
 
-        if (request.Rol is not null && !Roles.IsValid(request.Rol))
-            return ApiResponse<UsuarioResponseDto>.Fail($"Rol inválido: {request.Rol}. Roles permitidos: {string.Join(", ", Roles.All)}.");
+        if (await _uow.Usuarios.ExistsByNombreUsuario(nombreUsuario))
+        {
+            return ApiResponse<UsuarioResponseDto>.Fail($"Ya existe un usuario con el nombre {nombreUsuario}.", ErrorType.Conflict);
+        }
+
+        // El formato del rol ya lo valida el validador (400); por defecto CLIENTE.
+        var rol = RolUsuario.CLIENTE;
+        if (!string.IsNullOrWhiteSpace(request.Rol))
+        {
+            Enum.TryParse(request.Rol, ignoreCase: true, out rol);
+        }
 
         var entity = new UsuarioEntity
         {
-            NombreUsuario = request.NombreUsuario,
-            Email         = request.Email,
+            NombreUsuario = nombreUsuario,
+            Email         = email,
             Contrasenia   = _passwordService.Hash(request.Contrasenia),
-            Rol           = request.Rol ?? Roles.User,
+            Rol           = rol,
             Activo        = request.Activo,
             CreatedAt     = DateTime.UtcNow
         };
 
-        await repo.Add(entity);
+        await _uow.Usuarios.Add(entity);
         await _uow.Complete();
 
-        return ApiResponse<UsuarioResponseDto>.Ok(new UsuarioResponseDto
+        return ApiResponse<UsuarioResponseDto>.Created(new UsuarioResponseDto
         {
             Id            = entity.Id,
             NombreUsuario = entity.NombreUsuario,
             Email         = entity.Email,
-            Rol           = entity.Rol,
+            Rol           = entity.Rol?.ToString(),
             Activo        = entity.Activo,
             CreatedAt     = entity.CreatedAt,
             UpdatedAt     = entity.UpdatedAt

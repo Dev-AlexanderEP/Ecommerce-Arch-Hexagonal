@@ -22,6 +22,51 @@ public class UnitOfWork : IUnitOfWork
     private ICarritoRepository? _carritos;
     public ICarritoRepository Carritos => _carritos ??= new CarritoRepository(_context);
 
+    private ICarritoItemRepository? _carritoItems;
+    public ICarritoItemRepository CarritoItems => _carritoItems ??= new CarritoItemRepository(_context);
+
+    private ICategoriaRepository? _categorias;
+    public ICategoriaRepository Categorias => _categorias ??= new CategoriaRepository(_context);
+
+    private IGeneroRepository? _generos;
+    public IGeneroRepository Generos => _generos ??= new GeneroRepository(_context);
+
+    private IMarcaRepository? _marcas;
+    public IMarcaRepository Marcas => _marcas ??= new MarcaRepository(_context);
+
+    private IPrendaRepository? _prendas;
+    public IPrendaRepository Prendas => _prendas ??= new PrendaRepository(_context);
+
+    private IPrendaTallaRepository? _prendaTallas;
+    public IPrendaTallaRepository PrendaTallas => _prendaTallas ??= new PrendaTallaRepository(_context);
+
+    private IProveedorRepository? _proveedores;
+    public IProveedorRepository Proveedores => _proveedores ??= new ProveedorRepository(_context);
+
+    private ITallaRepository? _tallas;
+    public ITallaRepository Tallas => _tallas ??= new TallaRepository(_context);
+
+    private IVentaRepository? _ventas;
+    public IVentaRepository Ventas => _ventas ??= new VentaRepository(_context);
+
+    private IVentasDetalleRepository? _ventasDetalles;
+    public IVentasDetalleRepository VentasDetalles => _ventasDetalles ??= new VentasDetalleRepository(_context);
+
+    private IDescuentoCodigoRepository? _descuentoCodigos;
+    public IDescuentoCodigoRepository DescuentoCodigos => _descuentoCodigos ??= new DescuentoCodigoRepository(_context);
+
+    private IDescuentoUsuarioRepository? _descuentoUsuarios;
+    public IDescuentoUsuarioRepository DescuentoUsuarios => _descuentoUsuarios ??= new DescuentoUsuarioRepository(_context);
+
+    private IDatosEnvioRepository? _datosEnvios;
+    public IDatosEnvioRepository DatosEnvios => _datosEnvios ??= new DatosEnvioRepository(_context);
+
+    private IEnvioRepository? _envios;
+    public IEnvioRepository Envios => _envios ??= new EnvioRepository(_context);
+
+    private IMetodoPagoRepository? _metodoPagos;
+    public IMetodoPagoRepository MetodoPagos => _metodoPagos ??= new MetodoPagoRepository(_context);
+
     private IReseniaRepository? _resenias;
     public IReseniaRepository Resenias => _resenias ??= new ReseniaRepository(_context);
 

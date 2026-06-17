@@ -1,13 +1,16 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.PrendaImagen.Commands;
 using MixAndMatch.Application.UseCases.PrendaImagen.Queries;
+using MixAndMatch.Domain.Common;
 
 namespace MixAndMatch.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class PrendaImagenesController(IMediator _mediator) : ControllerBase
 {
     [HttpGet]
@@ -19,10 +22,12 @@ public class PrendaImagenesController(IMediator _mediator) : ControllerBase
         this.ToActionResult(await _mediator.Send(new GetPrendaImagenByIdQuery { PrendaImagenId = id }));
 
     [HttpPost]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
     public async Task<IActionResult> Create([FromBody] CreatePrendaImagenCommand command) =>
         this.ToActionResult(await _mediator.Send(command));
 
     [HttpPut("{id}")]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
     public async Task<IActionResult> Update(long id, [FromBody] UpdatePrendaImagenCommand command)
     {
         command.PrendaImagenId = id;
@@ -30,6 +35,7 @@ public class PrendaImagenesController(IMediator _mediator) : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
     public async Task<IActionResult> Delete(long id) =>
         this.ToActionResult(await _mediator.Send(new DeletePrendaImagenCommand { PrendaImagenId = id }));
 }

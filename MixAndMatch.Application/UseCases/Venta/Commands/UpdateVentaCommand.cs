@@ -1,41 +1,39 @@
-﻿using MediatR;
+using System.Text.Json.Serialization;
+using MediatR;
 using MixAndMatch.Application.Common;
-using MixAndMatch.Domain.DTOs;
+using MixAndMatch.Domain.Common;
 using MixAndMatch.Domain.DTOs.Ventas;
 using MixAndMatch.Domain.Ports.IRepositories;
-using VentaEntity = MixAndMatch.Domain.Entities.Venta;
 
 namespace MixAndMatch.Application.UseCases.Venta.Commands;
 
 public class UpdateVentaCommand : IRequest<ApiResponse<VentaResponseDto>>
 {
-    public required long VentaId { get; set; }
+    [JsonIgnore]   // lo asigna el controller desde la ruta
+    public long VentaId { get; set; }
     public required string Estado { get; set; }
 }
 
 public class UpdateVentaCommandHandler(IUnitOfWork _uow) : IRequestHandler<UpdateVentaCommand, ApiResponse<VentaResponseDto>>
 {
-    private static readonly HashSet<string> EstadosValidos = ["PENDIENTE", "PROCESANDO", "ENVIADO", "ENTREGADO", "CANCELADO"];
-
     public async Task<ApiResponse<VentaResponseDto>> Handle(UpdateVentaCommand request, CancellationToken cancellationToken)
     {
-        var repo = _uow.Repository<VentaEntity>();
-        var entity = await repo.GetById(request.VentaId);
+        var entity = await _uow.Ventas.GetById(request.VentaId);
         if (entity is null)
         {
             return ApiResponse<VentaResponseDto>.Fail($"Venta no encontrada para id {request.VentaId}.");
         }
 
-        var estado = (request.Estado ?? string.Empty).Trim().ToUpperInvariant();
-        if (!EstadosValidos.Contains(estado))
+        // El formato del estado ya lo valida UpdateVentaCommandValidator (400); esto es defensa.
+        if (!Enum.TryParse<EstadoVenta>(request.Estado, ignoreCase: true, out var nuevoEstado))
         {
-            return ApiResponse<VentaResponseDto>.Fail($"Estado invÃ¡lido. Valores permitidos: {string.Join(", ", EstadosValidos)}.");
+            return ApiResponse<VentaResponseDto>.Fail($"Estado inválido: {request.Estado}. Permitidos: {string.Join(", ", Enum.GetNames<EstadoVenta>())}.", ErrorType.Validation);
         }
 
-        entity.Estado = estado;
+        entity.Estado = nuevoEstado;
         entity.UpdatedAt = DateTime.UtcNow;
 
-        await repo.Update(entity);
+        await _uow.Ventas.Update(entity);
         await _uow.Complete();
 
         return ApiResponse<VentaResponseDto>.Ok(new VentaResponseDto
@@ -43,7 +41,7 @@ public class UpdateVentaCommandHandler(IUnitOfWork _uow) : IRequestHandler<Updat
             Id = entity.Id,
             UsuarioId = entity.UsuarioId,
             FechaCreacion = entity.FechaCreacion,
-            Estado = entity.Estado,
+            Estado = entity.Estado?.ToString(),
             UpdatedAt = entity.UpdatedAt
         });
     }

@@ -1,8 +1,6 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
-using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
-using UsuarioEntity = MixAndMatch.Domain.Entities.Usuario;
 
 namespace MixAndMatch.Application.UseCases.Usuario.Commands;
 
@@ -15,15 +13,19 @@ public class DeleteUsuarioCommandHandler(IUnitOfWork _uow) : IRequestHandler<Del
 {
     public async Task<ApiResponse<bool>> Handle(DeleteUsuarioCommand request, CancellationToken cancellationToken)
     {
-        var repo   = _uow.Repository<UsuarioEntity>();
-        var entity = await repo.GetById(request.UsuarioId);
-
+        var entity = await _uow.Usuarios.GetById(request.UsuarioId);
         if (entity is null)
+        {
             return ApiResponse<bool>.Fail($"Usuario no encontrado para id {request.UsuarioId}.");
+        }
 
-        await repo.Delete(request.UsuarioId);
+        // Soft-delete: el usuario conserva su historial (ventas, resenias, etc.); solo se desactiva.
+        entity.Activo = false;
+        entity.UpdatedAt = DateTime.UtcNow;
+
+        await _uow.Usuarios.Update(entity);
         await _uow.Complete();
 
-        return ApiResponse<bool>.Ok(true, "Usuario eliminado correctamente.");
+        return ApiResponse<bool>.Ok(true, "Usuario desactivado correctamente.");
     }
 }

@@ -1,7 +1,5 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
-using MixAndMatch.Domain.DTOs;
-using MixAndMatch.Domain.DTOs.Descuentos;
 using MixAndMatch.Domain.Ports.IRepositories;
 using DescuentoPrendaEntity = MixAndMatch.Domain.Entities.DescuentoPrenda;
 

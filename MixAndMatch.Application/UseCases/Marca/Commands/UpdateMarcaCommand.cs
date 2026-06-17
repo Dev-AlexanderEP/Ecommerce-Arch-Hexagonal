@@ -1,14 +1,15 @@
-﻿using MediatR;
+using System.Text.Json.Serialization;
+using MediatR;
 using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
-using MarcaEntity = MixAndMatch.Domain.Entities.Marca;
 
 namespace MixAndMatch.Application.UseCases.Marca.Commands;
 
 public class UpdateMarcaCommand : IRequest<ApiResponse<MarcaResponseDto>>
 {
-    public required long MarcaId { get; set; }
+    [JsonIgnore]   // lo asigna el controller desde la ruta
+    public long MarcaId { get; set; }
     public required string NomMarca { get; set; }
 }
 
@@ -16,27 +17,20 @@ public class UpdateMarcaCommandHandler(IUnitOfWork _uow) : IRequestHandler<Updat
 {
     public async Task<ApiResponse<MarcaResponseDto>> Handle(UpdateMarcaCommand request, CancellationToken cancellationToken)
     {
-        var repo = _uow.Repository<MarcaEntity>();
-        var entity = await repo.GetById(request.MarcaId);
+        var entity = await _uow.Marcas.GetById(request.MarcaId);
         if (entity is null)
         {
             return ApiResponse<MarcaResponseDto>.Fail($"Marca no encontrada para id {request.MarcaId}.");
         }
 
-        var nombre = (request.NomMarca ?? string.Empty).Trim();
-        if (string.IsNullOrWhiteSpace(nombre))
+        var nombre = request.NomMarca.Trim();
+        if (await _uow.Marcas.ExisteConNombre(nombre, request.MarcaId))
         {
-            return ApiResponse<MarcaResponseDto>.Fail("El nombre de la marca es obligatorio.");
-        }
-
-        var items = await repo.GetAll();
-        if (items.Any(x => x.Id != request.MarcaId && x.NomMarca == nombre))
-        {
-            return ApiResponse<MarcaResponseDto>.Fail("La marca ya existe.");
+            return ApiResponse<MarcaResponseDto>.Fail("La marca ya existe.", ErrorType.Conflict);
         }
 
         entity.NomMarca = nombre;
-        await repo.Update(entity);
+        await _uow.Marcas.Update(entity);
         await _uow.Complete();
 
         return ApiResponse<MarcaResponseDto>.Ok(new MarcaResponseDto

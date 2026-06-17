@@ -1,61 +1,49 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.MetodoPago.Commands;
 using MixAndMatch.Application.UseCases.MetodoPago.Queries;
-using MixAndMatch.Application.UseCases.MetodoPagoUseCase.Commands;
+using MixAndMatch.Domain.Common;
 
 namespace MixAndMatch.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class MetodoPagoController(IMediator mediator) : ControllerBase
+[Authorize]
+public class MetodoPagoController(IMediator _mediator) : ControllerBase
 {
-    private readonly IMediator _mediator = mediator;
-
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
-        var result = await _mediator.Send(new GetAllMetodoPagoQuery { Page = page, PageSize = pageSize });
-        return Ok(result);
+        return this.ToActionResult(await _mediator.Send(new GetAllMetodoPagoQuery { Page = page, PageSize = pageSize }));
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(long id)
     {
-        var result = await _mediator.Send(new GetMetodoPagoByIdQuery
-        {
-            Id = id
-        });
-
-        return Ok(result);
+        return this.ToActionResult(await _mediator.Send(new GetMetodoPagoByIdQuery { Id = id }));
     }
 
     [HttpPost]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
     public async Task<IActionResult> Create([FromBody] CreateMetodoPagoCommand command)
     {
-        var result = await _mediator.Send(command);
-        return Ok(result);
+        return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(
-        long id,
-        [FromBody] UpdateMetodoPagoCommand command)
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    public async Task<IActionResult> Update(long id, [FromBody] UpdateMetodoPagoCommand command)
     {
         command.Id = id;
-
-        var result = await _mediator.Send(command);
-        return Ok(result);
+        return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
     public async Task<IActionResult> Delete(long id)
     {
-        var result = await _mediator.Send(new DeleteMetodoPagoCommand
-        {
-            Id = id
-        });
-
-        return Ok(result);
+        return this.ToActionResult(await _mediator.Send(new DeleteMetodoPagoCommand { Id = id }));
     }
 }

@@ -15,11 +15,11 @@ public class UsuarioRepository(MixAndMatchDbContext context)
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Email == email);
 
-    public Task<bool> ExistsByEmail(string email) =>
+    public Task<bool> ExistsByEmail(string email, long? exceptoId = null) =>
         _context.Set<Usuario>()
-            .AnyAsync(u => u.Email == email);
+            .AnyAsync(u => u.Email == email && (exceptoId == null || u.Id != exceptoId));
 
-    public Task<bool> ExistsByNombreUsuario(string nombreUsuario) =>
+    public Task<bool> ExistsByNombreUsuario(string nombreUsuario, long? exceptoId = null) =>
         _context.Set<Usuario>()
-            .AnyAsync(u => u.NombreUsuario == nombreUsuario);
+            .AnyAsync(u => u.NombreUsuario == nombreUsuario && (exceptoId == null || u.Id != exceptoId));
 }

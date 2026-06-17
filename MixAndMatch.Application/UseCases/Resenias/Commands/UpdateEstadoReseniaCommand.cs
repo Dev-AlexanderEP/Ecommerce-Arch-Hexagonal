@@ -1,6 +1,6 @@
-﻿using MediatR;
+using System.Text.Json.Serialization;
+using MediatR;
 using MixAndMatch.Application.Common;
-using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Resenias;
 using MixAndMatch.Domain.Entities;
 using MixAndMatch.Domain.Ports.IRepositories;
@@ -10,12 +10,10 @@ namespace MixAndMatch.Application.UseCases.Resenias.Commands;
 
 public class UpdateEstadoReseniaCommand : IRequest<ApiResponse<ReseniaResponseDto>>
 {
-    public required long ReseniaId { get; set; }
-
+    [JsonIgnore]   // lo asigna el controller desde la ruta
+    public long ReseniaId { get; set; }
     public required EstadoResenia Estado { get; set; }
-
     public Guid ModeradoPorId { get; set; }
-
     public string? MotivoRechazo { get; set; }
 }
 
@@ -24,20 +22,10 @@ public class UpdateEstadoReseniaCommandHandler(IUnitOfWork _uow)
 {
     public async Task<ApiResponse<ReseniaResponseDto>> Handle(UpdateEstadoReseniaCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _uow.Repository<ReseniaEntity>().GetById(request.ReseniaId);
+        var entity = await _uow.Resenias.GetById(request.ReseniaId);
         if (entity is null)
         {
             return ApiResponse<ReseniaResponseDto>.Fail($"Resenia no encontrada para id {request.ReseniaId}.");
-        }
-
-        if (request.Estado == EstadoResenia.PENDIENTE)
-        {
-            return ApiResponse<ReseniaResponseDto>.Fail("El estado de moderacion no puede ser PENDIENTE.");
-        }
-
-        if (request.Estado == EstadoResenia.RECHAZADA && string.IsNullOrWhiteSpace(request.MotivoRechazo))
-        {
-            return ApiResponse<ReseniaResponseDto>.Fail("El motivo de rechazo es obligatorio.");
         }
 
         entity.Estado = request.Estado;
@@ -48,7 +36,7 @@ public class UpdateEstadoReseniaCommandHandler(IUnitOfWork _uow)
             : null;
         entity.UpdatedAt = DateTime.UtcNow;
 
-        await _uow.Repository<ReseniaEntity>().Update(entity);
+        await _uow.Resenias.Update(entity);
         await _uow.Complete();
 
         return ApiResponse<ReseniaResponseDto>.Ok(new ReseniaResponseDto

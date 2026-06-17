@@ -1,8 +1,7 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
-using PrendaEntity = MixAndMatch.Domain.Entities.Prenda;
 
 namespace MixAndMatch.Application.UseCases.Prenda.Queries;
 
@@ -16,12 +15,9 @@ public class GetAllPrendasQueryHandler(IUnitOfWork _uow) : IRequestHandler<GetAl
 {
     public async Task<ApiPaginationResponse<PrendaResponseDto>> Handle(GetAllPrendasQuery request, CancellationToken cancellationToken)
     {
-        var (items, total) = await _uow.Repository<PrendaEntity>().GetPaged(request.Page, request.PageSize);
-        if (!items.Any())
-        {
-            return ApiPaginationResponse<PrendaResponseDto>.Fail("No se encontraron prendas.");
-        }
+        var (items, total) = await _uow.Prendas.GetPaged(request.Page, request.PageSize);
 
+        // Una lista vacia no es un error: se devuelve 200 con data: [].
         return ApiPaginationResponse<PrendaResponseDto>.Ok(items.Select(x => new PrendaResponseDto
         {
             Id = x.Id,

@@ -1,9 +1,7 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
-using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Descuentos;
 using MixAndMatch.Domain.Ports.IRepositories;
-using DescuentoCodigoEntity = MixAndMatch.Domain.Entities.DescuentoCodigo;
 
 namespace MixAndMatch.Application.UseCases.DescuentoCodigo.Queries;
 
@@ -16,7 +14,7 @@ public class GetDescuentoCodigoByIdQueryHandler(IUnitOfWork _uow) : IRequestHand
 {
     public async Task<ApiResponse<DescuentoCodigoResponseDto>> Handle(GetDescuentoCodigoByIdQuery request, CancellationToken cancellationToken)
     {
-        var entity = await _uow.Repository<DescuentoCodigoEntity>().GetById(request.DescuentoCodigoId);
+        var entity = await _uow.DescuentoCodigos.GetById(request.DescuentoCodigoId);
         if (entity is null)
         {
             return ApiResponse<DescuentoCodigoResponseDto>.Fail($"Descuento de código no encontrado para id {request.DescuentoCodigoId}.");

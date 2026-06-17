@@ -1,9 +1,6 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
-using MixAndMatch.Domain.DTOs;
-using MixAndMatch.Domain.DTOs.Descuentos;
 using MixAndMatch.Domain.Ports.IRepositories;
-using DescuentoCodigoEntity = MixAndMatch.Domain.Entities.DescuentoCodigo;
 
 namespace MixAndMatch.Application.UseCases.DescuentoCodigo.Commands;
 
@@ -16,14 +13,18 @@ public class DeleteDescuentoCodigoCommandHandler(IUnitOfWork _uow) : IRequestHan
 {
     public async Task<ApiResponse<bool>> Handle(DeleteDescuentoCodigoCommand request, CancellationToken cancellationToken)
     {
-        var repo = _uow.Repository<DescuentoCodigoEntity>();
-        var entity = await repo.GetById(request.DescuentoCodigoId);
+        var entity = await _uow.DescuentoCodigos.GetById(request.DescuentoCodigoId);
         if (entity is null)
         {
             return ApiResponse<bool>.Fail($"Descuento de código no encontrado para id {request.DescuentoCodigoId}.");
         }
 
-        await repo.Delete(request.DescuentoCodigoId);
+        if (await _uow.DescuentoCodigos.TieneUsos(request.DescuentoCodigoId))
+        {
+            return ApiResponse<bool>.Fail("El código de descuento tiene usos asociados.", ErrorType.Conflict);
+        }
+
+        await _uow.DescuentoCodigos.Delete(request.DescuentoCodigoId);
         await _uow.Complete();
         return ApiResponse<bool>.Ok(true, "Descuento de código eliminado correctamente.");
     }

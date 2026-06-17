@@ -1,9 +1,7 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
-using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Ventas;
 using MixAndMatch.Domain.Ports.IRepositories;
-using VentasDetalleEntity = MixAndMatch.Domain.Entities.VentasDetalle;
 
 namespace MixAndMatch.Application.UseCases.VentasDetalle.Queries;
 
@@ -17,12 +15,9 @@ public class GetAllVentasDetallesQueryHandler(IUnitOfWork _uow) : IRequestHandle
 {
     public async Task<ApiPaginationResponse<VentasDetalleResponseDto>> Handle(GetAllVentasDetallesQuery request, CancellationToken cancellationToken)
     {
-        var (items, total) = await _uow.Repository<VentasDetalleEntity>().GetPaged(request.Page, request.PageSize);
-        if (!items.Any())
-        {
-            return ApiPaginationResponse<VentasDetalleResponseDto>.Fail("No se encontraron detalles de venta.");
-        }
+        var (items, total) = await _uow.VentasDetalles.GetPaged(request.Page, request.PageSize);
 
+        // Una lista vacia no es un error: se devuelve 200 con data: [].
         return ApiPaginationResponse<VentasDetalleResponseDto>.Ok(items.Select(x => new VentasDetalleResponseDto
         {
             Id = x.Id,

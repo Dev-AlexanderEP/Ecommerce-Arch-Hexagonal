@@ -1,6 +1,6 @@
-﻿using MediatR;
+using System.Text.Json.Serialization;
+using MediatR;
 using MixAndMatch.Application.Common;
-using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Resenias;
 using MixAndMatch.Domain.Entities;
 using MixAndMatch.Domain.Ports.IRepositories;
@@ -10,11 +10,13 @@ namespace MixAndMatch.Application.UseCases.Resenias.Commands;
 
 public class UpdateReseniaCommand : IRequest<ApiResponse<ReseniaResponseDto>>
 {
-    public required long ReseniaId { get; set; }
-
+    [JsonIgnore]   // lo asigna el controller desde la ruta
+    public long ReseniaId { get; set; }
     public required int Calificacion { get; set; }
-
     public string? Comentario { get; set; }
+
+    [JsonIgnore]   // lo asigna el controller desde el token, nunca el body
+    public long SolicitanteId { get; set; }
 }
 
 public class UpdateReseniaCommandHandler(IUnitOfWork _uow)
@@ -22,27 +24,27 @@ public class UpdateReseniaCommandHandler(IUnitOfWork _uow)
 {
     public async Task<ApiResponse<ReseniaResponseDto>> Handle(UpdateReseniaCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _uow.Repository<ReseniaEntity>().GetById(request.ReseniaId);
+        var entity = await _uow.Resenias.GetById(request.ReseniaId);
         if (entity is null)
         {
             return ApiResponse<ReseniaResponseDto>.Fail($"Resenia no encontrada para id {request.ReseniaId}.");
         }
 
-        if (entity.Estado != EstadoResenia.PENDIENTE)
+        if (entity.UsuarioId != request.SolicitanteId)
         {
-            return ApiResponse<ReseniaResponseDto>.Fail("Solo se pueden actualizar resenias en estado PENDIENTE.");
+            return ApiResponse<ReseniaResponseDto>.Fail("No tienes acceso a esta resenia.", ErrorType.Forbidden);
         }
 
-        if (request.Calificacion < 1 || request.Calificacion > 5)
+        if (entity.Estado != EstadoResenia.PENDIENTE)
         {
-            return ApiResponse<ReseniaResponseDto>.Fail("La calificacion debe estar entre 1 y 5.");
+            return ApiResponse<ReseniaResponseDto>.Fail("Solo se pueden actualizar resenias en estado PENDIENTE.", ErrorType.Conflict);
         }
 
         entity.Calificacion = request.Calificacion;
         entity.Comentario = request.Comentario;
         entity.UpdatedAt = DateTime.UtcNow;
 
-        await _uow.Repository<ReseniaEntity>().Update(entity);
+        await _uow.Resenias.Update(entity);
         await _uow.Complete();
 
         return ApiResponse<ReseniaResponseDto>.Ok(new ReseniaResponseDto
