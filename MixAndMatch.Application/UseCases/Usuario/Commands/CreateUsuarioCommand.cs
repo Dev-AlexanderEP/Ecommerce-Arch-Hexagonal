@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using MixAndMatch.Application.Common;
+using MixAndMatch.Application.UseCases.Notificacion.Commands;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using MixAndMatch.Domain.Ports.IServices;
@@ -16,7 +17,7 @@ public class CreateUsuarioCommand : IRequest<ApiResponse<UsuarioResponseDto>>
     public bool Activo { get; set; } = true;
 }
 
-public class CreateUsuarioCommandHandler(IUnitOfWork _uow, IPasswordService _passwordService)
+public class CreateUsuarioCommandHandler(IUnitOfWork _uow, IPasswordService _passwordService, IMediator _mediator)
     : IRequestHandler<CreateUsuarioCommand, ApiResponse<UsuarioResponseDto>>
 {
     public async Task<ApiResponse<UsuarioResponseDto>> Handle(CreateUsuarioCommand request, CancellationToken cancellationToken)
@@ -39,6 +40,19 @@ public class CreateUsuarioCommandHandler(IUnitOfWork _uow, IPasswordService _pas
 
         await repo.Add(entity);
         await _uow.Complete();
+
+        try
+        {
+            await _mediator.Send(new SendWelcomeEmailCommand
+            {
+                Email         = entity.Email,
+                NombreUsuario = entity.NombreUsuario
+            }, cancellationToken);
+        }
+        catch
+        {
+            // el registro no debe fallar si el SMTP no esta disponible o configurado
+        }
 
         return ApiResponse<UsuarioResponseDto>.Ok(new UsuarioResponseDto
         {
