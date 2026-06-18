@@ -10,6 +10,7 @@ using MixAndMatch.Domain.Ports.IServices;
 using MixAndMatch.Infrastructure.Adapters;
 using MixAndMatch.Infrastructure.Adapters.Services;
 using MixAndMatch.Infrastructure.Middlewares;
+using StackExchange.Redis;
 
 namespace MixAndMatch.Infrastructure.Configuration;
 
@@ -66,6 +67,16 @@ public static class InfrastructureServicesExtensions
             });
 
         services.AddAuthorization();
+
+        // Redis
+        services.AddSingleton<IConnectionMultiplexer>(_ =>
+            ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")!));
+        services.AddScoped<ICacheService, RedisCacheService>();
+
+        // Notifications (SMTP Gmail)
+        services.Configure<SmtpSettings>(configuration.GetSection("Smtp"));
+        services.AddScoped<IEmailService, SmtpEmailService>();
+        services.AddScoped<IEmailTemplateService, EmailTemplateService>();
 
         // Middlewares
         services.AddExceptionHandler<GlobalExceptionHandler>();

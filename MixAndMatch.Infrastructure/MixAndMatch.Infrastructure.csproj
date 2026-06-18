@@ -16,6 +16,7 @@
       <PackageReference Include="Google.Apis.Auth" Version="1.75.0" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.16" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+      <PackageReference Include="StackExchange.Redis" Version="3.0.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -25,6 +26,10 @@
     <ItemGroup>
       <Folder Include="Adapters\Services\" />
       <Folder Include="Middlewares\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="www\EmailTemplates\*.html" />
     </ItemGroup>
 
 </Project>
