@@ -2,7 +2,6 @@ using MediatR;
 using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.Ports.IRepositories;
 using MixAndMatch.Domain.Ports.IServices;
-using UsuarioEntity = MixAndMatch.Domain.Entities.Usuario;
 
 namespace MixAndMatch.Application.UseCases.Notificacion.Commands;
 
@@ -22,11 +21,10 @@ public class SendRecuperacionContraseniaCommandHandler(
 
     public async Task<ApiResponse<bool>> Handle(SendRecuperacionContraseniaCommand request, CancellationToken cancellationToken)
     {
-        var usuario = (await _uow.Repository<UsuarioEntity>().GetAll())
-            .FirstOrDefault(u => u.Email == request.Email);
+        var usuario = await _uow.Usuarios.GetByEmail(request.Email);
 
         if (usuario is null)
-            return ApiResponse<bool>.Fail("No existe una cuenta registrada con ese correo.");
+            return ApiResponse<bool>.Fail("No existe una cuenta registrada con ese correo.", ErrorType.NotFound);
 
         var codigo = System.Security.Cryptography.RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
         await _cache.SetAsync($"otp:recovery:{request.Email}", codigo, Expiracion);
@@ -37,8 +35,8 @@ public class SendRecuperacionContraseniaCommandHandler(
             ["Codigo"]        = codigo
         });
 
-        await _emailService.SendAsync(request.Email, "Codigo de recuperacion - Mix&Match", html);
+        await _emailService.SendAsync(request.Email, "Código de recuperación - Mix&Match", html);
 
-        return ApiResponse<bool>.Ok(true, "Se envio el codigo de recuperacion al correo indicado.");
+        return ApiResponse<bool>.Ok(true, "Se envió el código de recuperación al correo indicado.");
     }
 }

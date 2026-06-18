@@ -2,9 +2,6 @@ using MediatR;
 using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.Ports.IRepositories;
 using MixAndMatch.Domain.Ports.IServices;
-using UsuarioEntity = MixAndMatch.Domain.Entities.Usuario;
-using VentaDetalleEntity = MixAndMatch.Domain.Entities.VentasDetalle;
-using VentaEntity = MixAndMatch.Domain.Entities.Venta;
 
 namespace MixAndMatch.Application.UseCases.Notificacion.Commands;
 
@@ -21,27 +18,22 @@ public class SendConfirmacionVentaEmailCommandHandler(
 {
     public async Task<ApiResponse<bool>> Handle(SendConfirmacionVentaEmailCommand request, CancellationToken cancellationToken)
     {
-        var venta = await _uow.Repository<VentaEntity>().GetById(request.VentaId);
+        var venta = await _uow.Ventas.GetByIdConDetalles(request.VentaId);
         if (venta is null)
-            return ApiResponse<bool>.Fail($"Venta no encontrada para id {request.VentaId}.");
+            return ApiResponse<bool>.Fail($"Venta no encontrada para id {request.VentaId}.", ErrorType.NotFound);
 
-        var usuario = await _uow.Repository<UsuarioEntity>().GetById(venta.UsuarioId);
+        var usuario = await _uow.Usuarios.GetById(venta.UsuarioId);
         if (usuario is null)
-            return ApiResponse<bool>.Fail("Usuario de la venta no encontrado.");
-
-        var detalles = (await _uow.Repository<VentaDetalleEntity>().GetAll())
-            .Where(d => d.VentaId == request.VentaId);
-
-        var total = detalles.Sum(d => d.Cantidad * d.PrecioUnitario);
+            return ApiResponse<bool>.Fail("Usuario de la venta no encontrado.", ErrorType.NotFound);
 
         var html = _templates.Render("ConfirmacionVenta", new Dictionary<string, string>
         {
             ["VentaId"] = request.VentaId.ToString(),
-            ["Total"]   = total.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)
+            ["Total"]   = venta.Total.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)
         });
 
-        await _emailService.SendAsync(usuario.Email, $"Confirmacion de pedido #{request.VentaId} - Mix&Match", html);
+        await _emailService.SendAsync(usuario.Email, $"Confirmación de pedido #{request.VentaId} - Mix&Match", html);
 
-        return ApiResponse<bool>.Ok(true, "Correo de confirmacion de venta enviado.");
+        return ApiResponse<bool>.Ok(true, "Correo de confirmación de venta enviado.");
     }
 }
