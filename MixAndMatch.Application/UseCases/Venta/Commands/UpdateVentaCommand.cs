@@ -36,7 +36,7 @@ public class UpdateVentaCommandHandler(IUnitOfWork _uow, IMediator _mediator)
         await _uow.Ventas.Update(entity);
         await _uow.Complete();
 
-        if (estado == "PROCESANDO")
+        if (request.Estado == "PROCESANDO")
         {
             try
             {
