@@ -18,4 +18,16 @@ public class CarritoRepository(MixAndMatchDbContext context)
     public Task<bool> TieneItems(long carritoId) =>
         _context.Set<CarritoItem>()
             .AnyAsync(i => i.CarritoId == carritoId);
+
+    public async Task<int> MarcarAbandonadosAsync(int diasInactividad)
+    {
+        var umbral = DateTime.UtcNow.AddDays(-diasInactividad);
+        return await _context.Set<Carrito>()
+            .Where(c => c.Estado == EstadoCarrito.ACTIVO &&
+                        (c.UpdatedAt != null && c.UpdatedAt < umbral ||
+                         c.UpdatedAt == null && c.FechaCreacion != null && c.FechaCreacion < umbral))
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(c => c.Estado, EstadoCarrito.ABANDONADO)
+                .SetProperty(c => c.UpdatedAt, DateTime.UtcNow));
+    }
 }

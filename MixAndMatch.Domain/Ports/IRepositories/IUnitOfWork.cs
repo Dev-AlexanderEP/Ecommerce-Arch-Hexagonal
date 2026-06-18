@@ -18,6 +18,8 @@ public interface IUnitOfWork : IDisposable
     IVentaRepository Ventas { get; }
     IVentasDetalleRepository VentasDetalles { get; }
     IDescuentoCodigoRepository DescuentoCodigos { get; }
+    IDescuentoPrendaRepository DescuentosPrenda { get; }
+    IDescuentoCategoriaRepository DescuentosCategoria { get; }
     IDescuentoUsuarioRepository DescuentoUsuarios { get; }
     IDatosEnvioRepository DatosEnvios { get; }
     IEnvioRepository Envios { get; }

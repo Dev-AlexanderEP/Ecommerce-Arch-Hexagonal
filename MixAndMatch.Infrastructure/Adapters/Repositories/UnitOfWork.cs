@@ -55,6 +55,12 @@ public class UnitOfWork : IUnitOfWork
     private IDescuentoCodigoRepository? _descuentoCodigos;
     public IDescuentoCodigoRepository DescuentoCodigos => _descuentoCodigos ??= new DescuentoCodigoRepository(_context);
 
+    private IDescuentoPrendaRepository? _descuentosPrenda;
+    public IDescuentoPrendaRepository DescuentosPrenda => _descuentosPrenda ??= new DescuentoPrendaRepository(_context);
+
+    private IDescuentoCategoriaRepository? _descuentosCategoria;
+    public IDescuentoCategoriaRepository DescuentosCategoria => _descuentosCategoria ??= new DescuentoCategoriaRepository(_context);
+
     private IDescuentoUsuarioRepository? _descuentoUsuarios;
     public IDescuentoUsuarioRepository DescuentoUsuarios => _descuentoUsuarios ??= new DescuentoUsuarioRepository(_context);
 
