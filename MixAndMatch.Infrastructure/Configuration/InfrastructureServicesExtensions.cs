@@ -83,6 +83,9 @@ public static class InfrastructureServicesExtensions
         services.AddProblemDetails();
         services.AddApiRateLimiter();
 
+        // Hangfire
+        services.AddHangfireWithPostgres(configuration);
+
         return services;
     }
 }
