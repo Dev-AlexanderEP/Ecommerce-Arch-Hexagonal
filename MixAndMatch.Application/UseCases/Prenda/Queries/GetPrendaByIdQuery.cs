@@ -1,8 +1,7 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
-using PrendaEntity = MixAndMatch.Domain.Entities.Prenda;
 
 namespace MixAndMatch.Application.UseCases.Prenda.Queries;
 
@@ -15,7 +14,7 @@ public class GetPrendaByIdQueryHandler(IUnitOfWork _uow) : IRequestHandler<GetPr
 {
     public async Task<ApiResponse<PrendaResponseDto>> Handle(GetPrendaByIdQuery request, CancellationToken cancellationToken)
     {
-        var entity = await _uow.Repository<PrendaEntity>().GetById(request.PrendaId);
+        var entity = await _uow.Prendas.GetById(request.PrendaId);
         if (entity is null)
         {
             return ApiResponse<PrendaResponseDto>.Fail($"Prenda no encontrada para id {request.PrendaId}.");

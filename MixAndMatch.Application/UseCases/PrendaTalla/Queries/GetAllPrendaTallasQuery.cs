@@ -1,8 +1,7 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
-using PrendaTallaEntity = MixAndMatch.Domain.Entities.PrendaTalla;
 
 namespace MixAndMatch.Application.UseCases.PrendaTalla.Queries;
 
@@ -16,10 +15,9 @@ public class GetAllPrendaTallasQueryHandler(IUnitOfWork _uow) : IRequestHandler<
 {
     public async Task<ApiPaginationResponse<PrendaTallaResponseDto>> Handle(GetAllPrendaTallasQuery request, CancellationToken cancellationToken)
     {
-        var (items, total) = await _uow.Repository<PrendaTallaEntity>().GetPaged(request.Page, request.PageSize);
-        if (!items.Any())
-            return ApiPaginationResponse<PrendaTallaResponseDto>.Fail("No se encontraron combinaciones de prenda y talla.");
+        var (items, total) = await _uow.PrendaTallas.GetPaged(request.Page, request.PageSize);
 
+        // Una lista vacia no es un error: se devuelve 200 con data: [].
         return ApiPaginationResponse<PrendaTallaResponseDto>.Ok(items.Select(x => new PrendaTallaResponseDto
         {
             Id = x.Id,

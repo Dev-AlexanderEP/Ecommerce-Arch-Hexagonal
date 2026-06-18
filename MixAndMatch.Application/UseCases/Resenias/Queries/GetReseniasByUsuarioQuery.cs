@@ -1,8 +1,7 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
-using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Resenias;
-using MixAndMatch.Domain.Ports;
+using MixAndMatch.Domain.Ports.IRepositories;
 
 namespace MixAndMatch.Application.UseCases.Resenias.Queries;
 
@@ -11,17 +10,14 @@ public class GetReseniasByUsuarioQuery : IRequest<ApiResponse<IEnumerable<Reseni
     public required long UsuarioId { get; set; }
 }
 
-public class GetReseniasByUsuarioQueryHandler(IReseniaRepository _reseniaRepository)
+public class GetReseniasByUsuarioQueryHandler(IUnitOfWork _uow)
     : IRequestHandler<GetReseniasByUsuarioQuery, ApiResponse<IEnumerable<ReseniaResponseDto>>>
 {
     public async Task<ApiResponse<IEnumerable<ReseniaResponseDto>>> Handle(GetReseniasByUsuarioQuery request, CancellationToken cancellationToken)
     {
-        var items = await _reseniaRepository.GetByUsuarioIdAsync(request.UsuarioId);
-        if (!items.Any())
-        {
-            return ApiResponse<IEnumerable<ReseniaResponseDto>>.Fail("No se encontraron resenias para el usuario.");
-        }
+        var items = await _uow.Resenias.GetByUsuarioIdAsync(request.UsuarioId);
 
+        // Una lista vacia no es un error: se devuelve 200 con data: [].
         return ApiResponse<IEnumerable<ReseniaResponseDto>>.Ok(items.Select(x => new ReseniaResponseDto
         {
             Id = x.Id,

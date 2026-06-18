@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MixAndMatch.Domain.Common;
 
 namespace MixAndMatch.Domain.Entities;
 
@@ -11,7 +12,7 @@ public partial class Carrito
 
     public DateTime? FechaCreacion { get; set; }
 
-    public string? Estado { get; set; }
+    public EstadoCarrito? Estado { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
 

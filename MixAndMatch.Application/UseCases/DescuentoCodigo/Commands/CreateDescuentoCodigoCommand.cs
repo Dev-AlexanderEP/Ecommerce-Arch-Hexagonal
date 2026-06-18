@@ -1,6 +1,5 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
-using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Descuentos;
 using MixAndMatch.Domain.Ports.IRepositories;
 using DescuentoCodigoEntity = MixAndMatch.Domain.Entities.DescuentoCodigo;
@@ -22,29 +21,16 @@ public class CreateDescuentoCodigoCommandHandler(IUnitOfWork _uow) : IRequestHan
 {
     public async Task<ApiResponse<DescuentoCodigoResponseDto>> Handle(CreateDescuentoCodigoCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.Codigo))
-        {
-            return ApiResponse<DescuentoCodigoResponseDto>.Fail("El código no puede estar vacío.");
-        }
+        var codigo = request.Codigo.Trim();
 
-        if (request.Porcentaje < 0 || request.Porcentaje > 100)
+        if (await _uow.DescuentoCodigos.ExisteConCodigo(codigo))
         {
-            return ApiResponse<DescuentoCodigoResponseDto>.Fail("El porcentaje debe estar entre 0 y 100.");
-        }
-
-        if (request.UsoMaximo <= 0)
-        {
-            return ApiResponse<DescuentoCodigoResponseDto>.Fail("El uso máximo debe ser mayor a 0.");
-        }
-
-        if (request.FechaFin.HasValue && request.FechaFin.Value < request.FechaInicio)
-        {
-            return ApiResponse<DescuentoCodigoResponseDto>.Fail("La fecha fin no puede ser menor a la fecha inicio.");
+            return ApiResponse<DescuentoCodigoResponseDto>.Fail("El código de descuento ya existe.", ErrorType.Conflict);
         }
 
         var entity = new DescuentoCodigoEntity
         {
-            Codigo = request.Codigo,
+            Codigo = codigo,
             Descripcion = request.Descripcion,
             Porcentaje = request.Porcentaje,
             FechaInicio = request.FechaInicio,
@@ -54,11 +40,10 @@ public class CreateDescuentoCodigoCommandHandler(IUnitOfWork _uow) : IRequestHan
             CreatedAt = DateTime.UtcNow
         };
 
-        var repo = _uow.Repository<DescuentoCodigoEntity>();
-        await repo.Add(entity);
+        await _uow.DescuentoCodigos.Add(entity);
         await _uow.Complete();
 
-        return ApiResponse<DescuentoCodigoResponseDto>.Ok(new DescuentoCodigoResponseDto
+        return ApiResponse<DescuentoCodigoResponseDto>.Created(new DescuentoCodigoResponseDto
         {
             Id = entity.Id,
             Codigo = entity.Codigo,

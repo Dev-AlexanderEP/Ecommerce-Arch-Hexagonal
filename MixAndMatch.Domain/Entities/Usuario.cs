@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MixAndMatch.Domain.Common;
 
 namespace MixAndMatch.Domain.Entities;
 
@@ -13,7 +14,7 @@ public partial class Usuario
 
     public string? Contrasenia { get; set; }
 
-    public string? Rol { get; set; }
+    public RolUsuario? Rol { get; set; }
 
     public bool? Activo { get; set; }
 

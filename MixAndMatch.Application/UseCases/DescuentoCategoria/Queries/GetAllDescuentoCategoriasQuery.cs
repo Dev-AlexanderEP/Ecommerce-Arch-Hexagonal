@@ -1,6 +1,5 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
-using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Descuentos;
 using MixAndMatch.Domain.Ports.IRepositories;
 using DescuentoCategoriaEntity = MixAndMatch.Domain.Entities.DescuentoCategoria;
@@ -18,11 +17,8 @@ public class GetAllDescuentoCategoriasQueryHandler(IUnitOfWork _uow) : IRequestH
     public async Task<ApiPaginationResponse<DescuentoCategoriaResponseDto>> Handle(GetAllDescuentoCategoriasQuery request, CancellationToken cancellationToken)
     {
         var (items, total) = await _uow.Repository<DescuentoCategoriaEntity>().GetPaged(request.Page, request.PageSize);
-        if (!items.Any())
-        {
-            return ApiPaginationResponse<DescuentoCategoriaResponseDto>.Fail("No se encontraron descuentos por categoría.");
-        }
 
+        // Una lista vacia no es un error: se devuelve 200 con data: [].
         return ApiPaginationResponse<DescuentoCategoriaResponseDto>.Ok(items.Select(x => new DescuentoCategoriaResponseDto
         {
             Id = x.Id,

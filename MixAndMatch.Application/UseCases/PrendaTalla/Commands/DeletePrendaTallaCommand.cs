@@ -1,10 +1,6 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
-using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
-using PrendaTallaEntity = MixAndMatch.Domain.Entities.PrendaTalla;
-using CarritoItemEntity = MixAndMatch.Domain.Entities.CarritoItem;
-using VentasDetalleEntity = MixAndMatch.Domain.Entities.VentasDetalle;
 
 namespace MixAndMatch.Application.UseCases.PrendaTalla.Commands;
 
@@ -17,20 +13,23 @@ public class DeletePrendaTallaCommandHandler(IUnitOfWork _uow) : IRequestHandler
 {
     public async Task<ApiResponse<bool>> Handle(DeletePrendaTallaCommand request, CancellationToken cancellationToken)
     {
-        var repo = _uow.Repository<PrendaTallaEntity>();
-        var entity = await repo.GetById(request.PrendaTallaId);
+        var entity = await _uow.PrendaTallas.GetById(request.PrendaTallaId);
         if (entity is null)
+        {
             return ApiResponse<bool>.Fail($"PrendaTalla no encontrada para id {request.PrendaTallaId}.");
+        }
 
-        var carritoItems = await _uow.Repository<CarritoItemEntity>().GetAll();
-        if (carritoItems.Any(x => x.PrendaTallaId == request.PrendaTallaId))
-            return ApiResponse<bool>.Fail("La combinaciÃ³n de prenda y talla tiene Ã­tems de carrito asociados.");
+        if (await _uow.PrendaTallas.TieneItemsCarrito(request.PrendaTallaId))
+        {
+            return ApiResponse<bool>.Fail("La combinación de prenda y talla tiene ítems de carrito asociados.", ErrorType.Conflict);
+        }
 
-        var ventasDetalles = await _uow.Repository<VentasDetalleEntity>().GetAll();
-        if (ventasDetalles.Any(x => x.PrendaTallaId == request.PrendaTallaId))
-            return ApiResponse<bool>.Fail("La combinaciÃ³n de prenda y talla tiene ventas asociadas.");
+        if (await _uow.PrendaTallas.TieneVentas(request.PrendaTallaId))
+        {
+            return ApiResponse<bool>.Fail("La combinación de prenda y talla tiene ventas asociadas.", ErrorType.Conflict);
+        }
 
-        await repo.Delete(request.PrendaTallaId);
+        await _uow.PrendaTallas.Delete(request.PrendaTallaId);
         await _uow.Complete();
         return ApiResponse<bool>.Ok(true, "PrendaTalla eliminada correctamente.");
     }

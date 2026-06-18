@@ -1,8 +1,7 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
-using GeneroEntity = MixAndMatch.Domain.Entities.Genero;
 
 namespace MixAndMatch.Application.UseCases.Genero.Queries;
 
@@ -16,12 +15,9 @@ public class GetAllGenerosQueryHandler(IUnitOfWork _uow) : IRequestHandler<GetAl
 {
     public async Task<ApiPaginationResponse<GeneroResponseDto>> Handle(GetAllGenerosQuery request, CancellationToken cancellationToken)
     {
-        var (items, total) = await _uow.Repository<GeneroEntity>().GetPaged(request.Page, request.PageSize);
-        if (!items.Any())
-        {
-            return ApiPaginationResponse<GeneroResponseDto>.Fail("No se encontraron géneros.");
-        }
+        var (items, total) = await _uow.Generos.GetPaged(request.Page, request.PageSize);
 
+        // Una lista vacia no es un error: se devuelve 200 con data: [].
         return ApiPaginationResponse<GeneroResponseDto>.Ok(items.Select(x => new GeneroResponseDto
         {
             Id = x.Id,

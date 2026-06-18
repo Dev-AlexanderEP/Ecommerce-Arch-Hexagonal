@@ -15,24 +15,18 @@ public class CreateCategoriaCommandHandler(IUnitOfWork _uow) : IRequestHandler<C
 {
     public async Task<ApiResponse<CategoriaResponseDto>> Handle(CreateCategoriaCommand request, CancellationToken cancellationToken)
     {
-        var nombre = (request.NomCategoria ?? string.Empty).Trim();
-        if (string.IsNullOrWhiteSpace(nombre))
-        {
-            return ApiResponse<CategoriaResponseDto>.Fail("El nombre de la categorÃ­a es obligatorio.");
-        }
+        var nombre = request.NomCategoria.Trim();
 
-        var repo = _uow.Repository<CategoriaEntity>();
-        var items = await repo.GetAll();
-        if (items.Any(x => x.NomCategoria == nombre))
+        if (await _uow.Categorias.ExisteConNombre(nombre))
         {
-            return ApiResponse<CategoriaResponseDto>.Fail("La categorÃ­a ya existe.");
+            return ApiResponse<CategoriaResponseDto>.Fail("La categoría ya existe.", ErrorType.Conflict);
         }
 
         var entity = new CategoriaEntity { NomCategoria = nombre };
-        await repo.Add(entity);
+        await _uow.Categorias.Add(entity);
         await _uow.Complete();
 
-        return ApiResponse<CategoriaResponseDto>.Ok(new CategoriaResponseDto
+        return ApiResponse<CategoriaResponseDto>.Created(new CategoriaResponseDto
         {
             Id = entity.Id,
             NomCategoria = entity.NomCategoria

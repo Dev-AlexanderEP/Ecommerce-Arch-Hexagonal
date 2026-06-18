@@ -23,7 +23,7 @@ public class GetPrendaImagenByIdQueryHandler(IUnitOfWork _uow) : IRequestHandler
         {
             Id = entity.Id,
             PrendaId = entity.PrendaId,
-            Tipo = entity.Tipo,
+            Tipo = entity.Tipo.ToString(),
             Url = entity.Url,
             Orden = entity.Orden,
             CreatedAt = entity.CreatedAt,

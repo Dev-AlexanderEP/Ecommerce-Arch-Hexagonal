@@ -1,66 +1,57 @@
-
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using MixAndMatch.Api.Common;
+using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.Pago.Commands;
 using MixAndMatch.Application.UseCases.Pago.Queries;
+using MixAndMatch.Domain.Common;
 
 namespace MixAndMatch.Api.Controllers;
 
-
-
-
-[ApiController]
 [Route("api/[controller]")]
-public class PagoController(IMediator mediator) : ControllerBase
+[Authorize]
+public class PagoController(IMediator _mediator) : ApiControllerBase
 {
-    private readonly IMediator _mediator = mediator;
-
     [HttpGet]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
     public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
-        var result = await _mediator.Send(new GetAllPagosQuery { Page = page, PageSize = pageSize });
-        return Ok(result);
+        return this.ToActionResult(await _mediator.Send(new GetAllPagosQuery { Page = page, PageSize = pageSize }));
     }
 
     [HttpGet("{id}")]
+    [Authorize(Roles = $"{nameof(RolUsuario.ADMIN)},{nameof(RolUsuario.CLIENTE)}")]
     public async Task<IActionResult> GetById(long id)
     {
-        var result = await _mediator.Send(new GetPagoByIdQuery
+        return this.ToActionResult(await _mediator.Send(new GetPagoByIdQuery
         {
-            Id = id
-        });
-
-        return Ok(result);
+            Id = id,
+            SolicitanteId = CurrentUser.Id,
+            EsAdmin = CurrentUser.IsAdmin
+        }));
     }
 
     [HttpPost]
+    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
     public async Task<IActionResult> Create([FromBody] CreatePagoCommand command)
     {
-        var result = await _mediator.Send(command);
-        return Ok(result);
+        command.SolicitanteId = CurrentUser.Id;
+        return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(
-        long id,
-        [FromBody] UpdatePagoCommand command)
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    public async Task<IActionResult> Update(long id, [FromBody] UpdatePagoCommand command)
     {
         command.Id = id;
-
-        var result = await _mediator.Send(command);
-
-        return Ok(result);
+        return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
     public async Task<IActionResult> Delete(long id)
     {
-        var result = await _mediator.Send(new DeletePagoCommand
-        {
-            Id = id
-        });
-
-        return Ok(result);
+        return this.ToActionResult(await _mediator.Send(new DeletePagoCommand { Id = id }));
     }
 }

@@ -1,13 +1,16 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.Genero.Commands;
 using MixAndMatch.Application.UseCases.Genero.Queries;
+using MixAndMatch.Domain.Common;
 
 namespace MixAndMatch.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class GenerosController(IMediator _mediator) : ControllerBase
 {
     [HttpGet]
@@ -23,12 +26,14 @@ public class GenerosController(IMediator _mediator) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
     public async Task<IActionResult> Create([FromBody] CreateGeneroCommand command)
     {
         return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
     public async Task<IActionResult> Update(long id, [FromBody] UpdateGeneroCommand command)
     {
         command.GeneroId = id;
@@ -36,6 +41,7 @@ public class GenerosController(IMediator _mediator) : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
     public async Task<IActionResult> Delete(long id)
     {
         return this.ToActionResult(await _mediator.Send(new DeleteGeneroCommand { GeneroId = id }));
