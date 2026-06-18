@@ -1,8 +1,7 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
-using ProveedorEntity = MixAndMatch.Domain.Entities.Proveedor;
 
 namespace MixAndMatch.Application.UseCases.Proveedor.Queries;
 
@@ -16,12 +15,9 @@ public class GetAllProveedoresQueryHandler(IUnitOfWork _uow) : IRequestHandler<G
 {
     public async Task<ApiPaginationResponse<ProveedorResponseDto>> Handle(GetAllProveedoresQuery request, CancellationToken cancellationToken)
     {
-        var (items, total) = await _uow.Repository<ProveedorEntity>().GetPaged(request.Page, request.PageSize);
-        if (!items.Any())
-        {
-            return ApiPaginationResponse<ProveedorResponseDto>.Fail("No se encontraron proveedores.");
-        }
+        var (items, total) = await _uow.Proveedores.GetPaged(request.Page, request.PageSize);
 
+        // Una lista vacia no es un error: se devuelve 200 con data: [].
         return ApiPaginationResponse<ProveedorResponseDto>.Ok(items.Select(x => new ProveedorResponseDto
         {
             Id = x.Id,

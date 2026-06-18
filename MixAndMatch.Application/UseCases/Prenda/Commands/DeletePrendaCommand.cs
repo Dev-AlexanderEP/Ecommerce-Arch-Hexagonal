@@ -1,12 +1,6 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
-using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
-using DescuentoPrendaEntity = MixAndMatch.Domain.Entities.DescuentoPrenda;
-using PrendaEntity = MixAndMatch.Domain.Entities.Prenda;
-using PrendaImagenEntity = MixAndMatch.Domain.Entities.PrendaImagen;
-using PrendaTallaEntity = MixAndMatch.Domain.Entities.PrendaTalla;
-using ReseniaEntity = MixAndMatch.Domain.Entities.Resenia;
 
 namespace MixAndMatch.Application.UseCases.Prenda.Commands;
 
@@ -19,34 +13,33 @@ public class DeletePrendaCommandHandler(IUnitOfWork _uow) : IRequestHandler<Dele
 {
     public async Task<ApiResponse<bool>> Handle(DeletePrendaCommand request, CancellationToken cancellationToken)
     {
-        var repo = _uow.Repository<PrendaEntity>();
-        var entity = await repo.GetById(request.PrendaId);
+        var entity = await _uow.Prendas.GetById(request.PrendaId);
         if (entity is null)
         {
             return ApiResponse<bool>.Fail($"Prenda no encontrada para id {request.PrendaId}.");
         }
 
-        if ((await _uow.Repository<DescuentoPrendaEntity>().GetAll()).Any(x => x.PrendaId == request.PrendaId))
+        if (await _uow.Prendas.TieneDescuentos(request.PrendaId))
         {
-            return ApiResponse<bool>.Fail("La prenda tiene descuentos asociados.");
+            return ApiResponse<bool>.Fail("La prenda tiene descuentos asociados.", ErrorType.Conflict);
         }
 
-        if ((await _uow.Repository<PrendaImagenEntity>().GetAll()).Any(x => x.PrendaId == request.PrendaId))
+        if (await _uow.Prendas.TieneImagenes(request.PrendaId))
         {
-            return ApiResponse<bool>.Fail("La prenda tiene imÃ¡genes asociadas.");
+            return ApiResponse<bool>.Fail("La prenda tiene imágenes asociadas.", ErrorType.Conflict);
         }
 
-        if ((await _uow.Repository<PrendaTallaEntity>().GetAll()).Any(x => x.PrendaId == request.PrendaId))
+        if (await _uow.Prendas.TieneTallas(request.PrendaId))
         {
-            return ApiResponse<bool>.Fail("La prenda tiene tallas asociadas.");
+            return ApiResponse<bool>.Fail("La prenda tiene tallas asociadas.", ErrorType.Conflict);
         }
 
-        if ((await _uow.Repository<ReseniaEntity>().GetAll()).Any(x => x.PrendaId == request.PrendaId))
+        if (await _uow.Prendas.TieneResenias(request.PrendaId))
         {
-            return ApiResponse<bool>.Fail("La prenda tiene reseÃ±as asociadas.");
+            return ApiResponse<bool>.Fail("La prenda tiene reseñas asociadas.", ErrorType.Conflict);
         }
 
-        await repo.Delete(request.PrendaId);
+        await _uow.Prendas.Delete(request.PrendaId);
         await _uow.Complete();
         return ApiResponse<bool>.Ok(true, "Prenda eliminada correctamente.");
     }

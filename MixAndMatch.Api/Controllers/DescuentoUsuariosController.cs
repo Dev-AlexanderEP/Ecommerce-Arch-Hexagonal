@@ -1,37 +1,51 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MixAndMatch.Api.Common;
 using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.DescuentoUsuario.Commands;
 using MixAndMatch.Application.UseCases.DescuentoUsuario.Queries;
-using MixAndMatch.Domain.DTOs;
+using MixAndMatch.Domain.Common;
 
 namespace MixAndMatch.Api.Controllers;
 
-[ApiController]
 [Route("api/[controller]")]
-public class DescuentoUsuariosController(IMediator _mediator) : ControllerBase
+[Authorize]
+public class DescuentoUsuariosController(IMediator _mediator) : ApiControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
-    {
-        return this.ToActionResult(await _mediator.Send(new GetAllDescuentoUsuariosQuery { Page = page, PageSize = pageSize }));
-    }
+    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
+    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
+        this.ToActionResult(await _mediator.Send(new GetAllDescuentoUsuariosQuery
+        {
+            Page = page,
+            PageSize = pageSize,
+            SolicitanteId = CurrentUser.Id
+        }));
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(long id)
-    {
-        return this.ToActionResult(await _mediator.Send(new GetDescuentoUsuarioByIdQuery { DescuentoUsuarioId = id }));
-    }
+    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
+    public async Task<IActionResult> GetById(long id) =>
+        this.ToActionResult(await _mediator.Send(new GetDescuentoUsuarioByIdQuery
+        {
+            DescuentoUsuarioId = id,
+            SolicitanteId = CurrentUser.Id
+        }));
 
     [HttpPost]
+    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
     public async Task<IActionResult> Create([FromBody] CreateDescuentoUsuarioCommand command)
     {
+        command.SolicitanteId = CurrentUser.Id;
         return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(long id)
-    {
-        return this.ToActionResult(await _mediator.Send(new DeleteDescuentoUsuarioCommand { DescuentoUsuarioId = id }));
-    }
+    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
+    public async Task<IActionResult> Delete(long id) =>
+        this.ToActionResult(await _mediator.Send(new DeleteDescuentoUsuarioCommand
+        {
+            DescuentoUsuarioId = id,
+            SolicitanteId = CurrentUser.Id
+        }));
 }

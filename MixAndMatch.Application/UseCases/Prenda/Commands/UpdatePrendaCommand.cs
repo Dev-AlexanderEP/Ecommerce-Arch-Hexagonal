@@ -1,18 +1,15 @@
-﻿using MediatR;
+using System.Text.Json.Serialization;
+using MediatR;
 using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
-using CategoriaEntity = MixAndMatch.Domain.Entities.Categoria;
-using GeneroEntity = MixAndMatch.Domain.Entities.Genero;
-using MarcaEntity = MixAndMatch.Domain.Entities.Marca;
-using PrendaEntity = MixAndMatch.Domain.Entities.Prenda;
-using ProveedorEntity = MixAndMatch.Domain.Entities.Proveedor;
 
 namespace MixAndMatch.Application.UseCases.Prenda.Commands;
 
 public class UpdatePrendaCommand : IRequest<ApiResponse<PrendaResponseDto>>
 {
-    public required long PrendaId { get; set; }
+    [JsonIgnore]   // lo asigna el controller desde la ruta
+    public long PrendaId { get; set; }
     public required string Nombre { get; set; }
     public string? Descripcion { get; set; }
     public required long MarcaId { get; set; }
@@ -27,28 +24,33 @@ public class UpdatePrendaCommandHandler(IUnitOfWork _uow) : IRequestHandler<Upda
 {
     public async Task<ApiResponse<PrendaResponseDto>> Handle(UpdatePrendaCommand request, CancellationToken cancellationToken)
     {
-        var repo = _uow.Repository<PrendaEntity>();
-        var entity = await repo.GetById(request.PrendaId);
+        var entity = await _uow.Prendas.GetById(request.PrendaId);
         if (entity is null)
         {
             return ApiResponse<PrendaResponseDto>.Fail($"Prenda no encontrada para id {request.PrendaId}.");
         }
 
-        var nombre = (request.Nombre ?? string.Empty).Trim();
-        if (string.IsNullOrWhiteSpace(nombre))
+        var nombre = request.Nombre.Trim();
+
+        if (await _uow.Marcas.GetById(request.MarcaId) is null)
         {
-            return ApiResponse<PrendaResponseDto>.Fail("El nombre de la prenda es obligatorio.");
+            return ApiResponse<PrendaResponseDto>.Fail($"Marca no encontrada para id {request.MarcaId}.", ErrorType.Validation);
         }
 
-        if (request.Precio < 0)
+        if (await _uow.Categorias.GetById(request.CategoriaId) is null)
         {
-            return ApiResponse<PrendaResponseDto>.Fail("El precio no puede ser negativo.");
+            return ApiResponse<PrendaResponseDto>.Fail($"Categoría no encontrada para id {request.CategoriaId}.", ErrorType.Validation);
         }
 
-        if (await _uow.Repository<MarcaEntity>().GetById(request.MarcaId) is null) return ApiResponse<PrendaResponseDto>.Fail($"Marca no encontrada para id {request.MarcaId}.");
-        if (await _uow.Repository<CategoriaEntity>().GetById(request.CategoriaId) is null) return ApiResponse<PrendaResponseDto>.Fail($"CategorÃ­a no encontrada para id {request.CategoriaId}.");
-        if (await _uow.Repository<ProveedorEntity>().GetById(request.ProveedorId) is null) return ApiResponse<PrendaResponseDto>.Fail($"Proveedor no encontrado para id {request.ProveedorId}.");
-        if (await _uow.Repository<GeneroEntity>().GetById(request.GeneroId) is null) return ApiResponse<PrendaResponseDto>.Fail($"GÃ©nero no encontrado para id {request.GeneroId}.");
+        if (await _uow.Proveedores.GetById(request.ProveedorId) is null)
+        {
+            return ApiResponse<PrendaResponseDto>.Fail($"Proveedor no encontrado para id {request.ProveedorId}.", ErrorType.Validation);
+        }
+
+        if (await _uow.Generos.GetById(request.GeneroId) is null)
+        {
+            return ApiResponse<PrendaResponseDto>.Fail($"Género no encontrado para id {request.GeneroId}.", ErrorType.Validation);
+        }
 
         entity.Nombre = nombre;
         entity.Descripcion = request.Descripcion;
@@ -60,7 +62,7 @@ public class UpdatePrendaCommandHandler(IUnitOfWork _uow) : IRequestHandler<Upda
         entity.Activo = request.Activo;
         entity.UpdatedAt = DateTime.UtcNow;
 
-        await repo.Update(entity);
+        await _uow.Prendas.Update(entity);
         await _uow.Complete();
 
         return ApiResponse<PrendaResponseDto>.Ok(new PrendaResponseDto

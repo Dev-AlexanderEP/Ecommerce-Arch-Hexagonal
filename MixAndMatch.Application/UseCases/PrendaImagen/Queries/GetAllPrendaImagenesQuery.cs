@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
@@ -17,14 +17,13 @@ public class GetAllPrendaImagenesQueryHandler(IUnitOfWork _uow) : IRequestHandle
     public async Task<ApiPaginationResponse<PrendaImagenResponseDto>> Handle(GetAllPrendaImagenesQuery request, CancellationToken cancellationToken)
     {
         var (items, total) = await _uow.Repository<PrendaImagenEntity>().GetPaged(request.Page, request.PageSize);
-        if (!items.Any())
-            return ApiPaginationResponse<PrendaImagenResponseDto>.Fail("No se encontraron imágenes de prendas.");
 
+        // Una lista vacia no es un error: se devuelve 200 con data: [].
         return ApiPaginationResponse<PrendaImagenResponseDto>.Ok(items.Select(x => new PrendaImagenResponseDto
         {
             Id = x.Id,
             PrendaId = x.PrendaId,
-            Tipo = x.Tipo,
+            Tipo = x.Tipo.ToString(),
             Url = x.Url,
             Orden = x.Orden,
             CreatedAt = x.CreatedAt,

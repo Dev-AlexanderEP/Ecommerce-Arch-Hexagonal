@@ -1,61 +1,55 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MixAndMatch.Api.Common;
+using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.DatosEnvio.Commands;
 using MixAndMatch.Application.UseCases.DatosEnvio.Queries;
+using MixAndMatch.Domain.Common;
 
 namespace MixAndMatch.Api.Controllers;
 
-[ApiController]
 [Route("api/[controller]")]
-public class DatosEnvioController(IMediator mediator) : ControllerBase
+[Authorize]
+public class DatosEnvioController(IMediator _mediator) : ApiControllerBase
 {
-    private readonly IMediator _mediator = mediator;
-
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
-    {
-        var result = await _mediator.Send(new GetAllDatosEnvioQuery { Page = page, PageSize = pageSize });
-        return Ok(result);
-    }
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
+        this.ToActionResult(await _mediator.Send(new GetAllDatosEnvioQuery { Page = page, PageSize = pageSize }));
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(long id)
-    {
-        var result = await _mediator.Send(new GetDatosEnvioByIdQuery
+    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
+    public async Task<IActionResult> GetById(long id) =>
+        this.ToActionResult(await _mediator.Send(new GetDatosEnvioByIdQuery
         {
-            DatosEnvioId = id
-        });
-
-        return Ok(result);
-    }
+            DatosEnvioId = id,
+            SolicitanteId = CurrentUser.Id
+        }));
 
     [HttpPost]
+    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
     public async Task<IActionResult> Create([FromBody] CreateDatosEnvioCommand command)
     {
-        var result = await _mediator.Send(command);
-        return Ok(result);
+        command.UsuarioId = CurrentUser.Id;
+        return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(
-        long id,
-        [FromBody] UpdateDatosEnvioCommand command)
+    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
+    public async Task<IActionResult> Update(long id, [FromBody] UpdateDatosEnvioCommand command)
     {
         command.DatosEnvioId = id;
-
-        var result = await _mediator.Send(command);
-
-        return Ok(result);
+        command.SolicitanteId = CurrentUser.Id;
+        return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(long id)
-    {
-        var result = await _mediator.Send(new DeleteDatosEnvioCommand
+    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
+    public async Task<IActionResult> Delete(long id) =>
+        this.ToActionResult(await _mediator.Send(new DeleteDatosEnvioCommand
         {
-            DatosEnvioId = id
-        });
-
-        return Ok(result);
-    }
+            DatosEnvioId = id,
+            SolicitanteId = CurrentUser.Id
+        }));
 }

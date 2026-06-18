@@ -13,7 +13,8 @@ public record ApiPaginationResponse<T>(
     bool Success,
     string? Message,
     IEnumerable<T> Data,
-    PaginationMetadata Metadata
+    PaginationMetadata Metadata,
+    ErrorType? Error = null
 )
 {
     public static ApiPaginationResponse<T> Ok(
@@ -31,6 +32,6 @@ public record ApiPaginationResponse<T>(
         ));
     }
 
-    public static ApiPaginationResponse<T> Fail(string message) =>
-        new(false, message, [], new PaginationMetadata(0, 0, 0, 0, false, false));
+    public static ApiPaginationResponse<T> Fail(string message, ErrorType error = ErrorType.NotFound) =>
+        new(false, message, [], new PaginationMetadata(0, 0, 0, 0, false, false), error);
 }

@@ -1,16 +1,16 @@
-﻿using MediatR;
+using System.Text.Json.Serialization;
+using MediatR;
 using MixAndMatch.Application.Common;
-using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Descuentos;
 using MixAndMatch.Domain.Ports.IRepositories;
 using DescuentoPrendaEntity = MixAndMatch.Domain.Entities.DescuentoPrenda;
-using PrendaEntity = MixAndMatch.Domain.Entities.Prenda;
 
 namespace MixAndMatch.Application.UseCases.DescuentoPrenda.Commands;
 
 public class UpdateDescuentoPrendaCommand : IRequest<ApiResponse<DescuentoPrendaResponseDto>>
 {
-    public required long DescuentoPrendaId { get; set; }
+    [JsonIgnore]   // lo asigna el controller desde la ruta
+    public long DescuentoPrendaId { get; set; }
     public required long PrendaId { get; set; }
     public required decimal Porcentaje { get; set; }
     public required DateOnly FechaInicio { get; set; }
@@ -22,27 +22,16 @@ public class UpdateDescuentoPrendaCommandHandler(IUnitOfWork _uow) : IRequestHan
 {
     public async Task<ApiResponse<DescuentoPrendaResponseDto>> Handle(UpdateDescuentoPrendaCommand request, CancellationToken cancellationToken)
     {
-        if (request.Porcentaje < 0 || request.Porcentaje > 100)
-        {
-            return ApiResponse<DescuentoPrendaResponseDto>.Fail("El porcentaje debe estar entre 0 y 100.");
-        }
-
-        if (request.FechaFin.HasValue && request.FechaFin.Value < request.FechaInicio)
-        {
-            return ApiResponse<DescuentoPrendaResponseDto>.Fail("La fecha fin no puede ser menor a la fecha inicio.");
-        }
-
-        var repo = _uow.Repository<DescuentoPrendaEntity>();
-        var entity = await repo.GetById(request.DescuentoPrendaId);
+        var entity = await _uow.Repository<DescuentoPrendaEntity>().GetById(request.DescuentoPrendaId);
         if (entity is null)
         {
             return ApiResponse<DescuentoPrendaResponseDto>.Fail($"Descuento de prenda no encontrado para id {request.DescuentoPrendaId}.");
         }
 
-        var prenda = await _uow.Repository<PrendaEntity>().GetById(request.PrendaId);
+        var prenda = await _uow.Prendas.GetById(request.PrendaId);
         if (prenda is null)
         {
-            return ApiResponse<DescuentoPrendaResponseDto>.Fail($"Prenda no encontrada para id {request.PrendaId}.");
+            return ApiResponse<DescuentoPrendaResponseDto>.Fail($"Prenda no encontrada para id {request.PrendaId}.", ErrorType.Validation);
         }
 
         entity.PrendaId = request.PrendaId;
@@ -52,7 +41,7 @@ public class UpdateDescuentoPrendaCommandHandler(IUnitOfWork _uow) : IRequestHan
         entity.Activo = request.Activo;
         entity.UpdatedAt = DateTime.UtcNow;
 
-        await repo.Update(entity);
+        await _uow.Repository<DescuentoPrendaEntity>().Update(entity);
         await _uow.Complete();
 
         return ApiResponse<DescuentoPrendaResponseDto>.Ok(new DescuentoPrendaResponseDto

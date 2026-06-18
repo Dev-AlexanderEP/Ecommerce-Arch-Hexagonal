@@ -5,7 +5,8 @@ using MixAndMatch.Infrastructure.Configuration;
 
 namespace MixAndMatch.Infrastructure.Adapters;
 
-public class ReseniaRepository(MixAndMatchDbContext context) : IReseniaRepository
+public class ReseniaRepository(MixAndMatchDbContext context)
+    : GenericRepository<Resenia>(context), IReseniaRepository
 {
     private readonly MixAndMatchDbContext _context = context;
 

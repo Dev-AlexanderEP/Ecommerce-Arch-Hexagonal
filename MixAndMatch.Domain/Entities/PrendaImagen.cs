@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MixAndMatch.Domain.Common;
 
 namespace MixAndMatch.Domain.Entities;
 
@@ -9,7 +10,7 @@ public partial class PrendaImagen
 
     public long PrendaId { get; set; }
 
-    public string Tipo { get; set; } = null!;
+    public TipoImagen Tipo { get; set; }
 
     public string Url { get; set; } = null!;
 

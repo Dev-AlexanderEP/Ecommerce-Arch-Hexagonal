@@ -1,8 +1,9 @@
 using MixAndMatch.Domain.Entities;
+using MixAndMatch.Domain.Ports.IRepositories;
 
 namespace MixAndMatch.Domain.Ports;
 
-public interface IReseniaRepository
+public interface IReseniaRepository : IGenericRepository<Resenia>
 {
     Task<(IReadOnlyList<Resenia> Items, int TotalCount)> GetPaginatedByPrendaIdAsync(
         long prendaId,

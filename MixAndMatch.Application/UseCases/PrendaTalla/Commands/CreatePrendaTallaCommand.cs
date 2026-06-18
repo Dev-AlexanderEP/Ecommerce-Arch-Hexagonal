@@ -1,10 +1,8 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
 using PrendaTallaEntity = MixAndMatch.Domain.Entities.PrendaTalla;
-using PrendaEntity = MixAndMatch.Domain.Entities.Prenda;
-using TallaEntity = MixAndMatch.Domain.Entities.Talla;
 
 namespace MixAndMatch.Application.UseCases.PrendaTalla.Commands;
 
@@ -19,20 +17,20 @@ public class CreatePrendaTallaCommandHandler(IUnitOfWork _uow) : IRequestHandler
 {
     public async Task<ApiResponse<PrendaTallaResponseDto>> Handle(CreatePrendaTallaCommand request, CancellationToken cancellationToken)
     {
-        var prenda = await _uow.Repository<PrendaEntity>().GetById(request.PrendaId);
-        if (prenda is null)
-            return ApiResponse<PrendaTallaResponseDto>.Fail($"Prenda no encontrada para id {request.PrendaId}.");
+        if (await _uow.Prendas.GetById(request.PrendaId) is null)
+        {
+            return ApiResponse<PrendaTallaResponseDto>.Fail($"Prenda no encontrada para id {request.PrendaId}.", ErrorType.Validation);
+        }
 
-        var talla = await _uow.Repository<TallaEntity>().GetById(request.TallaId);
-        if (talla is null)
-            return ApiResponse<PrendaTallaResponseDto>.Fail($"Talla no encontrada para id {request.TallaId}.");
+        if (await _uow.Tallas.GetById(request.TallaId) is null)
+        {
+            return ApiResponse<PrendaTallaResponseDto>.Fail($"Talla no encontrada para id {request.TallaId}.", ErrorType.Validation);
+        }
 
-        if (request.Stock < 0)
-            return ApiResponse<PrendaTallaResponseDto>.Fail("El stock no puede ser negativo.");
-
-        var existentes = await _uow.Repository<PrendaTallaEntity>().GetAll();
-        if (existentes.Any(x => x.PrendaId == request.PrendaId && x.TallaId == request.TallaId))
-            return ApiResponse<PrendaTallaResponseDto>.Fail("Ya existe una combinaciÃ³n de prenda y talla con esos valores.");
+        if (await _uow.PrendaTallas.ExisteCombinacion(request.PrendaId, request.TallaId))
+        {
+            return ApiResponse<PrendaTallaResponseDto>.Fail("Ya existe una combinación de prenda y talla con esos valores.", ErrorType.Conflict);
+        }
 
         var entity = new PrendaTallaEntity
         {
@@ -42,19 +40,17 @@ public class CreatePrendaTallaCommandHandler(IUnitOfWork _uow) : IRequestHandler
             CreatedAt = DateTime.UtcNow
         };
 
-        await _uow.Repository<PrendaTallaEntity>().Add(entity);
+        await _uow.PrendaTallas.Add(entity);
         await _uow.Complete();
 
-        return ApiResponse<PrendaTallaResponseDto>.Ok(ToDto(entity));
+        return ApiResponse<PrendaTallaResponseDto>.Created(new PrendaTallaResponseDto
+        {
+            Id = entity.Id,
+            PrendaId = entity.PrendaId,
+            TallaId = entity.TallaId,
+            Stock = entity.Stock,
+            CreatedAt = entity.CreatedAt,
+            UpdatedAt = entity.UpdatedAt
+        });
     }
-
-    private static PrendaTallaResponseDto ToDto(PrendaTallaEntity e) => new()
-    {
-        Id = e.Id,
-        PrendaId = e.PrendaId,
-        TallaId = e.TallaId,
-        Stock = e.Stock,
-        CreatedAt = e.CreatedAt,
-        UpdatedAt = e.UpdatedAt
-    };
 }

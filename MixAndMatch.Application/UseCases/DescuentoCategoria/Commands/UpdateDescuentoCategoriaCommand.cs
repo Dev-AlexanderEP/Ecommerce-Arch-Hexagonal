@@ -1,16 +1,16 @@
-﻿using MediatR;
+using System.Text.Json.Serialization;
+using MediatR;
 using MixAndMatch.Application.Common;
-using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Descuentos;
 using MixAndMatch.Domain.Ports.IRepositories;
-using CategoriaEntity = MixAndMatch.Domain.Entities.Categoria;
 using DescuentoCategoriaEntity = MixAndMatch.Domain.Entities.DescuentoCategoria;
 
 namespace MixAndMatch.Application.UseCases.DescuentoCategoria.Commands;
 
 public class UpdateDescuentoCategoriaCommand : IRequest<ApiResponse<DescuentoCategoriaResponseDto>>
 {
-    public required long DescuentoCategoriaId { get; set; }
+    [JsonIgnore]   // lo asigna el controller desde la ruta
+    public long DescuentoCategoriaId { get; set; }
     public required long CategoriaId { get; set; }
     public required decimal Porcentaje { get; set; }
     public required DateOnly FechaInicio { get; set; }
@@ -22,27 +22,16 @@ public class UpdateDescuentoCategoriaCommandHandler(IUnitOfWork _uow) : IRequest
 {
     public async Task<ApiResponse<DescuentoCategoriaResponseDto>> Handle(UpdateDescuentoCategoriaCommand request, CancellationToken cancellationToken)
     {
-        if (request.Porcentaje < 0 || request.Porcentaje > 100)
-        {
-            return ApiResponse<DescuentoCategoriaResponseDto>.Fail("El porcentaje debe estar entre 0 y 100.");
-        }
-
-        if (request.FechaFin.HasValue && request.FechaFin.Value < request.FechaInicio)
-        {
-            return ApiResponse<DescuentoCategoriaResponseDto>.Fail("La fecha fin no puede ser menor a la fecha inicio.");
-        }
-
-        var repo = _uow.Repository<DescuentoCategoriaEntity>();
-        var entity = await repo.GetById(request.DescuentoCategoriaId);
+        var entity = await _uow.Repository<DescuentoCategoriaEntity>().GetById(request.DescuentoCategoriaId);
         if (entity is null)
         {
-            return ApiResponse<DescuentoCategoriaResponseDto>.Fail($"Descuento de categorÃ­a no encontrado para id {request.DescuentoCategoriaId}.");
+            return ApiResponse<DescuentoCategoriaResponseDto>.Fail($"Descuento de categoría no encontrado para id {request.DescuentoCategoriaId}.");
         }
 
-        var categoria = await _uow.Repository<CategoriaEntity>().GetById(request.CategoriaId);
+        var categoria = await _uow.Categorias.GetById(request.CategoriaId);
         if (categoria is null)
         {
-            return ApiResponse<DescuentoCategoriaResponseDto>.Fail($"categorÃ­a no encontrada para id {request.CategoriaId}.");
+            return ApiResponse<DescuentoCategoriaResponseDto>.Fail($"Categoría no encontrada para id {request.CategoriaId}.", ErrorType.Validation);
         }
 
         entity.CategoriaId = request.CategoriaId;
@@ -52,7 +41,7 @@ public class UpdateDescuentoCategoriaCommandHandler(IUnitOfWork _uow) : IRequest
         entity.Activo = request.Activo;
         entity.UpdatedAt = DateTime.UtcNow;
 
-        await repo.Update(entity);
+        await _uow.Repository<DescuentoCategoriaEntity>().Update(entity);
         await _uow.Complete();
 
         return ApiResponse<DescuentoCategoriaResponseDto>.Ok(new DescuentoCategoriaResponseDto

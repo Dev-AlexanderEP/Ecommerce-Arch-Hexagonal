@@ -2,7 +2,6 @@
 using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
-using CategoriaEntity = MixAndMatch.Domain.Entities.Categoria;
 
 namespace MixAndMatch.Application.UseCases.Categoria.Queries;
 
@@ -16,12 +15,9 @@ public class GetAllCategoriasQueryHandler(IUnitOfWork _uow) : IRequestHandler<Ge
 {
     public async Task<ApiPaginationResponse<CategoriaResponseDto>> Handle(GetAllCategoriasQuery request, CancellationToken cancellationToken)
     {
-        var (items, total) = await _uow.Repository<CategoriaEntity>().GetPaged(request.Page, request.PageSize);
-        if (!items.Any())
-        {
-            return ApiPaginationResponse<CategoriaResponseDto>.Fail("No se encontraron categorías.");
-        }
+        var (items, total) = await _uow.Categorias.GetPaged(request.Page, request.PageSize);
 
+        // Una lista vacia no es un error: se devuelve 200 con data: [].
         return ApiPaginationResponse<CategoriaResponseDto>.Ok(items.Select(x => new CategoriaResponseDto
         {
             Id = x.Id,

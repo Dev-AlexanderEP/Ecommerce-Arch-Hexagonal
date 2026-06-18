@@ -1,13 +1,16 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.Usuario.Commands;
 using MixAndMatch.Application.UseCases.Usuario.Queries;
+using MixAndMatch.Domain.Common;
 
 namespace MixAndMatch.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = nameof(RolUsuario.ADMIN))]
 public class UsuariosController(IMediator _mediator) : ControllerBase
 {
     [HttpGet]

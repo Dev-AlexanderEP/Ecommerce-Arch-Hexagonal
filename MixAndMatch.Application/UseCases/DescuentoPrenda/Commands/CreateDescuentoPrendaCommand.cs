@@ -1,10 +1,8 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
-using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Descuentos;
 using MixAndMatch.Domain.Ports.IRepositories;
 using DescuentoPrendaEntity = MixAndMatch.Domain.Entities.DescuentoPrenda;
-using PrendaEntity = MixAndMatch.Domain.Entities.Prenda;
 
 namespace MixAndMatch.Application.UseCases.DescuentoPrenda.Commands;
 
@@ -21,20 +19,10 @@ public class CreateDescuentoPrendaCommandHandler(IUnitOfWork _uow) : IRequestHan
 {
     public async Task<ApiResponse<DescuentoPrendaResponseDto>> Handle(CreateDescuentoPrendaCommand request, CancellationToken cancellationToken)
     {
-        if (request.Porcentaje < 0 || request.Porcentaje > 100)
-        {
-            return ApiResponse<DescuentoPrendaResponseDto>.Fail("El porcentaje debe estar entre 0 y 100.");
-        }
-
-        if (request.FechaFin.HasValue && request.FechaFin.Value < request.FechaInicio)
-        {
-            return ApiResponse<DescuentoPrendaResponseDto>.Fail("La fecha fin no puede ser menor a la fecha inicio.");
-        }
-
-        var prenda = await _uow.Repository<PrendaEntity>().GetById(request.PrendaId);
+        var prenda = await _uow.Prendas.GetById(request.PrendaId);
         if (prenda is null)
         {
-            return ApiResponse<DescuentoPrendaResponseDto>.Fail($"Prenda no encontrada para id {request.PrendaId}.");
+            return ApiResponse<DescuentoPrendaResponseDto>.Fail($"Prenda no encontrada para id {request.PrendaId}.", ErrorType.Validation);
         }
 
         var entity = new DescuentoPrendaEntity
@@ -47,11 +35,10 @@ public class CreateDescuentoPrendaCommandHandler(IUnitOfWork _uow) : IRequestHan
             CreatedAt = DateTime.UtcNow
         };
 
-        var repo = _uow.Repository<DescuentoPrendaEntity>();
-        await repo.Add(entity);
+        await _uow.Repository<DescuentoPrendaEntity>().Add(entity);
         await _uow.Complete();
 
-        return ApiResponse<DescuentoPrendaResponseDto>.Ok(new DescuentoPrendaResponseDto
+        return ApiResponse<DescuentoPrendaResponseDto>.Created(new DescuentoPrendaResponseDto
         {
             Id = entity.Id,
             PrendaId = entity.PrendaId,

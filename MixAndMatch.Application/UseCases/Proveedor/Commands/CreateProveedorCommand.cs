@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
@@ -15,24 +15,18 @@ public class CreateProveedorCommandHandler(IUnitOfWork _uow) : IRequestHandler<C
 {
     public async Task<ApiResponse<ProveedorResponseDto>> Handle(CreateProveedorCommand request, CancellationToken cancellationToken)
     {
-        var nombre = (request.NomProveedor ?? string.Empty).Trim();
-        if (string.IsNullOrWhiteSpace(nombre))
-        {
-            return ApiResponse<ProveedorResponseDto>.Fail("El nombre del proveedor es obligatorio.");
-        }
+        var nombre = request.NomProveedor.Trim();
 
-        var repo = _uow.Repository<ProveedorEntity>();
-        var items = await repo.GetAll();
-        if (items.Any(x => x.NomProveedor == nombre))
+        if (await _uow.Proveedores.ExisteConNombre(nombre))
         {
-            return ApiResponse<ProveedorResponseDto>.Fail("El proveedor ya existe.");
+            return ApiResponse<ProveedorResponseDto>.Fail("El proveedor ya existe.", ErrorType.Conflict);
         }
 
         var entity = new ProveedorEntity { NomProveedor = nombre };
-        await repo.Add(entity);
+        await _uow.Proveedores.Add(entity);
         await _uow.Complete();
 
-        return ApiResponse<ProveedorResponseDto>.Ok(new ProveedorResponseDto
+        return ApiResponse<ProveedorResponseDto>.Created(new ProveedorResponseDto
         {
             Id = entity.Id,
             NomProveedor = entity.NomProveedor

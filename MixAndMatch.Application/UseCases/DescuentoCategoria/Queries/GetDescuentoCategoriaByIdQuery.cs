@@ -1,6 +1,5 @@
-﻿using MediatR;
+using MediatR;
 using MixAndMatch.Application.Common;
-using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.DTOs.Descuentos;
 using MixAndMatch.Domain.Ports.IRepositories;
 using DescuentoCategoriaEntity = MixAndMatch.Domain.Entities.DescuentoCategoria;
@@ -19,7 +18,7 @@ public class GetDescuentoCategoriaByIdQueryHandler(IUnitOfWork _uow) : IRequestH
         var entity = await _uow.Repository<DescuentoCategoriaEntity>().GetById(request.DescuentoCategoriaId);
         if (entity is null)
         {
-            return ApiResponse<DescuentoCategoriaResponseDto>.Fail($"Descuento de categorÃ­a no encontrado para id {request.DescuentoCategoriaId}.");
+            return ApiResponse<DescuentoCategoriaResponseDto>.Fail($"Descuento de categoría no encontrado para id {request.DescuentoCategoriaId}.");
         }
 
         return ApiResponse<DescuentoCategoriaResponseDto>.Ok(new DescuentoCategoriaResponseDto

@@ -21,8 +21,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
     contrasenia    VARCHAR(255),
     rol            rol_usuario,
     activo         BOOLEAN      DEFAULT true,
-    created_at     TIMESTAMP,
-    updated_at     TIMESTAMP
+    created_at     TIMESTAMPTZ,
+    updated_at     TIMESTAMPTZ
 );
 
 CREATE TABLE IF NOT EXISTS datos_envio (
@@ -39,8 +39,8 @@ CREATE TABLE IF NOT EXISTS datos_envio (
     telefono     VARCHAR(20)  NOT NULL,
     email        VARCHAR(100) NOT NULL,
     es_principal BOOLEAN      DEFAULT false NOT NULL,
-    created_at   TIMESTAMP    NOT NULL,
-    updated_at   TIMESTAMP
+    created_at   TIMESTAMPTZ   NOT NULL,
+    updated_at   TIMESTAMPTZ
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_datos_envio_principal
@@ -84,8 +84,8 @@ CREATE TABLE IF NOT EXISTS prenda (
     genero_id    BIGINT        NOT NULL REFERENCES genero(id),
     precio       DECIMAL(10,2) NOT NULL,
     activo       BOOLEAN       DEFAULT true NOT NULL,
-    created_at   TIMESTAMP,
-    updated_at   TIMESTAMP
+    created_at   TIMESTAMPTZ,
+    updated_at   TIMESTAMPTZ
 );
 
 CREATE TABLE IF NOT EXISTS prenda_imagen (
@@ -94,8 +94,8 @@ CREATE TABLE IF NOT EXISTS prenda_imagen (
     tipo       tipo_imagen  NOT NULL,
     url        VARCHAR(500) NOT NULL,
     orden      INT          DEFAULT 0,
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP
+    created_at TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ
 );
 
 CREATE TABLE IF NOT EXISTS prenda_talla (
@@ -103,8 +103,8 @@ CREATE TABLE IF NOT EXISTS prenda_talla (
     prenda_id  BIGINT    NOT NULL REFERENCES prenda(id),
     talla_id   BIGINT    NOT NULL REFERENCES talla(id),
     stock      INT       NOT NULL DEFAULT 0,
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP,
+    created_at TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ,
     UNIQUE (prenda_id, talla_id)
 );
 
@@ -113,9 +113,9 @@ CREATE TABLE IF NOT EXISTS prenda_talla (
 CREATE TABLE IF NOT EXISTS carrito (
     id             BIGSERIAL   PRIMARY KEY NOT NULL,
     usuario_id     BIGINT      NOT NULL REFERENCES usuarios(id),
-    fecha_creacion TIMESTAMP,
+    fecha_creacion TIMESTAMPTZ,
     estado         estado_carrito,
-    updated_at     TIMESTAMP
+    updated_at     TIMESTAMPTZ
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_carrito_activo
@@ -128,8 +128,8 @@ CREATE TABLE IF NOT EXISTS carrito_item (
     prenda_talla_id BIGINT        NOT NULL REFERENCES prenda_talla(id),
     precio_unitario DECIMAL(10,2) NOT NULL,
     cantidad        INT           NOT NULL,
-    created_at      TIMESTAMP,
-    updated_at      TIMESTAMP,
+    created_at      TIMESTAMPTZ,
+    updated_at      TIMESTAMPTZ,
     UNIQUE (carrito_id, prenda_talla_id)
 );
 
@@ -138,9 +138,9 @@ CREATE TABLE IF NOT EXISTS carrito_item (
 CREATE TABLE IF NOT EXISTS ventas (
     id             BIGSERIAL   PRIMARY KEY NOT NULL,
     usuario_id     BIGINT      NOT NULL REFERENCES usuarios(id),
-    fecha_creacion TIMESTAMP   NOT NULL,
+    fecha_creacion TIMESTAMPTZ  NOT NULL,
     estado         estado_venta,
-    updated_at     TIMESTAMP
+    updated_at     TIMESTAMPTZ
 );
 
 CREATE TABLE IF NOT EXISTS ventas_detalle (
@@ -149,8 +149,8 @@ CREATE TABLE IF NOT EXISTS ventas_detalle (
     prenda_talla_id BIGINT        NOT NULL REFERENCES prenda_talla(id),
     cantidad        INT           NOT NULL,
     precio_unitario DECIMAL(10,2) NOT NULL,
-    created_at      TIMESTAMP,
-    updated_at      TIMESTAMP,
+    created_at      TIMESTAMPTZ,
+    updated_at      TIMESTAMPTZ,
     UNIQUE (venta_id, prenda_talla_id)
 );
 
@@ -159,8 +159,8 @@ CREATE TABLE IF NOT EXISTS ventas_detalle (
 CREATE TABLE IF NOT EXISTS metodo_pago (
     id         BIGSERIAL   PRIMARY KEY NOT NULL,
     tipo_pago  VARCHAR(50) NOT NULL UNIQUE,
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP
+    created_at TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ
 );
 
 CREATE TABLE IF NOT EXISTS pago (
@@ -169,8 +169,8 @@ CREATE TABLE IF NOT EXISTS pago (
     metodo_id      BIGINT        NOT NULL REFERENCES metodo_pago(id),
     monto          DECIMAL(10,2) NOT NULL,
     estado         estado_pago   NOT NULL,
-    fecha_creacion TIMESTAMP     NOT NULL,
-    updated_at     TIMESTAMP
+    fecha_creacion TIMESTAMPTZ    NOT NULL,
+    updated_at     TIMESTAMPTZ
 );
 
 -- ─── SHIPPING ───────────────────────────────────────────────
@@ -185,8 +185,8 @@ CREATE TABLE IF NOT EXISTS envio (
     estado          estado_envio  NOT NULL,
     metodo_envio    VARCHAR(50)   NOT NULL,
     tracking_number VARCHAR(100),
-    created_at      TIMESTAMP     NOT NULL,
-    updated_at      TIMESTAMP
+    created_at      TIMESTAMPTZ    NOT NULL,
+    updated_at      TIMESTAMPTZ
 );
 
 -- ─── DISCOUNTS ──────────────────────────────────────────────
@@ -198,8 +198,8 @@ CREATE TABLE IF NOT EXISTS descuento_prenda (
     fecha_inicio DATE         NOT NULL,
     fecha_fin    DATE,
     activo       BOOLEAN      NOT NULL,
-    created_at   TIMESTAMP,
-    updated_at   TIMESTAMP
+    created_at   TIMESTAMPTZ,
+    updated_at   TIMESTAMPTZ
 );
 
 CREATE TABLE IF NOT EXISTS descuento_categoria (
@@ -209,8 +209,8 @@ CREATE TABLE IF NOT EXISTS descuento_categoria (
     fecha_inicio DATE         NOT NULL,
     fecha_fin    DATE,
     activo       BOOLEAN      NOT NULL,
-    created_at   TIMESTAMP,
-    updated_at   TIMESTAMP
+    created_at   TIMESTAMPTZ,
+    updated_at   TIMESTAMPTZ
 );
 
 CREATE TABLE IF NOT EXISTS descuento_codigo (
@@ -222,8 +222,8 @@ CREATE TABLE IF NOT EXISTS descuento_codigo (
     fecha_fin    DATE,
     uso_maximo   INT          NOT NULL,
     activo       BOOLEAN      NOT NULL,
-    created_at   TIMESTAMP,
-    updated_at   TIMESTAMP
+    created_at   TIMESTAMPTZ,
+    updated_at   TIMESTAMPTZ
 );
 
 CREATE TABLE IF NOT EXISTS descuento_usuario (
@@ -231,8 +231,8 @@ CREATE TABLE IF NOT EXISTS descuento_usuario (
     descuento_codigo_id BIGINT    NOT NULL REFERENCES descuento_codigo(id),
     usuario_id          BIGINT    NOT NULL REFERENCES usuarios(id),
     fecha_uso           DATE      NOT NULL,
-    created_at          TIMESTAMP,
-    updated_at          TIMESTAMP,
+    created_at          TIMESTAMPTZ,
+    updated_at          TIMESTAMPTZ,
     UNIQUE (descuento_codigo_id, usuario_id)
 );
 
@@ -246,9 +246,9 @@ CREATE TABLE IF NOT EXISTS "resenia" (
     comentario   TEXT,
     estado       VARCHAR(50) NOT NULL,
     moderado_por_id UUID,
-    moderado_en  TIMESTAMP,
+    moderado_en  TIMESTAMPTZ,
     motivo_rechazo VARCHAR(255),
-    created_at   TIMESTAMP NOT NULL,
-    updated_at   TIMESTAMP,
+    created_at   TIMESTAMPTZNOT NULL,
+    updated_at   TIMESTAMPTZ,
     UNIQUE (prenda_id, usuario_id)
 );
