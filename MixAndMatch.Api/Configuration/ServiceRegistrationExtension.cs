@@ -1,6 +1,7 @@
 using FluentValidation;
 using MediatR;
 using MixAndMatch.Application.Common;
+using MixAndMatch.Application.Jobs;
 using MixAndMatch.Application.UseCases.Categoria.Commands;
 using MixAndMatch.Infrastructure.Configuration;
 
@@ -26,6 +27,11 @@ public static class ServiceRegistrationExtension
         // Un mensaje por campo (corta en el primer error de cada RuleFor),
         // pero reporta todos los campos fallidos a la vez.
         ValidatorOptions.Global.DefaultRuleLevelCascadeMode = CascadeMode.Stop;
+
+        // Hangfire jobs (DI para que Hangfire los resuelva al ejecutar)
+        services.AddScoped<SincronizarEstadosDescuentosJob>();
+        services.AddScoped<ExpirarCodigosPorUsoJob>();
+        services.AddScoped<LimpiarCarritosAbandonadosJob>();
 
         // Controllers y Swagger
         services.AddControllers();

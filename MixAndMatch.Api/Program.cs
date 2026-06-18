@@ -1,4 +1,6 @@
+using Hangfire;
 using MixAndMatch.Api.Configuration;
+using MixAndMatch.Infrastructure.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +22,25 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseHangfireDashboard("/hangfire", new DashboardOptions
+    {
+        Authorization = []
+    });
+}
+else
+{
+    var hangfireLogin    = app.Configuration["Hangfire:Login"]!;
+    var hangfirePassword = app.Configuration["Hangfire:Password"]!;
+    app.UseHangfireDashboard("/hangfire", new DashboardOptions
+    {
+        Authorization = [new HangfireBasicAuthFilter(hangfireLogin, hangfirePassword)]
+    });
+}
+
+HangfireJobScheduler.RegistrarJobsRecurrentes();
 
 app.MapControllers();
 
