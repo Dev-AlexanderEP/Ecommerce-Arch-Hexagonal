@@ -1,6 +1,7 @@
 # Build output
 bin/
 obj/
+graphify-out/
 
 # Visual Studio / Rider
 .vs/

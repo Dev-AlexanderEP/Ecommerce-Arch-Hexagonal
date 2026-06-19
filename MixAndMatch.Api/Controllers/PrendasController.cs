@@ -46,4 +46,98 @@ public class PrendasController(IMediator _mediator) : ControllerBase
     {
         return this.ToActionResult(await _mediator.Send(new DeletePrendaCommand { PrendaId = id }));
     }
+
+    [HttpGet("tallas-por-categoria/{categoria}")]
+    public async Task<IActionResult> GetTallasPorCategoria(string categoria) =>
+        this.ToActionResult(await _mediator.Send(new GetTallasPorCategoriaQuery { Categoria = categoria }));
+
+    [HttpGet("marcas-por-categoria/{categoria}")]
+    public async Task<IActionResult> GetMarcasPorCategoria(string categoria) =>
+        this.ToActionResult(await _mediator.Send(new GetMarcasPorCategoriaQuery { Categoria = categoria }));
+
+    [HttpGet("precios-por-categoria/{categoria}")]
+    public async Task<IActionResult> GetEstadisticasPreciosPorCategoria(string categoria) =>
+        this.ToActionResult(await _mediator.Send(new GetEstadisticasPreciosPorCategoriaQuery { Categoria = categoria }));
+
+    [HttpGet("descuentos-por-categoria/{categoria}")]
+    public async Task<IActionResult> GetDescuentosPorCategoria(string categoria) =>
+        this.ToActionResult(await _mediator.Send(new GetDescuentosPorCategoriaQuery { Categoria = categoria }));
+
+    [HttpGet("tallas-por-genero/{genero}")]
+    public async Task<IActionResult> GetTallasPorGenero(string genero) =>
+        this.ToActionResult(await _mediator.Send(new GetTallasPorGeneroQuery { Genero = genero }));
+
+    [HttpGet("marcas-por-genero/{genero}")]
+    public async Task<IActionResult> GetMarcasPorGenero(string genero) =>
+        this.ToActionResult(await _mediator.Send(new GetMarcasPorGeneroQuery { Genero = genero }));
+
+    [HttpGet("precios-por-genero/{genero}")]
+    public async Task<IActionResult> GetEstadisticasPreciosPorGenero(string genero) =>
+        this.ToActionResult(await _mediator.Send(new GetEstadisticasPreciosPorGeneroQuery { Genero = genero }));
+
+    [HttpGet("descuentos-por-genero/{genero}")]
+    public async Task<IActionResult> GetDescuentosPorGenero(string genero) =>
+        this.ToActionResult(await _mediator.Send(new GetDescuentosPorGeneroQuery { Genero = genero }));
+
+    [HttpGet("categorias-por-genero/{genero}")]
+    public async Task<IActionResult> GetCategoriasPorGenero(string genero) =>
+        this.ToActionResult(await _mediator.Send(new GetCategoriasPorGeneroQuery { Genero = genero }));
+
+    [HttpGet("buscar")]
+    public async Task<IActionResult> Buscar(
+        [FromQuery] string? nombre,
+        [FromQuery] string? categoria,
+        [FromQuery] string? genero) =>
+        this.ToActionResult(await _mediator.Send(new BuscarPrendasConDescuentoQuery
+        {
+            Nombre = nombre,
+            Categoria = categoria,
+            Genero = genero
+        }));
+
+    [HttpGet("buscar-por-nombre-genero")]
+    public async Task<IActionResult> BuscarPorNombreYGenero(
+        [FromQuery] string? nombre,
+        [FromQuery] string? genero) =>
+        this.ToActionResult(await _mediator.Send(new BuscarPrendasConDescuentoQuery
+        {
+            Nombre = nombre,
+            Genero = genero
+        }));
+
+    [HttpGet("descuentos-aplicados")]
+    public async Task<IActionResult> GetDescuentosAplicados(
+        [FromQuery] string? categoria,
+        [FromQuery] string? genero) =>
+        this.ToActionResult(await _mediator.Send(new GetDescuentosAplicadosQuery
+        {
+            Categoria = categoria,
+            Genero = genero
+        }));
+
+    [HttpGet("descuentos-aplicados-por-genero/{genero}")]
+    public async Task<IActionResult> GetDescuentosAplicadosAleatorio(string genero) =>
+        this.ToActionResult(await _mediator.Send(new GetDescuentosAplicadosAleatorioQuery { Genero = genero }));
+
+    [HttpGet("filtradas")]
+    public async Task<IActionResult> Filtrar(
+        [FromQuery] string? talla,
+        [FromQuery] string? categoria,
+        [FromQuery] string? marca,
+        [FromQuery] string? genero,
+        [FromQuery] double? precioMin,
+        [FromQuery] double? precioMax,
+        [FromQuery] double? descMin,
+        [FromQuery] double? descMax) =>
+        this.ToActionResult(await _mediator.Send(new FiltrarPrendasDinamicoQuery
+        {
+            Talla = talla,
+            Categoria = categoria,
+            Marca = marca,
+            Genero = genero,
+            PrecioMin = precioMin,
+            PrecioMax = precioMax,
+            DescMin = descMin,
+            DescMax = descMax
+        }));
 }
