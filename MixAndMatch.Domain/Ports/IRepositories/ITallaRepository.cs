@@ -6,4 +6,5 @@ public interface ITallaRepository : IGenericRepository<Talla>
 {
     Task<bool> ExisteConNombre(string nombre, long? exceptoId = null);
     Task<bool> TienePrendaTallas(long tallaId);
+    Task<Talla?> BuscarPorNombre(string nomTalla);
 }

@@ -83,7 +83,7 @@ public class PrendasController(IMediator _mediator) : ControllerBase
     public async Task<IActionResult> GetCategoriasPorGenero(string genero) =>
         this.ToActionResult(await _mediator.Send(new GetCategoriasPorGeneroQuery { Genero = genero }));
 
-    [HttpGet("buscar")]
+    [HttpGet("busqueda")]
     public async Task<IActionResult> Buscar(
         [FromQuery] string? nombre,
         [FromQuery] string? categoria,
@@ -95,7 +95,7 @@ public class PrendasController(IMediator _mediator) : ControllerBase
             Genero = genero
         }));
 
-    [HttpGet("buscar-por-nombre-genero")]
+    [HttpGet("busqueda-por-nombre-genero")]
     public async Task<IActionResult> BuscarPorNombreYGenero(
         [FromQuery] string? nombre,
         [FromQuery] string? genero) =>
@@ -105,7 +105,7 @@ public class PrendasController(IMediator _mediator) : ControllerBase
             Genero = genero
         }));
 
-    [HttpGet("descuentos-aplicados")]
+    [HttpGet("con-descuentos")]
     public async Task<IActionResult> GetDescuentosAplicados(
         [FromQuery] string? categoria,
         [FromQuery] string? genero) =>
@@ -115,11 +115,11 @@ public class PrendasController(IMediator _mediator) : ControllerBase
             Genero = genero
         }));
 
-    [HttpGet("descuentos-aplicados-por-genero/{genero}")]
+    [HttpGet("con-descuentos-aleatorio/{genero}")]
     public async Task<IActionResult> GetDescuentosAplicadosAleatorio(string genero) =>
         this.ToActionResult(await _mediator.Send(new GetDescuentosAplicadosAleatorioQuery { Genero = genero }));
 
-    [HttpGet("filtradas")]
+    [HttpGet("filtro")]
     public async Task<IActionResult> Filtrar(
         [FromQuery] string? talla,
         [FromQuery] string? categoria,

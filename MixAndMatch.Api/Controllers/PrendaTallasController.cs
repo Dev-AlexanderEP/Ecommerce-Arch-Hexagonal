@@ -38,4 +38,19 @@ public class PrendaTallasController(IMediator _mediator) : ControllerBase
     [Authorize(Roles = nameof(RolUsuario.ADMIN))]
     public async Task<IActionResult> Delete(long id) =>
         this.ToActionResult(await _mediator.Send(new DeletePrendaTallaCommand { PrendaTallaId = id }));
+
+    [HttpPut("stock/decremento")]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    public async Task<IActionResult> RestarUnoStock([FromQuery] long prendaId, [FromQuery] long tallaId) =>
+        this.ToActionResult(await _mediator.Send(new RestarUnoStockCommand { PrendaId = prendaId, TallaId = tallaId }));
+
+    [HttpPut("stock/incremento")]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    public async Task<IActionResult> SumarUnoStock([FromQuery] long prendaId, [FromQuery] long tallaId) =>
+        this.ToActionResult(await _mediator.Send(new SumarUnoStockCommand { PrendaId = prendaId, TallaId = tallaId }));
+
+    [HttpPut("stock/suma")]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    public async Task<IActionResult> SumarStock([FromQuery] long prendaId, [FromQuery] long tallaId, [FromQuery] int cantidad) =>
+        this.ToActionResult(await _mediator.Send(new SumarStockCommand { PrendaId = prendaId, TallaId = tallaId, Cantidad = cantidad }));
 }
