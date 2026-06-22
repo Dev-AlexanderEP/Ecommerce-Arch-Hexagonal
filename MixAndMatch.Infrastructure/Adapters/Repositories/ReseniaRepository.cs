@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using MixAndMatch.Domain.DTOs.Resenias;
 using MixAndMatch.Domain.Entities;
 using MixAndMatch.Domain.Ports;
 using MixAndMatch.Infrastructure.Configuration;
@@ -10,15 +11,47 @@ public class ReseniaRepository(MixAndMatchDbContext context)
 {
     private readonly MixAndMatchDbContext _context = context;
 
-    public async Task<(IReadOnlyList<Resenia> Items, int TotalCount)> GetPaginatedByPrendaIdAsync(
-        long prendaId,
+    public Task<bool> ExisteResenia(long prendaId, long usuarioId) =>
+        _context.Resenia.AnyAsync(r => r.PrendaId == prendaId && r.UsuarioId == usuarioId);
+
+    public async Task<IReadOnlyList<ReseniaByPrendaItemDto>> GetByPrendaAsync(long prendaId)
+    {
+        return await _context.Resenia
+            .AsNoTracking()
+            .Where(r => r.PrendaId == prendaId)
+            .OrderByDescending(r => r.CreatedAt)
+            .Select(r => new ReseniaByPrendaItemDto
+            {
+                UsuarioId = r.UsuarioId,
+                NombreUsuario = r.Usuario.NombreUsuario,
+                PuntajeEstrellas = r.Calificacion,
+                // CantidadResenias: total de resenias escritas por ese usuario (subconsulta correlacionada).
+                CantidadResenias = _context.Resenia.Count(x => x.UsuarioId == r.UsuarioId),
+                Comentario = r.Comentario,
+                CreatedAt = r.CreatedAt
+            })
+            .ToListAsync();
+    }
+
+    public async Task<(IEnumerable<Resenia> Items, int TotalCount)> BuscarAsync(
+        long? prendaId,
+        long? usuarioId,
+        int? calificacion,
         int page,
         int pageSize)
     {
-        var query = _context.Resenia
-            .AsNoTracking()
-            .Where(r => r.PrendaId == prendaId)
-            .OrderByDescending(r => r.CreatedAt);
+        var query = _context.Resenia.AsNoTracking();
+
+        if (prendaId.HasValue)
+            query = query.Where(r => r.PrendaId == prendaId.Value);
+
+        if (usuarioId.HasValue)
+            query = query.Where(r => r.UsuarioId == usuarioId.Value);
+
+        if (calificacion.HasValue)
+            query = query.Where(r => r.Calificacion == calificacion.Value);
+
+        query = query.OrderByDescending(r => r.CreatedAt);
 
         var totalCount = await query.CountAsync();
         var items = await query
@@ -27,32 +60,5 @@ public class ReseniaRepository(MixAndMatchDbContext context)
             .ToListAsync();
 
         return (items, totalCount);
-    }
-
-    public async Task<IReadOnlyList<Resenia>> GetByUsuarioIdAsync(long usuarioId)
-    {
-        return await _context.Resenia
-            .AsNoTracking()
-            .Where(r => r.UsuarioId == usuarioId)
-            .OrderByDescending(r => r.CreatedAt)
-            .ToListAsync();
-    }
-
-    public async Task<Resenia?> GetByPrendaAndUsuarioAsync(long prendaId, long usuarioId)
-    {
-        return await _context.Resenia
-            .AsNoTracking()
-            .FirstOrDefaultAsync(r => r.PrendaId == prendaId && r.UsuarioId == usuarioId);
-    }
-
-    public async Task<decimal> GetPromedioByPrendaIdAsync(long prendaId)
-    {
-        var promedio = await _context.Resenia
-            .AsNoTracking()
-            .Where(r => r.PrendaId == prendaId)
-            .Select(r => (decimal?)r.Calificacion)
-            .AverageAsync();
-
-        return promedio ?? 0m;
     }
 }
