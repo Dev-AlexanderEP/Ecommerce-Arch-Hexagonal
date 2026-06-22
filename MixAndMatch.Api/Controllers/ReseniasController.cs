@@ -22,19 +22,17 @@ public class ReseniasController(IMediator _mediator) : ApiControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll(
-        [FromQuery] long? prendaId,
-        [FromQuery] long? usuarioId,
-        [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 10)
+    [Authorize(Roles = $"{nameof(RolUsuario.ADMIN)},{nameof(RolUsuario.CLIENTE)}")]
+    public async Task<IActionResult> Buscar([FromQuery] BuscarReseniasQuery query)
     {
-        return this.ToActionResult(await _mediator.Send(new GetReseniasQuery
-        {
-            PrendaId = prendaId,
-            UsuarioId = usuarioId,
-            Page = page,
-            PageSize = pageSize
-        }));
+        return this.ToActionResult(await _mediator.Send(query));
+    }
+
+    [HttpGet("prenda/{prendaId}")]
+    [Authorize(Roles = $"{nameof(RolUsuario.ADMIN)},{nameof(RolUsuario.CLIENTE)}")]
+    public async Task<IActionResult> GetByPrenda(long prendaId)
+    {
+        return this.ToActionResult(await _mediator.Send(new GetByPrendaQuery { PrendaId = prendaId }));
     }
 
     [HttpGet("{id}")]
