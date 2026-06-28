@@ -21,6 +21,10 @@ public class TallasController(IMediator _mediator) : ControllerBase
     public async Task<IActionResult> GetById(long id) =>
         this.ToActionResult(await _mediator.Send(new GetTallaByIdQuery { TallaId = id }));
 
+    [HttpGet("por-nombre/{nomTalla}")]
+    public async Task<IActionResult> GetPorNombre(string nomTalla) =>
+        this.ToActionResult(await _mediator.Send(new GetTallaPorNombreQuery { NomTalla = nomTalla }));
+
     [HttpPost]
     [Authorize(Roles = nameof(RolUsuario.ADMIN))]
     public async Task<IActionResult> Create([FromBody] CreateTallaCommand command) =>

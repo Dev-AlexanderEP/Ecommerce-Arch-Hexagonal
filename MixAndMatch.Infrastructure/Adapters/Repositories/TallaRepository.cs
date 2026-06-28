@@ -16,4 +16,8 @@ public class TallaRepository(MixAndMatchDbContext context)
 
     public Task<bool> TienePrendaTallas(long tallaId) =>
         _context.Set<PrendaTalla>().AnyAsync(pt => pt.TallaId == tallaId);
+
+    public Task<Talla?> BuscarPorNombre(string nomTalla) =>
+        _context.Set<Talla>()
+            .FirstOrDefaultAsync(t => t.NomTalla.ToLower() == nomTalla.ToLower());
 }
