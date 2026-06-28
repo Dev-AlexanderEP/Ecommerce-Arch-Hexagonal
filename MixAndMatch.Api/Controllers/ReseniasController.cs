@@ -67,6 +67,7 @@ public class ReseniasController(IMediator _mediator) : ApiControllerBase
     public async Task<IActionResult> UpdateEstado(long id, [FromBody] UpdateEstadoReseniaCommand command)
     {
         command.ReseniaId = id;
+        command.ModeradoPorId = CurrentUser.Id;
         return this.ToActionResult(await _mediator.Send(command));
     }
 }

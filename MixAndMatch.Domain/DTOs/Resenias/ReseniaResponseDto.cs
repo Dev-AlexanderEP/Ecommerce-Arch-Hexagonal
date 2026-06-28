@@ -16,7 +16,7 @@ public class ReseniaResponseDto
 
     public EstadoResenia Estado { get; set; }
 
-    public Guid? ModeradoPorId { get; set; }
+    public long? ModeradoPorId { get; set; }
 
     public DateTime? ModeradoEn { get; set; }
 

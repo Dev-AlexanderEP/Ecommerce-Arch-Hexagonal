@@ -49,5 +49,10 @@ public sealed class ReseniaConfiguration : IEntityTypeConfiguration<Resenia>
             .HasForeignKey(r => r.UsuarioId)
             .OnDelete(DeleteBehavior.ClientSetNull)
             .HasConstraintName("resenia_usuario_id_fkey");
+
+        builder.HasOne(r => r.ModeradoPor).WithMany()
+            .HasForeignKey(r => r.ModeradoPorId)
+            .OnDelete(DeleteBehavior.ClientSetNull)
+            .HasConstraintName("resenia_moderado_por_id_fkey");
     }
 }
