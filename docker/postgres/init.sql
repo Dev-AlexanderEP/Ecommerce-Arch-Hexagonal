@@ -245,7 +245,7 @@ CREATE TABLE IF NOT EXISTS "resenia" (
     calificacion INT       NOT NULL,
     comentario   TEXT,
     estado       VARCHAR(50) NOT NULL,
-    moderado_por_id UUID,
+    moderado_por_id BIGINT REFERENCES usuarios(id),
     moderado_en  TIMESTAMPTZ,
     motivo_rechazo VARCHAR(255),
     created_at   TIMESTAMPTZNOT NULL,

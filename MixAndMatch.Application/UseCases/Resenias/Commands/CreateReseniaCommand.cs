@@ -28,8 +28,7 @@ public class CreateReseniaCommandHandler(IUnitOfWork _uow)
             return ApiResponse<ReseniaResponseDto>.Fail($"Prenda no encontrada para id {request.PrendaId}.", ErrorType.Validation);
         }
 
-        var existing = await _uow.Resenias.GetByPrendaAndUsuarioAsync(request.PrendaId, request.SolicitanteId);
-        if (existing is not null)
+        if (await _uow.Resenias.ExisteResenia(request.PrendaId, request.SolicitanteId))
         {
             return ApiResponse<ReseniaResponseDto>.Fail("Ya tienes una resenia para esta prenda.", ErrorType.Conflict);
         }

@@ -13,7 +13,9 @@ public class UpdateEstadoReseniaCommand : IRequest<ApiResponse<ReseniaResponseDt
     [JsonIgnore]   // lo asigna el controller desde la ruta
     public long ReseniaId { get; set; }
     public required EstadoResenia Estado { get; set; }
-    public Guid ModeradoPorId { get; set; }
+
+    [JsonIgnore]   // lo asigna el controller desde el token
+    public long ModeradoPorId { get; set; }
     public string? MotivoRechazo { get; set; }
 }
 
@@ -29,7 +31,7 @@ public class UpdateEstadoReseniaCommandHandler(IUnitOfWork _uow)
         }
 
         entity.Estado = request.Estado;
-        entity.ModeradoPorId = request.ModeradoPorId == Guid.Empty ? null : request.ModeradoPorId;
+        entity.ModeradoPorId = request.ModeradoPorId;
         entity.ModeradoEn = DateTime.UtcNow;
         entity.MotivoRechazo = request.Estado == EstadoResenia.RECHAZADA
             ? request.MotivoRechazo?.Trim()
