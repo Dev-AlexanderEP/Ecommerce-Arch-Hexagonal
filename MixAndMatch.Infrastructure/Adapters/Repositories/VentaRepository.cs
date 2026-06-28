@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using MixAndMatch.Domain.Common;
 using MixAndMatch.Domain.Entities;
 using MixAndMatch.Domain.Ports.IRepositories;
 using MixAndMatch.Infrastructure.Configuration;
@@ -23,4 +24,12 @@ public class VentaRepository(MixAndMatchDbContext context)
         _context.Set<Venta>()
             .Include(v => v.VentasDetalles)
             .FirstOrDefaultAsync(v => v.Id == ventaId);
+
+    public Task<long?> GetSegundaPendienteId(long usuarioId) =>
+        _context.Set<Venta>()
+            .Where(v => v.UsuarioId == usuarioId && v.Estado == EstadoVenta.PENDIENTE)
+            .OrderBy(v => v.FechaCreacion)
+            .Skip(1)
+            .Select(v => (long?)v.Id)
+            .FirstOrDefaultAsync();
 }

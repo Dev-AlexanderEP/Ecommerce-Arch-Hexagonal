@@ -54,4 +54,21 @@ public class VentasController(IMediator _mediator) : ApiControllerBase
     {
         return this.ToActionResult(await _mediator.Send(new DeleteVentaCommand { VentaId = id }));
     }
+
+    [HttpGet("segunda-pendiente/{usuarioId}")]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    public async Task<IActionResult> GetSegundaPendiente(long usuarioId)
+    {
+        return this.ToActionResult(await _mediator.Send(new GetSegundaVentaPendienteQuery
+        {
+            UsuarioId = usuarioId
+        }));
+    }
+
+    [HttpPost("carrito-detalle")]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    public async Task<IActionResult> AgregarDetallesDesdeCarrito([FromBody] AgregarDetallesDesdeCarritoCommand command)
+    {
+        return this.ToActionResult(await _mediator.Send(command));
+    }
 }

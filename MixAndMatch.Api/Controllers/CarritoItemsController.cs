@@ -52,4 +52,31 @@ public class CarritoItemsController(IMediator _mediator) : ApiControllerBase
             CarritoItemId = id,
             SolicitanteId = CurrentUser.Id
         }));
+
+    [HttpPost("agregar")]
+    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
+    public async Task<IActionResult> AgregarOIncrementar([FromQuery] long carritoId, [FromQuery] long prendaId, [FromQuery] long tallaId)
+    {
+        var command = new AgregarOIncrementarCarritoItemCommand
+        {
+            CarritoId = carritoId,
+            PrendaId = prendaId,
+            TallaId = tallaId,
+            SolicitanteId = CurrentUser.Id
+        };
+        return this.ToActionResult(await _mediator.Send(command));
+    }
+
+    [HttpPut("{id}/cantidad")]
+    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
+    public async Task<IActionResult> ActualizarCantidad(long id, [FromQuery] int cantidad)
+    {
+        var command = new ActualizarCantidadCarritoItemCommand
+        {
+            CarritoItemId = id,
+            Cantidad = cantidad,
+            SolicitanteId = CurrentUser.Id
+        };
+        return this.ToActionResult(await _mediator.Send(command));
+    }
 }
