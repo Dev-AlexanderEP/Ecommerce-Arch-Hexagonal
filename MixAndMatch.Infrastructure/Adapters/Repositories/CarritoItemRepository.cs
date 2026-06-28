@@ -13,4 +13,8 @@ public class CarritoItemRepository(MixAndMatchDbContext context)
     public Task<bool> ExisteEnCarrito(long carritoId, long prendaTallaId) =>
         _context.Set<CarritoItem>()
             .AnyAsync(i => i.CarritoId == carritoId && i.PrendaTallaId == prendaTallaId);
+
+    public Task<CarritoItem?> BuscarPorCarritoPrendaTalla(long carritoId, long prendaTallaId) =>
+        _context.Set<CarritoItem>()
+            .FirstOrDefaultAsync(i => i.CarritoId == carritoId && i.PrendaTallaId == prendaTallaId);
 }

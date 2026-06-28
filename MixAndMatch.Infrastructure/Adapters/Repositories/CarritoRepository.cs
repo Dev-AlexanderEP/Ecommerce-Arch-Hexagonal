@@ -30,4 +30,13 @@ public class CarritoRepository(MixAndMatchDbContext context)
                 .SetProperty(c => c.Estado, EstadoCarrito.ABANDONADO)
                 .SetProperty(c => c.UpdatedAt, DateTime.UtcNow));
     }
+
+    public Task<List<Carrito>> BuscarAbiertosPorUsuarioId(long usuarioId) =>
+        _context.Set<Carrito>()
+            .Where(c => c.UsuarioId == usuarioId && c.Estado == EstadoCarrito.ACTIVO)
+            .ToListAsync();
+
+    public Task<int> ContarItemsDistintos(long carritoId) =>
+        _context.Set<CarritoItem>()
+            .CountAsync(i => i.CarritoId == carritoId);
 }

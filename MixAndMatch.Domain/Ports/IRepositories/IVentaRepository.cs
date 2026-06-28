@@ -10,4 +10,7 @@ public interface IVentaRepository : IGenericRepository<Venta>
 
     // Carga la venta junto con sus detalles (necesario para usar Venta.Total).
     Task<Venta?> GetByIdConDetalles(long ventaId);
+
+    // Migration: buscar la segunda venta pendiente de un usuario
+    Task<long?> GetSegundaPendienteId(long usuarioId);
 }
