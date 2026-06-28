@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MixAndMatch.Api.Common;
 using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.PrendaTalla.Commands;
 using MixAndMatch.Application.UseCases.PrendaTalla.Queries;
@@ -8,10 +9,9 @@ using MixAndMatch.Domain.Common;
 
 namespace MixAndMatch.Api.Controllers;
 
-[ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class PrendaTallasController(IMediator _mediator) : ControllerBase
+public class PrendaTallasController(IMediator _mediator) : ApiControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
@@ -41,16 +41,16 @@ public class PrendaTallasController(IMediator _mediator) : ControllerBase
 
     [HttpPut("stock/decremento")]
     [Authorize(Roles = nameof(RolUsuario.ADMIN))]
-    public async Task<IActionResult> RestarUnoStock([FromQuery] long prendaId, [FromQuery] long tallaId) =>
-        this.ToActionResult(await _mediator.Send(new RestarUnoStockCommand { PrendaId = prendaId, TallaId = tallaId }));
+    public async Task<IActionResult> RestarUnoStock([FromQuery] RestarUnoStockCommand command) =>
+        this.ToActionResult(await _mediator.Send(command));
 
     [HttpPut("stock/incremento")]
     [Authorize(Roles = nameof(RolUsuario.ADMIN))]
-    public async Task<IActionResult> SumarUnoStock([FromQuery] long prendaId, [FromQuery] long tallaId) =>
-        this.ToActionResult(await _mediator.Send(new SumarUnoStockCommand { PrendaId = prendaId, TallaId = tallaId }));
+    public async Task<IActionResult> SumarUnoStock([FromQuery] SumarUnoStockCommand command) =>
+        this.ToActionResult(await _mediator.Send(command));
 
     [HttpPut("stock/suma")]
     [Authorize(Roles = nameof(RolUsuario.ADMIN))]
-    public async Task<IActionResult> SumarStock([FromQuery] long prendaId, [FromQuery] long tallaId, [FromQuery] int cantidad) =>
-        this.ToActionResult(await _mediator.Send(new SumarStockCommand { PrendaId = prendaId, TallaId = tallaId, Cantidad = cantidad }));
+    public async Task<IActionResult> SumarStock([FromQuery] SumarStockCommand command) =>
+        this.ToActionResult(await _mediator.Send(command));
 }

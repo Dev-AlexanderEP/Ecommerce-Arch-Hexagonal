@@ -8,7 +8,7 @@ namespace MixAndMatch.Application.UseCases.Prenda.Commands;
 
 public class UpdatePrendaCommand : IRequest<ApiResponse<PrendaResponseDto>>
 {
-    [JsonIgnore]   // lo asigna el controller desde la ruta
+    [JsonIgnore]
     public long PrendaId { get; set; }
     public required string Nombre { get; set; }
     public string? Descripcion { get; set; }

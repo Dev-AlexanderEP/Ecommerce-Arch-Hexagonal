@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MixAndMatch.Api.Common;
 using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.Prenda.Commands;
 using MixAndMatch.Application.UseCases.Prenda.Queries;
@@ -8,29 +9,22 @@ using MixAndMatch.Domain.Common;
 
 namespace MixAndMatch.Api.Controllers;
 
-[ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class PrendasController(IMediator _mediator) : ControllerBase
+public class PrendasController(IMediator _mediator) : ApiControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
-    {
-        return this.ToActionResult(await _mediator.Send(new GetAllPrendasQuery { Page = page, PageSize = pageSize }));
-    }
+    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
+        this.ToActionResult(await _mediator.Send(new GetAllPrendasQuery { Page = page, PageSize = pageSize }));
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(long id)
-    {
-        return this.ToActionResult(await _mediator.Send(new GetPrendaByIdQuery { PrendaId = id }));
-    }
+    public async Task<IActionResult> GetById(long id) =>
+        this.ToActionResult(await _mediator.Send(new GetPrendaByIdQuery { PrendaId = id }));
 
     [HttpPost]
     [Authorize(Roles = nameof(RolUsuario.ADMIN))]
-    public async Task<IActionResult> Create([FromBody] CreatePrendaCommand command)
-    {
-        return this.ToActionResult(await _mediator.Send(command));
-    }
+    public async Task<IActionResult> Create([FromBody] CreatePrendaCommand command) =>
+        this.ToActionResult(await _mediator.Send(command));
 
     [HttpPut("{id}")]
     [Authorize(Roles = nameof(RolUsuario.ADMIN))]
@@ -42,10 +36,8 @@ public class PrendasController(IMediator _mediator) : ControllerBase
 
     [HttpDelete("{id}")]
     [Authorize(Roles = nameof(RolUsuario.ADMIN))]
-    public async Task<IActionResult> Delete(long id)
-    {
-        return this.ToActionResult(await _mediator.Send(new DeletePrendaCommand { PrendaId = id }));
-    }
+    public async Task<IActionResult> Delete(long id) =>
+        this.ToActionResult(await _mediator.Send(new DeletePrendaCommand { PrendaId = id }));
 
     [HttpGet("tallas-por-categoria/{categoria}")]
     public async Task<IActionResult> GetTallasPorCategoria(string categoria) =>
@@ -84,60 +76,22 @@ public class PrendasController(IMediator _mediator) : ControllerBase
         this.ToActionResult(await _mediator.Send(new GetCategoriasPorGeneroQuery { Genero = genero }));
 
     [HttpGet("busqueda")]
-    public async Task<IActionResult> Buscar(
-        [FromQuery] string? nombre,
-        [FromQuery] string? categoria,
-        [FromQuery] string? genero) =>
-        this.ToActionResult(await _mediator.Send(new BuscarPrendasConDescuentoQuery
-        {
-            Nombre = nombre,
-            Categoria = categoria,
-            Genero = genero
-        }));
+    public async Task<IActionResult> Buscar([FromQuery] BuscarPrendasConDescuentoQuery query) =>
+        this.ToActionResult(await _mediator.Send(query));
 
     [HttpGet("busqueda-por-nombre-genero")]
-    public async Task<IActionResult> BuscarPorNombreYGenero(
-        [FromQuery] string? nombre,
-        [FromQuery] string? genero) =>
-        this.ToActionResult(await _mediator.Send(new BuscarPrendasConDescuentoQuery
-        {
-            Nombre = nombre,
-            Genero = genero
-        }));
+    public async Task<IActionResult> BuscarPorNombreYGenero([FromQuery] BuscarPrendasConDescuentoQuery query) =>
+        this.ToActionResult(await _mediator.Send(query));
 
     [HttpGet("con-descuentos")]
-    public async Task<IActionResult> GetDescuentosAplicados(
-        [FromQuery] string? categoria,
-        [FromQuery] string? genero) =>
-        this.ToActionResult(await _mediator.Send(new GetDescuentosAplicadosQuery
-        {
-            Categoria = categoria,
-            Genero = genero
-        }));
+    public async Task<IActionResult> GetDescuentosAplicados([FromQuery] GetDescuentosAplicadosQuery query) =>
+        this.ToActionResult(await _mediator.Send(query));
 
     [HttpGet("con-descuentos-aleatorio/{genero}")]
     public async Task<IActionResult> GetDescuentosAplicadosAleatorio(string genero) =>
         this.ToActionResult(await _mediator.Send(new GetDescuentosAplicadosAleatorioQuery { Genero = genero }));
 
     [HttpGet("filtro")]
-    public async Task<IActionResult> Filtrar(
-        [FromQuery] string? talla,
-        [FromQuery] string? categoria,
-        [FromQuery] string? marca,
-        [FromQuery] string? genero,
-        [FromQuery] double? precioMin,
-        [FromQuery] double? precioMax,
-        [FromQuery] double? descMin,
-        [FromQuery] double? descMax) =>
-        this.ToActionResult(await _mediator.Send(new FiltrarPrendasDinamicoQuery
-        {
-            Talla = talla,
-            Categoria = categoria,
-            Marca = marca,
-            Genero = genero,
-            PrecioMin = precioMin,
-            PrecioMax = precioMax,
-            DescMin = descMin,
-            DescMax = descMax
-        }));
+    public async Task<IActionResult> Filtrar([FromQuery] FiltrarPrendasDinamicoQuery query) =>
+        this.ToActionResult(await _mediator.Send(query));
 }
