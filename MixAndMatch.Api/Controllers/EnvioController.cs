@@ -48,4 +48,19 @@ public class EnvioController(IMediator _mediator) : ControllerBase
     {
         return this.ToActionResult(await _mediator.Send(new DeleteEnvioCommand { EnvioId = id }));
     }
+
+    [HttpGet("tracking/{trackingNumber}")]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    public async Task<IActionResult> GetByTrackingNumber(string trackingNumber) =>
+        this.ToActionResult(await _mediator.Send(new GetEnvioByTrackingNumberQuery { TrackingNumber = trackingNumber }));
+
+    [HttpGet("usuario/{userId}/entregados")]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    public async Task<IActionResult> GetEntregadosPorUsuario(long userId) =>
+        this.ToActionResult(await _mediator.Send(new GetEnviosEntregadosPorUsuarioQuery { UsuarioId = userId }));
+
+    [HttpGet("usuario/{userId}/no-entregados")]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    public async Task<IActionResult> GetNoEntregadosPorUsuario(long userId) =>
+        this.ToActionResult(await _mediator.Send(new GetEnviosNoEntregadosPorUsuarioQuery { UsuarioId = userId }));
 }
