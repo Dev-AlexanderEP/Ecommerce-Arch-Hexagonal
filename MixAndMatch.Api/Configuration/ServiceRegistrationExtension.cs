@@ -1,5 +1,6 @@
 using FluentValidation;
 using MediatR;
+using Microsoft.OpenApi.Models;
 using MixAndMatch.Application.Common;
 using MixAndMatch.Application.Jobs;
 using MixAndMatch.Application.UseCases.Categoria.Commands;
@@ -36,7 +37,32 @@ public static class ServiceRegistrationExtension
         // Controllers y Swagger
         services.AddControllers();
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(c =>
+        {
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name         = "Authorization",
+                Type         = SecuritySchemeType.Http,
+                Scheme       = "Bearer",
+                BearerFormat = "JWT",
+                In           = ParameterLocation.Header,
+                Description  = "Ingresa el token JWT. Ejemplo: Bearer {token}"
+            });
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id   = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+        });
 
         return services;
     }
