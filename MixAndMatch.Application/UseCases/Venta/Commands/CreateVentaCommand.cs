@@ -4,17 +4,22 @@ using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.Common;
 using MixAndMatch.Domain.DTOs.Ventas;
 using MixAndMatch.Domain.Ports.IRepositories;
+using MixAndMatch.Domain.Ports.IServices;
 using VentaEntity = MixAndMatch.Domain.Entities.Venta;
 
 namespace MixAndMatch.Application.UseCases.Venta.Commands;
 
 public class CreateVentaCommand : IRequest<ApiResponse<VentaResponseDto>>
 {
-    [JsonIgnore]   // lo asigna el controller desde el token, nunca el body
+    [JsonIgnore]
     public long SolicitanteId { get; set; }
 }
 
-public class CreateVentaCommandHandler(IUnitOfWork _uow) : IRequestHandler<CreateVentaCommand, ApiResponse<VentaResponseDto>>
+public class CreateVentaCommandHandler(
+    IUnitOfWork _uow,
+    IEmailService _email,
+    IEmailTemplateService _templates)
+    : IRequestHandler<CreateVentaCommand, ApiResponse<VentaResponseDto>>
 {
     public async Task<ApiResponse<VentaResponseDto>> Handle(CreateVentaCommand request, CancellationToken cancellationToken)
     {
@@ -28,6 +33,8 @@ public class CreateVentaCommandHandler(IUnitOfWork _uow) : IRequestHandler<Creat
         await _uow.Ventas.Add(entity);
         await _uow.Complete();
 
+        _ = EnviarConfirmacionAsync(entity.Id, request.SolicitanteId);
+
         return ApiResponse<VentaResponseDto>.Created(new VentaResponseDto
         {
             Id = entity.Id,
@@ -36,5 +43,28 @@ public class CreateVentaCommandHandler(IUnitOfWork _uow) : IRequestHandler<Creat
             Estado = entity.Estado?.ToString(),
             UpdatedAt = entity.UpdatedAt
         });
+    }
+
+    private async Task EnviarConfirmacionAsync(long ventaId, long usuarioId)
+    {
+        try
+        {
+            var usuario = await _uow.Usuarios.GetById(usuarioId);
+            if (usuario is null) return;
+
+            var total = await _uow.Carritos.GetTotalCarritoActivo(usuarioId);
+
+            var html = _templates.Render("ConfirmacionVenta", new Dictionary<string, string>
+            {
+                ["VentaId"] = ventaId.ToString(),
+                ["Total"]   = total.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)
+            });
+
+            await _email.SendAsync(usuario.Email, $"Confirmación de pedido #{ventaId} - Mix&Match", html);
+        }
+        catch
+        {
+            // El email no debe bloquear ni revertir la creación de la venta.
+        }
     }
 }

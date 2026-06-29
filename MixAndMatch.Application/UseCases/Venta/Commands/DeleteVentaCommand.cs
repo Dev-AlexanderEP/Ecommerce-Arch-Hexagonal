@@ -1,5 +1,7 @@
+using System.Text.Json.Serialization;
 using MediatR;
 using MixAndMatch.Application.Common;
+using MixAndMatch.Domain.Common;
 using MixAndMatch.Domain.Ports.IRepositories;
 
 namespace MixAndMatch.Application.UseCases.Venta.Commands;
@@ -7,6 +9,8 @@ namespace MixAndMatch.Application.UseCases.Venta.Commands;
 public class DeleteVentaCommand : IRequest<ApiResponse<bool>>
 {
     public required long VentaId { get; set; }
+    [JsonIgnore] public long SolicitanteId { get; set; }
+    [JsonIgnore] public bool EsAdmin { get; set; }
 }
 
 public class DeleteVentaCommandHandler(IUnitOfWork _uow) : IRequestHandler<DeleteVentaCommand, ApiResponse<bool>>
@@ -18,6 +22,9 @@ public class DeleteVentaCommandHandler(IUnitOfWork _uow) : IRequestHandler<Delet
         {
             return ApiResponse<bool>.Fail($"Venta no encontrada para id {request.VentaId}.");
         }
+
+        if (!request.EsAdmin && entity.UsuarioId != request.SolicitanteId)
+            return ApiResponse<bool>.Fail("No tienes acceso a esta venta.", ErrorType.Forbidden);
 
         if (await _uow.Ventas.TieneDetalles(request.VentaId))
         {

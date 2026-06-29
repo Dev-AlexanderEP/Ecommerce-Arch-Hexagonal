@@ -10,8 +10,9 @@ namespace MixAndMatch.Application.UseCases.Venta.Commands;
 
 public class UpdateVentaCommand : IRequest<ApiResponse<VentaResponseDto>>
 {
-    [JsonIgnore]   // lo asigna el controller desde la ruta
-    public long VentaId { get; set; }
+    [JsonIgnore] public long VentaId { get; set; }
+    [JsonIgnore] public long SolicitanteId { get; set; }
+    [JsonIgnore] public bool EsAdmin { get; set; }
     public required string Estado { get; set; }
 }
 
@@ -24,11 +25,17 @@ public class UpdateVentaCommandHandler(IUnitOfWork _uow, IMediator _mediator)
         if (entity is null)
             return ApiResponse<VentaResponseDto>.Fail($"Venta no encontrada para id {request.VentaId}.");
 
+        if (!request.EsAdmin && entity.UsuarioId != request.SolicitanteId)
+            return ApiResponse<VentaResponseDto>.Fail("No tienes acceso a esta venta.", ErrorType.Forbidden);
+
         // El formato del estado ya lo valida UpdateVentaCommandValidator (400); esto es defensa.
         if (!Enum.TryParse<EstadoVenta>(request.Estado, ignoreCase: true, out var nuevoEstado))
         {
             return ApiResponse<VentaResponseDto>.Fail($"Estado inválido: {request.Estado}. Permitidos: {string.Join(", ", Enum.GetNames<EstadoVenta>())}.", ErrorType.Validation);
         }
+
+        if (!request.EsAdmin && nuevoEstado != EstadoVenta.CANCELADO)
+            return ApiResponse<VentaResponseDto>.Fail("Solo puedes cancelar tu propia venta.", ErrorType.Forbidden);
 
         entity.Estado = nuevoEstado;
         entity.UpdatedAt = DateTime.UtcNow;

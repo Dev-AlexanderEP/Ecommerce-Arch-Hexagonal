@@ -41,34 +41,42 @@ public class VentasController(IMediator _mediator) : ApiControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    [Authorize(Roles = $"{nameof(RolUsuario.ADMIN)},{nameof(RolUsuario.CLIENTE)}")]
     public async Task<IActionResult> Update(long id, [FromBody] UpdateVentaCommand command)
     {
         command.VentaId = id;
+        command.SolicitanteId = CurrentUser.Id;
+        command.EsAdmin = CurrentUser.IsAdmin;
         return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpDelete("{id}")]
-    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    [Authorize(Roles = $"{nameof(RolUsuario.ADMIN)},{nameof(RolUsuario.CLIENTE)}")]
     public async Task<IActionResult> Delete(long id)
     {
-        return this.ToActionResult(await _mediator.Send(new DeleteVentaCommand { VentaId = id }));
+        return this.ToActionResult(await _mediator.Send(new DeleteVentaCommand
+        {
+            VentaId = id,
+            SolicitanteId = CurrentUser.Id,
+            EsAdmin = CurrentUser.IsAdmin
+        }));
     }
 
-    [HttpGet("segunda-pendiente/{usuarioId}")]
-    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
-    public async Task<IActionResult> GetSegundaPendiente(long usuarioId)
+    [HttpGet("segunda-pendiente")]
+    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
+    public async Task<IActionResult> GetSegundaPendiente()
     {
         return this.ToActionResult(await _mediator.Send(new GetSegundaVentaPendienteQuery
         {
-            UsuarioId = usuarioId
+            UsuarioId = CurrentUser.Id
         }));
     }
 
     [HttpPost("carrito-detalle")]
-    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
     public async Task<IActionResult> AgregarDetallesDesdeCarrito([FromBody] AgregarDetallesDesdeCarritoCommand command)
     {
+        command.SolicitanteId = CurrentUser.Id;
         return this.ToActionResult(await _mediator.Send(command));
     }
 }
