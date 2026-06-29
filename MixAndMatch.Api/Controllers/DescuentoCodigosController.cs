@@ -25,6 +25,13 @@ public class DescuentoCodigosController(IMediator _mediator) : ControllerBase
         return this.ToActionResult(await _mediator.Send(new GetDescuentoCodigoByIdQuery { DescuentoCodigoId = id }));
     }
 
+    [HttpGet("codigo/{codigo}")]
+    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
+    public async Task<IActionResult> GetByCodigo(string codigo)
+    {
+        return this.ToActionResult(await _mediator.Send(new GetDescuentoCodigoByCodigoQuery { Codigo = codigo }));
+    }
+
     [HttpPost]
     [Authorize(Roles = nameof(RolUsuario.ADMIN))]
     public async Task<IActionResult> Create([FromBody] CreateDescuentoCodigoCommand command)

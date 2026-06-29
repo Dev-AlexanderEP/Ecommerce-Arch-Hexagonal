@@ -14,6 +14,10 @@ public class DescuentoCodigoRepository(MixAndMatchDbContext context)
         _context.Set<DescuentoCodigo>()
             .AnyAsync(d => d.Codigo == codigo && (exceptoId == null || d.Id != exceptoId));
 
+    public Task<DescuentoCodigo?> BuscarPorCodigo(string codigo) =>
+        _context.Set<DescuentoCodigo>()
+            .FirstOrDefaultAsync(d => d.Codigo == codigo);
+
     public Task<bool> TieneUsos(long descuentoCodigoId) =>
         _context.Set<DescuentoUsuario>().AnyAsync(u => u.DescuentoCodigoId == descuentoCodigoId);
 

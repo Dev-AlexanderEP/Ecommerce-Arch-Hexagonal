@@ -6,6 +6,7 @@ public interface IDescuentoCodigoRepository : IGenericRepository<DescuentoCodigo
 {
     Task<bool> ExisteConCodigo(string codigo, long? exceptoId = null);
     Task<bool> TieneUsos(long descuentoCodigoId);
+    Task<DescuentoCodigo?> BuscarPorCodigo(string codigo);
 
     // Jobs de mantenimiento
     Task<int> ExpirarVencidosAsync();
