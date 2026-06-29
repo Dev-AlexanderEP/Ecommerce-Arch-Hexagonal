@@ -40,17 +40,17 @@ public class PrendaTallasController(IMediator _mediator) : ApiControllerBase
         this.ToActionResult(await _mediator.Send(new DeletePrendaTallaCommand { PrendaTallaId = id }));
 
     [HttpPut("stock/decremento")]
-    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    [Authorize(Roles = $"{nameof(RolUsuario.ADMIN)},{nameof(RolUsuario.CLIENTE)}")]
     public async Task<IActionResult> RestarUnoStock([FromQuery] RestarUnoStockCommand command) =>
         this.ToActionResult(await _mediator.Send(command));
 
     [HttpPut("stock/incremento")]
-    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    [Authorize(Roles = $"{nameof(RolUsuario.ADMIN)},{nameof(RolUsuario.CLIENTE)}")]
     public async Task<IActionResult> SumarUnoStock([FromQuery] SumarUnoStockCommand command) =>
         this.ToActionResult(await _mediator.Send(command));
 
     [HttpPut("stock/suma")]
-    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    [Authorize(Roles = $"{nameof(RolUsuario.ADMIN)},{nameof(RolUsuario.CLIENTE)}")]
     public async Task<IActionResult> SumarStock([FromQuery] SumarStockCommand command) =>
         this.ToActionResult(await _mediator.Send(command));
 }
