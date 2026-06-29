@@ -52,18 +52,19 @@ public class CarritosController(IMediator _mediator) : ApiControllerBase
         }));
 
     [HttpGet("abierto/usuario/{usuarioId}")]
-    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    [Authorize(Roles = $"{nameof(RolUsuario.ADMIN)},{nameof(RolUsuario.CLIENTE)}")]
     public async Task<IActionResult> GetCarritosAbiertosByUsuario(long usuarioId) =>
         this.ToActionResult(await _mediator.Send(new GetCarritosAbiertosByUsuarioQuery
         {
-            UsuarioId = usuarioId
+            UsuarioId = CurrentUser.IsAdmin ? usuarioId : CurrentUser.Id
         }));
 
     [HttpGet("{id}/cantidad-items")]
-    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    [Authorize(Roles = $"{nameof(RolUsuario.ADMIN)},{nameof(RolUsuario.CLIENTE)}")]
     public async Task<IActionResult> GetCantidadItems(long id) =>
         this.ToActionResult(await _mediator.Send(new GetCantidadItemsCarritoQuery
         {
-            CarritoId = id
+            CarritoId = id,
+            SolicitanteId = CurrentUser.Id
         }));
 }

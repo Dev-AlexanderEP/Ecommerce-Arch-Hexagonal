@@ -35,6 +35,13 @@ public class CarritoRepository(MixAndMatchDbContext context)
         _context.Set<Carrito>()
             .Where(c => c.UsuarioId == usuarioId && c.Estado == EstadoCarrito.ACTIVO)
             .ToListAsync();
+            
+     public Task<decimal> GetTotalCarritoActivo(long usuarioId) =>
+        (from c in _context.Set<Carrito>()
+         join i in _context.Set<CarritoItem>() on c.Id equals i.CarritoId
+         where c.UsuarioId == usuarioId && c.Estado == EstadoCarrito.ACTIVO
+         select i.PrecioUnitario * i.Cantidad)
+        .SumAsync();
 
     public Task<int> ContarItemsDistintos(long carritoId) =>
         _context.Set<CarritoItem>()

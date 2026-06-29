@@ -9,6 +9,7 @@ public interface ICarritoRepository : IGenericRepository<Carrito>
 
     // Jobs de mantenimiento
     Task<int> MarcarAbandonadosAsync(int diasInactividad);
+    Task<decimal> GetTotalCarritoActivo(long usuarioId);
 
     // Migration endpoints
     Task<List<Carrito>> BuscarAbiertosPorUsuarioId(long usuarioId);
