@@ -21,6 +21,10 @@ public class PrendasController(IMediator _mediator) : ApiControllerBase
     public async Task<IActionResult> GetById(long id) =>
         this.ToActionResult(await _mediator.Send(new GetPrendaByIdQuery { PrendaId = id }));
 
+    [HttpGet("{id}/detalle")]
+    public async Task<IActionResult> GetDetalle(long id) =>
+        this.ToActionResult(await _mediator.Send(new GetPrendaDetalladaByIdQuery { PrendaId = id }));
+
     [HttpPost]
     [Authorize(Roles = nameof(RolUsuario.ADMIN))]
     public async Task<IActionResult> Create([FromBody] CreatePrendaCommand command) =>

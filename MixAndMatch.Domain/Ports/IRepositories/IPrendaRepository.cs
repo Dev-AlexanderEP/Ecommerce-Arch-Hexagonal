@@ -23,4 +23,5 @@ public interface IPrendaRepository : IGenericRepository<Prenda>
     Task<List<PrendaConDescuentoResponseDto>> BuscarDescuentosAplicados(string? categoria, string? genero);
     Task<List<PrendaConDescuentoTodoResponseDto>> BuscarDescuentosAplicadosAleatorio(string genero);
     Task<List<PrendaConDescuentoResponseDto>> FiltrarDinamico(string? talla, string? categoria, string? marca, string? genero, double? precioMin, double? precioMax, double? descMin, double? descMax);
+    Task<Prenda?> GetDetalladoById(long id);
 }

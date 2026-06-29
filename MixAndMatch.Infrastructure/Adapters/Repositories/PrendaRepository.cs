@@ -292,18 +292,29 @@ public class PrendaRepository(MixAndMatchDbContext context)
                 AND dc.fecha_inicio <= CURRENT_DATE
                 AND (dc.fecha_fin IS NULL OR dc.fecha_fin >= CURRENT_DATE)
             WHERE p.activo = true
-            AND ({talla} IS NULL OR EXISTS (
+            AND (CAST({talla} AS text) IS NULL OR EXISTS (
                 SELECT 1 FROM prenda_talla pt
                 JOIN talla t ON pt.talla_id = t.id
                 WHERE pt.prenda_id = p.id AND t.nom_talla = {talla}
             ))
-            AND ({categoria} IS NULL OR c.nom_categoria = {categoria})
-            AND ({marca} IS NULL OR m.nom_marca = {marca})
-            AND ({genero} IS NULL OR LOWER(g.nom_genero) LIKE LOWER(CONCAT('%', {genero}, '%')))
-            AND (({precioMin} IS NULL OR {precioMax} IS NULL) OR (p.precio BETWEEN {precioMin} AND {precioMax}))
-            AND (({descMin} IS NULL OR {descMax} IS NULL) OR (COALESCE(dp.porcentaje, dc.porcentaje, 0) BETWEEN {descMin} AND {descMax}))
+            AND (CAST({categoria} AS text) IS NULL OR c.nom_categoria = {categoria})
+            AND (CAST({marca} AS text) IS NULL OR m.nom_marca = {marca})
+            AND (CAST({genero} AS text) IS NULL OR LOWER(g.nom_genero) LIKE LOWER(CONCAT('%', {genero}, '%')))
+            AND ((CAST({precioMin} AS double precision) IS NULL OR CAST({precioMax} AS double precision) IS NULL) OR (p.precio BETWEEN {precioMin} AND {precioMax}))
+            AND ((CAST({descMin} AS double precision) IS NULL OR CAST({descMax} AS double precision) IS NULL) OR (COALESCE(dp.porcentaje, dc.porcentaje, 0) BETWEEN {descMin} AND {descMax}))
             ORDER BY p.nombre";
 
         return await _context.Database.SqlQuery<PrendaConDescuentoResponseDto>(sql).ToListAsync();
     }
+
+    public Task<Prenda?> GetDetalladoById(long id) =>
+        _context.Set<Prenda>()
+            .Where(p => p.Id == id)
+            .Include(p => p.Marca)
+            .Include(p => p.Categoria)
+            .Include(p => p.Proveedor)
+            .Include(p => p.PrendaImagens)
+            .Include(p => p.PrendaTallas)
+                .ThenInclude(pt => pt.Talla)
+            .FirstOrDefaultAsync(p => p.Id == id);
 }
