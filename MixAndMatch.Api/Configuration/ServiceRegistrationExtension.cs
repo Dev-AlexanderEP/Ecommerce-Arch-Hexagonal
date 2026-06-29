@@ -34,6 +34,15 @@ public static class ServiceRegistrationExtension
         services.AddScoped<ExpirarCodigosPorUsoJob>();
         services.AddScoped<LimpiarCarritosAbandonadosJob>();
 
+        // CORS
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll", policy =>
+                policy.AllowAnyOrigin()
+                      .AllowAnyMethod()
+                      .AllowAnyHeader());
+        });
+
         // Controllers y Swagger
         services.AddControllers();
         services.AddEndpointsApiExplorer();
