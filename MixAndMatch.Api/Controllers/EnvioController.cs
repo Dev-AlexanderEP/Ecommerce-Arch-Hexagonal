@@ -50,7 +50,7 @@ public class EnvioController(IMediator _mediator) : ControllerBase
     }
 
     [HttpGet("tracking/{trackingNumber}")]
-    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
     public async Task<IActionResult> GetByTrackingNumber(string trackingNumber) =>
         this.ToActionResult(await _mediator.Send(new GetEnvioByTrackingNumberQuery { TrackingNumber = trackingNumber }));
 
