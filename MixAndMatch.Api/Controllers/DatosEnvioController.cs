@@ -13,6 +13,11 @@ namespace MixAndMatch.Api.Controllers;
 [Authorize]
 public class DatosEnvioController(IMediator _mediator) : ApiControllerBase
 {
+    [HttpGet("mis-direcciones")]
+    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
+    public async Task<IActionResult> GetMisDirecciones() =>
+        this.ToActionResult(await _mediator.Send(new GetMisDireccionesQuery { UsuarioId = CurrentUser.Id }));
+
     [HttpGet]
     [Authorize(Roles = nameof(RolUsuario.ADMIN))]
     public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
