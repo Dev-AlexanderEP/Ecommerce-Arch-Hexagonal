@@ -6,4 +6,6 @@ public interface ICarritoItemRepository : IGenericRepository<CarritoItem>
 {
     Task<bool> ExisteEnCarrito(long carritoId, long prendaTallaId);
     Task<CarritoItem?> BuscarPorCarritoPrendaTalla(long carritoId, long prendaTallaId);
+    Task<List<CarritoItem>> GetByCarritoId(long carritoId);
+    Task<List<CarritoItem>> GetDetalladosByCarritoId(long carritoId);
 }

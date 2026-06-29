@@ -53,6 +53,15 @@ public class CarritoItemsController(IMediator _mediator) : ApiControllerBase
             SolicitanteId = CurrentUser.Id
         }));
 
+    [HttpGet("carrito/{carritoId}")]
+    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
+    public async Task<IActionResult> GetByCarrito(long carritoId) =>
+        this.ToActionResult(await _mediator.Send(new GetCarritoItemsByCarritoQuery
+        {
+            CarritoId     = carritoId,
+            SolicitanteId = CurrentUser.Id
+        }));
+
     [HttpPost("agregar")]
     [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
     public async Task<IActionResult> AgregarOIncrementar([FromQuery] long carritoId, [FromQuery] long prendaId, [FromQuery] long tallaId)
