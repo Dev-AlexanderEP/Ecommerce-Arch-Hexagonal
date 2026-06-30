@@ -4,6 +4,8 @@ namespace MixAndMatch.Domain.Common;
 public enum TipoImagen
 {
     PRINCIPAL,
+    HOVER,
     SECUNDARIA,
+    TERCIARIA,
     DETALLE
 }

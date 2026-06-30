@@ -27,17 +27,16 @@ public class GetPrendaDetalladaByIdQueryHandler(IUnitOfWork _uow)
             .FirstOrDefault(i => i.Tipo == TipoImagen.PRINCIPAL)?.Url;
 
         var imagenHover = prenda.PrendaImagens
+            .FirstOrDefault(i => i.Tipo == TipoImagen.HOVER)?.Url;
+
+        var imagenExtra1 = prenda.PrendaImagens
             .FirstOrDefault(i => i.Tipo == TipoImagen.SECUNDARIA)?.Url;
 
-        var detalles = prenda.PrendaImagens
-            .Where(i => i.Tipo == TipoImagen.DETALLE)
-            .OrderBy(i => i.Orden)
-            .ToList();
+        var imagenExtra2 = prenda.PrendaImagens
+            .FirstOrDefault(i => i.Tipo == TipoImagen.TERCIARIA)?.Url;
 
-        var imagenVideo   = detalles.FirstOrDefault(i => i.Url.EndsWith(".mp4", StringComparison.OrdinalIgnoreCase))?.Url;
-        var extras        = detalles.Where(i => !i.Url.EndsWith(".mp4", StringComparison.OrdinalIgnoreCase)).ToList();
-        var imagenExtra1  = extras.ElementAtOrDefault(0)?.Url;
-        var imagenExtra2  = extras.ElementAtOrDefault(1)?.Url;
+        var imagenVideo = prenda.PrendaImagens
+            .FirstOrDefault(i => i.Tipo == TipoImagen.DETALLE)?.Url;
 
         return ApiResponse<PrendaDetalladaResponseDto>.Ok(new PrendaDetalladaResponseDto
         {

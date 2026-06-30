@@ -5,6 +5,7 @@ using MixAndMatch.Api.Common;
 using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.Prenda.Commands;
 using MixAndMatch.Application.UseCases.Prenda.Queries;
+using MixAndMatch.Application.UseCases.PrendaImagen.Commands;
 using MixAndMatch.Domain.Common;
 
 namespace MixAndMatch.Api.Controllers;
@@ -98,4 +99,29 @@ public class PrendasController(IMediator _mediator) : ApiControllerBase
     [HttpGet("filtro")]
     public async Task<IActionResult> Filtrar([FromQuery] FiltrarPrendasDinamicoQuery query) =>
         this.ToActionResult(await _mediator.Send(query));
+
+    [HttpPost("{id}/imagenes")]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> UploadImagen(long id, IFormFile archivo, [FromForm] string tipo, [FromForm] int? orden)
+    {
+        if (archivo is null || archivo.Length == 0)
+            return BadRequest("El archivo es requerido.");
+
+        var command = new UploadPrendaImagenCommand
+        {
+            PrendaId      = id,
+            Contenido     = archivo.OpenReadStream(),
+            NombreArchivo = archivo.FileName,
+            ContentType   = archivo.ContentType,
+            Tipo          = tipo,
+            Orden         = orden
+        };
+        return this.ToActionResult(await _mediator.Send(command));
+    }
+
+    [HttpDelete("{id}/imagenes/{imagenId}")]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    public async Task<IActionResult> DeleteImagen(long id, long imagenId) =>
+        this.ToActionResult(await _mediator.Send(new DeletePrendaImagenCommand { PrendaImagenId = imagenId }));
 }
