@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System.Text.Json.Serialization;
+using MediatR;
 using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
@@ -7,7 +8,8 @@ namespace MixAndMatch.Application.UseCases.Categoria.Commands;
 
 public class UpdateCategoriaCommand : IRequest<ApiResponse<CategoriaResponseDto>>
 {
-    public required long CategoriaId { get; set; }
+    [JsonIgnore]
+    public long CategoriaId { get; set; }
     public required string NomCategoria { get; set; }
 }
 

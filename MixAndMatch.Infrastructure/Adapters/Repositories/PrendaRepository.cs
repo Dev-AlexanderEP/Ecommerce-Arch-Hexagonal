@@ -185,9 +185,9 @@ public class PrendaRepository(MixAndMatchDbContext context)
                 AND dc.fecha_inicio <= CURRENT_DATE
                 AND (dc.fecha_fin IS NULL OR dc.fecha_fin >= CURRENT_DATE)
             WHERE p.activo = true
-            AND ({nombre} IS NULL OR LOWER(p.nombre) LIKE LOWER(CONCAT('%', {nombre}, '%')))
-            AND ({categoria} IS NULL OR LOWER(c.nom_categoria) LIKE LOWER(CONCAT('%', {categoria}, '%')))
-            AND ({genero} IS NULL OR LOWER(g.nom_genero) LIKE LOWER(CONCAT('%', {genero}, '%')))";
+            AND (CAST({nombre} AS text) IS NULL OR LOWER(p.nombre) LIKE LOWER(CONCAT('%', CAST({nombre} AS text), '%')))
+            AND (CAST({categoria} AS text) IS NULL OR LOWER(c.nom_categoria) LIKE LOWER(CONCAT('%', CAST({categoria} AS text), '%')))
+            AND (CAST({genero} AS text) IS NULL OR LOWER(g.nom_genero) LIKE LOWER(CONCAT('%', CAST({genero} AS text), '%')))";
 
         return await _context.Database.SqlQuery<PrendaConDescuentoResponseDto>(sql).ToListAsync();
     }
@@ -221,8 +221,8 @@ public class PrendaRepository(MixAndMatchDbContext context)
                 AND dc.fecha_inicio <= CURRENT_DATE
                 AND (dc.fecha_fin IS NULL OR dc.fecha_fin >= CURRENT_DATE)
             WHERE p.activo = true
-            AND ({categoria} IS NULL OR LOWER(c.nom_categoria) LIKE LOWER(CONCAT('%', {categoria}, '%')))
-            AND ({genero} IS NULL OR LOWER(g.nom_genero) LIKE LOWER(CONCAT('%', {genero}, '%')))";
+            AND (CAST({categoria} AS text) IS NULL OR LOWER(c.nom_categoria) LIKE LOWER(CONCAT('%', CAST({categoria} AS text), '%')))
+            AND (CAST({genero} AS text) IS NULL OR LOWER(g.nom_genero) LIKE LOWER(CONCAT('%', CAST({genero} AS text), '%')))";
 
         return await _context.Database.SqlQuery<PrendaConDescuentoResponseDto>(sql).ToListAsync();
     }
@@ -257,7 +257,7 @@ public class PrendaRepository(MixAndMatchDbContext context)
                 AND dc.fecha_inicio <= CURRENT_DATE
                 AND (dc.fecha_fin IS NULL OR dc.fecha_fin >= CURRENT_DATE)
             WHERE p.activo = true
-            AND ({genero} IS NULL OR LOWER(g.nom_genero) LIKE LOWER(CONCAT('%', {genero}, '%')))
+            AND (CAST({genero} AS text) IS NULL OR LOWER(g.nom_genero) LIKE LOWER(CONCAT('%', CAST({genero} AS text), '%')))
             ORDER BY RANDOM()";
 
         return await _context.Database.SqlQuery<PrendaConDescuentoTodoResponseDto>(sql).ToListAsync();

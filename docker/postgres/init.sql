@@ -6,7 +6,7 @@
 -- ─── ENUMS ──────────────────────────────────────────────────
 
 CREATE TYPE rol_usuario      AS ENUM ('ADMIN', 'CLIENTE', 'VENDEDOR');
-CREATE TYPE tipo_imagen      AS ENUM ('PRINCIPAL', 'SECUNDARIA', 'DETALLE');
+CREATE TYPE tipo_imagen      AS ENUM ('PRINCIPAL', 'HOVER', 'SECUNDARIA', 'TERCIARIA', 'DETALLE');
 CREATE TYPE estado_carrito   AS ENUM ('ACTIVO', 'CERRADO', 'ABANDONADO');
 CREATE TYPE estado_venta     AS ENUM ('PENDIENTE', 'PAGADO', 'ENVIADO', 'ENTREGADO', 'CANCELADO');
 CREATE TYPE estado_pago      AS ENUM ('PENDIENTE', 'COMPLETADO', 'FALLIDO', 'REEMBOLSADO');

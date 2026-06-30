@@ -26,11 +26,6 @@ public class DeleteVentaCommandHandler(IUnitOfWork _uow) : IRequestHandler<Delet
         if (!request.EsAdmin && entity.UsuarioId != request.SolicitanteId)
             return ApiResponse<bool>.Fail("No tienes acceso a esta venta.", ErrorType.Forbidden);
 
-        if (await _uow.Ventas.TieneDetalles(request.VentaId))
-        {
-            return ApiResponse<bool>.Fail("La venta tiene detalles asociados y no puede eliminarse.", ErrorType.Conflict);
-        }
-
         if (await _uow.Ventas.TienePagos(request.VentaId))
         {
             return ApiResponse<bool>.Fail("La venta tiene pagos asociados y no puede eliminarse.", ErrorType.Conflict);
@@ -41,6 +36,7 @@ public class DeleteVentaCommandHandler(IUnitOfWork _uow) : IRequestHandler<Delet
             return ApiResponse<bool>.Fail("La venta tiene envíos asociados y no puede eliminarse.", ErrorType.Conflict);
         }
 
+        await _uow.VentasDetalles.DeleteByVentaId(request.VentaId);
         await _uow.Ventas.Delete(request.VentaId);
         await _uow.Complete();
         return ApiResponse<bool>.Ok(true, "Venta eliminada correctamente.");
