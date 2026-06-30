@@ -17,9 +17,11 @@ public class CreatePagoCommand : IRequest<ApiResponse<PagoResponseDto>>
     public long SolicitanteId { get; set; }
 }
 
-public class CreatePagoCommandHandler(IUnitOfWork _uow)
+public class CreatePagoCommandHandler(IUnitOfWork _uow, IMediator _mediator)
     : IRequestHandler<CreatePagoCommand, ApiResponse<PagoResponseDto>>
 {
+    private const string MetodoAutoConfirmable = "TARJETA_CREDITO";
+
     public async Task<ApiResponse<PagoResponseDto>> Handle(CreatePagoCommand request, CancellationToken cancellationToken)
     {
         // Se carga con detalles porque el monto se calcula desde venta.Total.
@@ -59,6 +61,17 @@ public class CreatePagoCommandHandler(IUnitOfWork _uow)
 
         await _uow.Repository<PagoEntity>().Add(entity);
         await _uow.Complete();
+
+        // La tarjeta de crédito es simbólica (no hay pasarela real): se autoconfirma de inmediato.
+        // PayPal/Yape/MercadoPago quedan PENDIENTE hasta que su webhook confirme el pago.
+        if (string.Equals(metodo.TipoPago, MetodoAutoConfirmable, StringComparison.OrdinalIgnoreCase))
+        {
+            var confirmado = await _mediator.Send(new ConfirmarPagoCommand { PagoId = entity.Id }, cancellationToken);
+            if (confirmado.Success)
+            {
+                return confirmado;
+            }
+        }
 
         return ApiResponse<PagoResponseDto>.Created(new PagoResponseDto
         {
