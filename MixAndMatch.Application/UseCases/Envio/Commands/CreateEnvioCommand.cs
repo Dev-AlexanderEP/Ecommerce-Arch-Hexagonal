@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using MediatR;
 using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.Common;
@@ -17,6 +18,8 @@ public class CreateEnvioCommand : IRequest<ApiResponse<EnvioResponseDto>>
     public required string Estado { get; set; }
     public required string MetodoEnvio { get; set; }
     public string? TrackingNumber { get; set; }
+
+    [JsonIgnore] public long SolicitanteId { get; set; }
 }
 
 public class CreateEnvioCommandHandler(IUnitOfWork _uow)
@@ -28,6 +31,11 @@ public class CreateEnvioCommandHandler(IUnitOfWork _uow)
         if (venta is null)
         {
             return ApiResponse<EnvioResponseDto>.Fail($"Venta no encontrada para id {request.VentaId}.", ErrorType.Validation);
+        }
+
+        if (venta.UsuarioId != request.SolicitanteId)
+        {
+            return ApiResponse<EnvioResponseDto>.Fail("No tienes acceso a esta venta.", ErrorType.Forbidden);
         }
 
         var datosEnvio = await _uow.DatosEnvios.GetById(request.DatosEnvioId);

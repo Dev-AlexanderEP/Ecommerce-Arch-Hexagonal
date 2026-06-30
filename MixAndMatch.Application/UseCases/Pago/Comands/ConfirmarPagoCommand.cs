@@ -44,6 +44,16 @@ public class ConfirmarPagoCommandHandler(IUnitOfWork _uow)
         venta.UpdatedAt = DateTime.UtcNow;
         await _uow.Ventas.Update(venta);
 
+        // Solo puede existir un carrito ACTIVO por usuario (constraint uq_carrito_activo);
+        // es el carrito del que salió esta venta, así que se cierra al confirmarse el pago.
+        var carritosActivos = await _uow.Carritos.BuscarAbiertosPorUsuarioId(venta.UsuarioId);
+        foreach (var carrito in carritosActivos)
+        {
+            carrito.Estado = EstadoCarrito.CERRADO;
+            carrito.UpdatedAt = DateTime.UtcNow;
+            await _uow.Carritos.Update(carrito);
+        }
+
         await _uow.Complete();
 
         return ApiResponse<PagoResponseDto>.Ok(new PagoResponseDto

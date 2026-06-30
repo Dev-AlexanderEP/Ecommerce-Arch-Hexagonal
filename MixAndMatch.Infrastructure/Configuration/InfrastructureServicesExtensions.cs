@@ -19,12 +19,12 @@ public static class InfrastructureServicesExtensions
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         // Database Connection
+        var translator = new ExactNameTranslator();
         services.AddDbContext<MixAndMatchDbContext>(options =>
         {
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             options.UseNpgsql(connectionString, npgsql =>
             {
-                var translator = new ExactNameTranslator();
                 npgsql.MapEnum<RolUsuario>("rol_usuario", nameTranslator: translator);
                 npgsql.MapEnum<TipoImagen>("tipo_imagen", nameTranslator: translator);
                 npgsql.MapEnum<EstadoCarrito>("estado_carrito", nameTranslator: translator);
@@ -73,10 +73,18 @@ public static class InfrastructureServicesExtensions
             ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")!));
         services.AddScoped<ICacheService, RedisCacheService>();
 
+        // Cloudflare R2
+        services.Configure<R2Settings>(configuration.GetSection(R2Settings.SectionName));
+        services.AddScoped<IStorageService, R2StorageService>();
+
         // Notifications (SMTP Gmail)
         services.Configure<SmtpSettings>(configuration.GetSection("Smtp"));
         services.AddScoped<IEmailService, SmtpEmailService>();
         services.AddScoped<IEmailTemplateService, EmailTemplateService>();
+
+        // Mercado Pago
+        services.Configure<MercadoPagoSettings>(configuration.GetSection(MercadoPagoSettings.SectionName));
+        services.AddScoped<IPagoGatewayService, MercadoPagoService>();
 
         // Middlewares
         services.AddExceptionHandler<GlobalExceptionHandler>();

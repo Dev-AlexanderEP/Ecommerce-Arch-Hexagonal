@@ -54,4 +54,28 @@ public class PagoController(IMediator _mediator) : ApiControllerBase
     {
         return this.ToActionResult(await _mediator.Send(new DeletePagoCommand { Id = id }));
     }
+
+    [HttpPost("mercadopago")]
+    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
+    public async Task<IActionResult> CreateMercadoPago([FromBody] CreatePagoMercadoPagoCommand command)
+    {
+        command.SolicitanteId = CurrentUser.Id;
+        return this.ToActionResult(await _mediator.Send(command));
+    }
+
+    [HttpPost("webhook/mercadopago")]
+    [AllowAnonymous]
+    public async Task<IActionResult> WebhookMercadoPago(
+        [FromHeader(Name = "x-signature")] string xSignature,
+        [FromHeader(Name = "x-request-id")] string xRequestId,
+        [FromQuery(Name = "data.id")] string dataId)
+    {
+        var result = await _mediator.Send(new ProcesarWebhookMercadoPagoCommand
+        {
+            XSignature = xSignature,
+            XRequestId = xRequestId,
+            DataId = dataId
+        });
+        return this.ToActionResult(result);
+    }
 }
