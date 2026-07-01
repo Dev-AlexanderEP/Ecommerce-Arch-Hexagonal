@@ -57,4 +57,8 @@ public class UsuariosController(IMediator _mediator) : ControllerBase
     {
         return this.ToActionResult(await _mediator.Send(new DeleteUsuarioCommand { UsuarioId = id }));
     }
+
+    [HttpGet("total")]
+    public async Task<IActionResult> GetTotal() =>
+        this.ToActionResult(await _mediator.Send(new GetTotalUsuariosQuery()));
 }

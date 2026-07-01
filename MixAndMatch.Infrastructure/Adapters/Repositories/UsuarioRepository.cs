@@ -24,6 +24,9 @@ public class UsuarioRepository(MixAndMatchDbContext context)
         _context.Set<Usuario>()
             .AnyAsync(u => u.NombreUsuario == nombreUsuario && (exceptoId == null || u.Id != exceptoId));
 
+    public Task<int> GetTotal() =>
+        _context.Set<Usuario>().CountAsync();
+
     public async Task<(IEnumerable<Usuario> Items, int TotalCount)> GetPagedConFiltro(
         string? nombre, string? email, string? rol, bool? activo, int page, int pageSize)
     {
