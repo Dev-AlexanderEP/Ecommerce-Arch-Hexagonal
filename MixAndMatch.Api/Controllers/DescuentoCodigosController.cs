@@ -1,7 +1,7 @@
-using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MixAndMatch.Api.Common;
 using MixAndMatch.Api.Configuration;
 using MixAndMatch.Application.UseCases.DescuentoCodigo.Commands;
 using MixAndMatch.Application.UseCases.DescuentoCodigo.Queries;
@@ -9,10 +9,9 @@ using MixAndMatch.Domain.Common;
 
 namespace MixAndMatch.Api.Controllers;
 
-[ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class DescuentoCodigosController(IMediator _mediator) : ControllerBase
+public class DescuentoCodigosController(IMediator _mediator) : ApiControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
@@ -35,33 +34,21 @@ public class DescuentoCodigosController(IMediator _mediator) : ControllerBase
 
     [HttpDelete("codigo/{codigo}/quitar")]
     [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
-    public async Task<IActionResult> Quitar(string codigo)
-    {
-        if (!long.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var usuarioId))
-            return Unauthorized();
-
-        var command = new QuitarDescuentoCodigoCommand
+    public async Task<IActionResult> Quitar(string codigo) =>
+        this.ToActionResult(await _mediator.Send(new QuitarDescuentoCodigoCommand
         {
             Codigo = codigo,
-            SolicitanteId = usuarioId
-        };
-        return this.ToActionResult(await _mediator.Send(command));
-    }
+            SolicitanteId = CurrentUser.Id
+        }));
 
     [HttpPost("codigo/{codigo}/aplicar")]
     [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
-    public async Task<IActionResult> Aplicar(string codigo)
-    {
-        if (!long.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var usuarioId))
-            return Unauthorized();
-
-        var command = new AplicarDescuentoCodigoCommand
+    public async Task<IActionResult> Aplicar(string codigo) =>
+        this.ToActionResult(await _mediator.Send(new AplicarDescuentoCodigoCommand
         {
             Codigo = codigo,
-            SolicitanteId = usuarioId
-        };
-        return this.ToActionResult(await _mediator.Send(command));
-    }
+            SolicitanteId = CurrentUser.Id
+        }));
 
     [HttpPost]
     [Authorize(Roles = nameof(RolUsuario.ADMIN))]

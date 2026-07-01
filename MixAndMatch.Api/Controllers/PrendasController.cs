@@ -103,22 +103,16 @@ public class PrendasController(IMediator _mediator) : ApiControllerBase
     [HttpPost("{id}/imagenes")]
     [Authorize(Roles = nameof(RolUsuario.ADMIN))]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> UploadImagen(long id, IFormFile archivo, [FromForm] string tipo, [FromForm] int? orden)
-    {
-        if (archivo is null || archivo.Length == 0)
-            return BadRequest("El archivo es requerido.");
-
-        var command = new UploadPrendaImagenCommand
+    public async Task<IActionResult> UploadImagen(long id, IFormFile archivo, [FromForm] string tipo, [FromForm] int? orden) =>
+        this.ToActionResult(await _mediator.Send(new UploadPrendaImagenCommand
         {
             PrendaId      = id,
-            Contenido     = archivo.OpenReadStream(),
-            NombreArchivo = archivo.FileName,
-            ContentType   = archivo.ContentType,
+            Contenido     = archivo?.OpenReadStream()!,
+            NombreArchivo = archivo?.FileName!,
+            ContentType   = archivo?.ContentType!,
             Tipo          = tipo,
             Orden         = orden
-        };
-        return this.ToActionResult(await _mediator.Send(command));
-    }
+        }));
 
     [HttpDelete("{id}/imagenes/{imagenId}")]
     [Authorize(Roles = nameof(RolUsuario.ADMIN))]

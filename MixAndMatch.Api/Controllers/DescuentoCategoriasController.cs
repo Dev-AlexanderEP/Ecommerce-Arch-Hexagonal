@@ -14,12 +14,14 @@ namespace MixAndMatch.Api.Controllers;
 public class DescuentoCategoriasController(IMediator _mediator) : ControllerBase
 {
     [HttpGet]
+    [Authorize(Roles = $"{nameof(RolUsuario.ADMIN)},{nameof(RolUsuario.CLIENTE)}")]
     public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
         return this.ToActionResult(await _mediator.Send(new GetAllDescuentoCategoriasQuery { Page = page, PageSize = pageSize }));
     }
 
     [HttpGet("{id}")]
+    [Authorize(Roles = $"{nameof(RolUsuario.ADMIN)},{nameof(RolUsuario.CLIENTE)}")]
     public async Task<IActionResult> GetById(long id)
     {
         return this.ToActionResult(await _mediator.Send(new GetDescuentoCategoriaByIdQuery { DescuentoCategoriaId = id }));

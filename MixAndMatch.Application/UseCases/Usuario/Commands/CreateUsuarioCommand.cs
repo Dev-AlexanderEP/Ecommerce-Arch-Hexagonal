@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using MixAndMatch.Application.Common;
-using MixAndMatch.Application.UseCases.Notificacion.Commands;
 using MixAndMatch.Domain.Common;
 using MixAndMatch.Domain.DTOs;
 using MixAndMatch.Domain.Ports.IRepositories;
@@ -18,7 +17,7 @@ public class CreateUsuarioCommand : IRequest<ApiResponse<UsuarioResponseDto>>
     public bool Activo { get; set; } = true;
 }
 
-public class CreateUsuarioCommandHandler(IUnitOfWork _uow, IPasswordService _passwordService, IMediator _mediator)
+public class CreateUsuarioCommandHandler(IUnitOfWork _uow, IPasswordService _passwordService, IEmailService _emailService, IEmailTemplateService _templates)
     : IRequestHandler<CreateUsuarioCommand, ApiResponse<UsuarioResponseDto>>
 {
     public async Task<ApiResponse<UsuarioResponseDto>> Handle(CreateUsuarioCommand request, CancellationToken cancellationToken)
@@ -58,18 +57,19 @@ public class CreateUsuarioCommandHandler(IUnitOfWork _uow, IPasswordService _pas
 
         try
         {
-            await _mediator.Send(new SendWelcomeEmailCommand
+            var html = _templates.Render("Welcome", new Dictionary<string, string>
             {
-                Email         = entity.Email,
-                NombreUsuario = entity.NombreUsuario
-            }, cancellationToken);
+                ["NombreUsuario"] = entity.NombreUsuario,
+                ["UrlTienda"]     = "#"
+            });
+            await _emailService.SendAsync(entity.Email, "Bienvenido a Mix&Match", html);
         }
         catch
         {
             // el registro no debe fallar si el SMTP no esta disponible o configurado
         }
 
-        return ApiResponse<UsuarioResponseDto>.Ok(new UsuarioResponseDto
+        return ApiResponse<UsuarioResponseDto>.Created(new UsuarioResponseDto
         {
             Id            = entity.Id,
             NombreUsuario = entity.NombreUsuario,
