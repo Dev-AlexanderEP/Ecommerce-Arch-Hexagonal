@@ -12,6 +12,7 @@ graphify-out/
 appsettings.Development.json
 appsettings.*.json
 !appsettings.json
+.env
 
 # Docker volumes (si se generan localmente)
 docker/volumes/

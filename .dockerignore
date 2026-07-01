@@ -1,0 +1,8 @@
+**/bin/
+**/obj/
+.git/
+.idea/
+.vs/
+docker/volumes/
+graphify-out/
+.env
