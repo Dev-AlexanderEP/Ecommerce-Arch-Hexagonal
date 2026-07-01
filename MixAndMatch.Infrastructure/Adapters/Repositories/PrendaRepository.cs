@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MixAndMatch.Domain.DTOs;
+using MixAndMatch.Domain.DTOs.Ventas;
 using MixAndMatch.Domain.Entities;
 using MixAndMatch.Domain.Ports.IRepositories;
 using MixAndMatch.Infrastructure.Configuration;
@@ -317,4 +318,11 @@ public class PrendaRepository(MixAndMatchDbContext context)
             .Include(p => p.PrendaTallas)
                 .ThenInclude(pt => pt.Talla)
             .FirstOrDefaultAsync(p => p.Id == id);
+
+    public async Task<ResumenPrendasDto> GetResumen()
+    {
+        var activas   = await _context.Set<Prenda>().CountAsync(p => p.Activo);
+        var inactivas = await _context.Set<Prenda>().CountAsync(p => !p.Activo);
+        return new ResumenPrendasDto { Activas = activas, Inactivas = inactivas };
+    }
 }

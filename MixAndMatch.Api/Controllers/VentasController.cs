@@ -87,4 +87,19 @@ public class VentasController(IMediator _mediator) : ApiControllerBase
         command.SolicitanteId = CurrentUser.Id;
         return this.ToActionResult(await _mediator.Send(command));
     }
+
+    [HttpGet("total")]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    public async Task<IActionResult> GetTotal() =>
+        this.ToActionResult(await _mediator.Send(new GetTotalVentasQuery()));
+
+    [HttpGet("por-periodo")]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    public async Task<IActionResult> GetPorPeriodo([FromQuery] string agrupacion = "diario") =>
+        this.ToActionResult(await _mediator.Send(new GetVentasPorPeriodoQuery { Agrupacion = agrupacion }));
+
+    [HttpGet("por-genero")]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    public async Task<IActionResult> GetPorGenero() =>
+        this.ToActionResult(await _mediator.Send(new GetVentasPorGeneroQuery()));
 }

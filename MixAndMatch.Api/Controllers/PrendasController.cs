@@ -124,4 +124,9 @@ public class PrendasController(IMediator _mediator) : ApiControllerBase
     [Authorize(Roles = nameof(RolUsuario.ADMIN))]
     public async Task<IActionResult> DeleteImagen(long id, long imagenId) =>
         this.ToActionResult(await _mediator.Send(new DeletePrendaImagenCommand { PrendaImagenId = imagenId }));
+
+    [HttpGet("resumen")]
+    [Authorize(Roles = nameof(RolUsuario.ADMIN))]
+    public async Task<IActionResult> GetResumen() =>
+        this.ToActionResult(await _mediator.Send(new GetResumenPrendasQuery()));
 }

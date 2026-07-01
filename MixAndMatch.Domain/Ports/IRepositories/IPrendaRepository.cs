@@ -1,4 +1,5 @@
 using MixAndMatch.Domain.DTOs;
+using MixAndMatch.Domain.DTOs.Ventas;
 using MixAndMatch.Domain.Entities;
 
 namespace MixAndMatch.Domain.Ports.IRepositories;
@@ -24,4 +25,6 @@ public interface IPrendaRepository : IGenericRepository<Prenda>
     Task<List<PrendaConDescuentoTodoResponseDto>> BuscarDescuentosAplicadosAleatorio(string genero);
     Task<List<PrendaConDescuentoResponseDto>> FiltrarDinamico(string? talla, string? categoria, string? marca, string? genero, double? precioMin, double? precioMax, double? descMin, double? descMax);
     Task<Prenda?> GetDetalladoById(long id);
+
+    Task<ResumenPrendasDto> GetResumen();
 }
