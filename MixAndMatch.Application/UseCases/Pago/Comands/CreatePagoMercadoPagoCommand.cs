@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using MediatR;
 using MixAndMatch.Application.Common;
+using MixAndMatch.Application.Services;
 using MixAndMatch.Domain.Common;
 using MixAndMatch.Domain.DTOs.MetodoPago;
 using MixAndMatch.Domain.Ports.IRepositories;
@@ -24,7 +25,7 @@ public class CreatePagoMercadoPagoCommand : IRequest<ApiResponse<PagoResponseDto
     [JsonIgnore] public long SolicitanteId { get; set; }
 }
 
-public class CreatePagoMercadoPagoCommandHandler(IUnitOfWork _uow, IPagoGatewayService _gateway, IMediator _mediator)
+public class CreatePagoMercadoPagoCommandHandler(IUnitOfWork _uow, IPagoGatewayService _gateway, IConfirmacionPagoService _confirmacion)
     : IRequestHandler<CreatePagoMercadoPagoCommand, ApiResponse<PagoResponseDto>>
 {
     public async Task<ApiResponse<PagoResponseDto>> Handle(CreatePagoMercadoPagoCommand request, CancellationToken cancellationToken)
@@ -85,7 +86,7 @@ public class CreatePagoMercadoPagoCommandHandler(IUnitOfWork _uow, IPagoGatewayS
 
         return resultado.Status switch
         {
-            "approved" => await _mediator.Send(new ConfirmarPagoCommand { PagoId = entity.Id }, cancellationToken),
+            "approved" => await _confirmacion.ConfirmarAsync(entity.Id, cancellationToken),
 
             "rejected" or "cancelled" => await MarcarFallido(entity, resultado.StatusDetail),
 

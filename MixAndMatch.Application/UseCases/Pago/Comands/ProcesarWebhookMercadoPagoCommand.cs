@@ -1,5 +1,6 @@
 using MediatR;
 using MixAndMatch.Application.Common;
+using MixAndMatch.Application.Services;
 using MixAndMatch.Domain.Common;
 using MixAndMatch.Domain.Ports.IRepositories;
 using MixAndMatch.Domain.Ports.IServices;
@@ -14,7 +15,7 @@ public class ProcesarWebhookMercadoPagoCommand : IRequest<ApiResponse<string>>
     public required string DataId { get; set; }
 }
 
-public class ProcesarWebhookMercadoPagoCommandHandler(IUnitOfWork _uow, IPagoGatewayService _gateway, IMediator _mediator)
+public class ProcesarWebhookMercadoPagoCommandHandler(IUnitOfWork _uow, IPagoGatewayService _gateway, IConfirmacionPagoService _confirmacion)
     : IRequestHandler<ProcesarWebhookMercadoPagoCommand, ApiResponse<string>>
 {
     private const string PrefijoReferencia = "pago-";
@@ -63,7 +64,7 @@ public class ProcesarWebhookMercadoPagoCommandHandler(IUnitOfWork _uow, IPagoGat
         switch (resultado.Status)
         {
             case "approved":
-                await _mediator.Send(new ConfirmarPagoCommand { PagoId = pago.Id }, cancellationToken);
+                await _confirmacion.ConfirmarAsync(pago.Id, cancellationToken);
                 break;
 
             case "rejected":

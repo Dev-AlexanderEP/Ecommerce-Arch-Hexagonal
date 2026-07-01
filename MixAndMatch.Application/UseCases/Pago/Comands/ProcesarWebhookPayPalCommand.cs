@@ -1,6 +1,7 @@
 using System.Text.Json;
 using MediatR;
 using MixAndMatch.Application.Common;
+using MixAndMatch.Application.Services;
 using MixAndMatch.Domain.Common;
 using MixAndMatch.Domain.Ports.IRepositories;
 using MixAndMatch.Domain.Ports.IServices;
@@ -18,7 +19,7 @@ public class ProcesarWebhookPayPalCommand : IRequest<ApiResponse<string>>
     public required string EventBody { get; set; }
 }
 
-public class ProcesarWebhookPayPalCommandHandler(IUnitOfWork _uow, IPayPalGatewayService _gateway, IMediator _mediator)
+public class ProcesarWebhookPayPalCommandHandler(IUnitOfWork _uow, IPayPalGatewayService _gateway, IConfirmacionPagoService _confirmacion)
     : IRequestHandler<ProcesarWebhookPayPalCommand, ApiResponse<string>>
 {
     private const string PrefijoReferencia = "pago-";
@@ -76,7 +77,7 @@ public class ProcesarWebhookPayPalCommandHandler(IUnitOfWork _uow, IPayPalGatewa
             return ApiResponse<string>.Ok("Pago ya procesado.");
         }
 
-        await _mediator.Send(new ConfirmarPagoCommand { PagoId = pago.Id }, cancellationToken);
+        await _confirmacion.ConfirmarAsync(pago.Id, cancellationToken);
 
         return ApiResponse<string>.Ok("Notificación procesada.");
     }

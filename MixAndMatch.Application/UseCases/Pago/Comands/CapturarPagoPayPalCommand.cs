@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using MediatR;
 using MixAndMatch.Application.Common;
+using MixAndMatch.Application.Services;
 using MixAndMatch.Domain.Common;
 using MixAndMatch.Domain.DTOs.MetodoPago;
 using MixAndMatch.Domain.Ports.IRepositories;
@@ -17,7 +18,7 @@ public class CapturarPagoPayPalCommand : IRequest<ApiResponse<PagoResponseDto>>
     [JsonIgnore] public long SolicitanteId { get; set; }
 }
 
-public class CapturarPagoPayPalCommandHandler(IUnitOfWork _uow, IPayPalGatewayService _gateway, IMediator _mediator)
+public class CapturarPagoPayPalCommandHandler(IUnitOfWork _uow, IPayPalGatewayService _gateway, IConfirmacionPagoService _confirmacion)
     : IRequestHandler<CapturarPagoPayPalCommand, ApiResponse<PagoResponseDto>>
 {
     public async Task<ApiResponse<PagoResponseDto>> Handle(CapturarPagoPayPalCommand request, CancellationToken cancellationToken)
@@ -50,9 +51,7 @@ public class CapturarPagoPayPalCommandHandler(IUnitOfWork _uow, IPayPalGatewaySe
         }
 
         if (resultado.Status == "COMPLETED")
-        {
-            return await _mediator.Send(new ConfirmarPagoCommand { PagoId = pago.Id }, cancellationToken);
-        }
+            return await _confirmacion.ConfirmarAsync(pago.Id, cancellationToken);
 
         pago.Estado = EstadoPago.FALLIDO;
         pago.UpdatedAt = DateTime.UtcNow;

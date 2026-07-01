@@ -2,9 +2,9 @@ using System.Text.Json.Serialization;
 using MediatR;
 using MixAndMatch.Application.Common;
 using MixAndMatch.Domain.Common;
-using MixAndMatch.Application.UseCases.Notificacion.Commands;
 using MixAndMatch.Domain.DTOs.Ventas;
 using MixAndMatch.Domain.Ports.IRepositories;
+using MixAndMatch.Domain.Ports.IServices;
 
 namespace MixAndMatch.Application.UseCases.Venta.Commands;
 
@@ -16,7 +16,7 @@ public class UpdateVentaCommand : IRequest<ApiResponse<VentaResponseDto>>
     public required string Estado { get; set; }
 }
 
-public class UpdateVentaCommandHandler(IUnitOfWork _uow, IMediator _mediator)
+public class UpdateVentaCommandHandler(IUnitOfWork _uow, IEmailService _emailService, IEmailTemplateService _templates)
     : IRequestHandler<UpdateVentaCommand, ApiResponse<VentaResponseDto>>
 {
     public async Task<ApiResponse<VentaResponseDto>> Handle(UpdateVentaCommand request, CancellationToken cancellationToken)
@@ -30,9 +30,7 @@ public class UpdateVentaCommandHandler(IUnitOfWork _uow, IMediator _mediator)
 
         // El formato del estado ya lo valida UpdateVentaCommandValidator (400); esto es defensa.
         if (!Enum.TryParse<EstadoVenta>(request.Estado, ignoreCase: true, out var nuevoEstado))
-        {
             return ApiResponse<VentaResponseDto>.Fail($"Estado inválido: {request.Estado}. Permitidos: {string.Join(", ", Enum.GetNames<EstadoVenta>())}.", ErrorType.Validation);
-        }
 
         if (!request.EsAdmin && nuevoEstado != EstadoVenta.CANCELADO)
             return ApiResponse<VentaResponseDto>.Fail("Solo puedes cancelar tu propia venta.", ErrorType.Forbidden);
@@ -43,11 +41,21 @@ public class UpdateVentaCommandHandler(IUnitOfWork _uow, IMediator _mediator)
         await _uow.Ventas.Update(entity);
         await _uow.Complete();
 
-        if (request.Estado == "PROCESANDO")
+        if (nuevoEstado == EstadoVenta.PAGADO)
         {
             try
             {
-                await _mediator.Send(new SendConfirmacionVentaEmailCommand { VentaId = entity.Id }, cancellationToken);
+                var ventaConDetalles = await _uow.Ventas.GetByIdConDetalles(entity.Id);
+                var usuario = ventaConDetalles is not null ? await _uow.Usuarios.GetById(entity.UsuarioId) : null;
+                if (ventaConDetalles is not null && usuario is not null)
+                {
+                    var html = _templates.Render("ConfirmacionVenta", new Dictionary<string, string>
+                    {
+                        ["VentaId"] = entity.Id.ToString(),
+                        ["Total"]   = ventaConDetalles.Total.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)
+                    });
+                    await _emailService.SendAsync(usuario.Email, $"Confirmación de pedido #{entity.Id} - Mix&Match", html);
+                }
             }
             catch
             {
@@ -60,8 +68,8 @@ public class UpdateVentaCommandHandler(IUnitOfWork _uow, IMediator _mediator)
             Id            = entity.Id,
             UsuarioId     = entity.UsuarioId,
             FechaCreacion = entity.FechaCreacion,
-            Estado = entity.Estado?.ToString(),
-            UpdatedAt = entity.UpdatedAt
+            Estado        = entity.Estado?.ToString(),
+            UpdatedAt     = entity.UpdatedAt
         });
     }
 }

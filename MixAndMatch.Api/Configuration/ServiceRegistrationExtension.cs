@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.OpenApi.Models;
 using MixAndMatch.Application.Common;
 using MixAndMatch.Application.Jobs;
+using MixAndMatch.Application.Services;
 using MixAndMatch.Application.UseCases.Categoria.Commands;
 using MixAndMatch.Infrastructure.Configuration;
 
@@ -14,6 +15,9 @@ public static class ServiceRegistrationExtension
     {
         // Registro de servicios de infraestructura
         services.AddInfrastructureServices(configuration);
+
+        // Application services (lógica compartida entre use cases)
+        services.AddScoped<IConfirmacionPagoService, ConfirmacionPagoService>();
 
         // Registro de MediatR + behavior de validación
         services.AddMediatR(cfg =>
