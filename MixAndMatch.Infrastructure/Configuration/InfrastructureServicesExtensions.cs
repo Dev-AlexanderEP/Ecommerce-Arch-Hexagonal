@@ -86,6 +86,14 @@ public static class InfrastructureServicesExtensions
         services.Configure<MercadoPagoSettings>(configuration.GetSection(MercadoPagoSettings.SectionName));
         services.AddScoped<IPagoGatewayService, MercadoPagoService>();
 
+        // PayPal
+        services.Configure<PayPalSettings>(configuration.GetSection(PayPalSettings.SectionName));
+        services.AddHttpClient<IPayPalGatewayService, PayPalService>((sp, client) =>
+        {
+            var settings = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<PayPalSettings>>().Value;
+            client.BaseAddress = new Uri(settings.BaseUrl);
+        });
+
         // Middlewares
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
