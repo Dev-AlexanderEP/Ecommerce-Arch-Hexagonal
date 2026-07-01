@@ -94,6 +94,9 @@ public static class InfrastructureServicesExtensions
             client.BaseAddress = new Uri(settings.BaseUrl);
         });
 
+        // Reportes Excel
+        services.AddScoped<IReporteService, ReporteExcelService>();
+
         // Middlewares
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
