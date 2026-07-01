@@ -7,6 +7,7 @@ namespace MixAndMatch.Application.UseCases.Venta.Queries;
 
 public class GetAllVentasQuery : IRequest<ApiPaginationResponse<VentaResponseDto>>
 {
+    public string? NombreUsuario { get; set; }
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 10;
 }
@@ -15,13 +16,13 @@ public class GetAllVentasQueryHandler(IUnitOfWork _uow) : IRequestHandler<GetAll
 {
     public async Task<ApiPaginationResponse<VentaResponseDto>> Handle(GetAllVentasQuery request, CancellationToken cancellationToken)
     {
-        var (items, total) = await _uow.Ventas.GetPaged(request.Page, request.PageSize);
+        var (items, total) = await _uow.Ventas.GetPagedConFiltro(request.NombreUsuario, request.Page, request.PageSize);
 
-        // Una lista vacia no es un error: se devuelve 200 con data: [].
         return ApiPaginationResponse<VentaResponseDto>.Ok(items.Select(x => new VentaResponseDto
         {
             Id = x.Id,
             UsuarioId = x.UsuarioId,
+            NombreUsuario = x.Usuario?.NombreUsuario,
             FechaCreacion = x.FechaCreacion,
             Estado = x.Estado?.ToString(),
             UpdatedAt = x.UpdatedAt

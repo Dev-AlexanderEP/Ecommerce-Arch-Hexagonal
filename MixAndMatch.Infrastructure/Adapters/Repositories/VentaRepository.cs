@@ -25,6 +25,26 @@ public class VentaRepository(MixAndMatchDbContext context)
             .Include(v => v.VentasDetalles)
             .FirstOrDefaultAsync(v => v.Id == ventaId);
 
+    public async Task<(IEnumerable<Venta> Items, int TotalCount)> GetPagedConFiltro(
+        string? nombreUsuario, int page, int pageSize)
+    {
+        var query = _context.Set<Venta>()
+            .Include(v => v.Usuario)
+            .AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(nombreUsuario))
+            query = query.Where(v => EF.Functions.ILike(v.Usuario.NombreUsuario, $"%{nombreUsuario}%"));
+
+        var total = await query.CountAsync();
+        var items = await query
+            .OrderByDescending(v => v.FechaCreacion)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, total);
+    }
+
     public Task<long?> GetSegundaPendienteId(long usuarioId) =>
         _context.Set<Venta>()
             .Where(v => v.UsuarioId == usuarioId && v.Estado == EstadoVenta.PENDIENTE)

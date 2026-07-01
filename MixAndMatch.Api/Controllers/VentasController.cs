@@ -15,9 +15,17 @@ public class VentasController(IMediator _mediator) : ApiControllerBase
 {
     [HttpGet]
     [Authorize(Roles = nameof(RolUsuario.ADMIN))]
-    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> GetAll(
+        [FromQuery] string? nombreUsuario,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
     {
-        return this.ToActionResult(await _mediator.Send(new GetAllVentasQuery { Page = page, PageSize = pageSize }));
+        return this.ToActionResult(await _mediator.Send(new GetAllVentasQuery
+        {
+            NombreUsuario = nombreUsuario,
+            Page = page,
+            PageSize = pageSize
+        }));
     }
 
     [HttpGet("{id}")]
