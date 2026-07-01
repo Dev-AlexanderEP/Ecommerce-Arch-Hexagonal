@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +31,36 @@ public class DescuentoCodigosController(IMediator _mediator) : ControllerBase
     public async Task<IActionResult> GetByCodigo(string codigo)
     {
         return this.ToActionResult(await _mediator.Send(new GetDescuentoCodigoByCodigoQuery { Codigo = codigo }));
+    }
+
+    [HttpDelete("codigo/{codigo}/quitar")]
+    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
+    public async Task<IActionResult> Quitar(string codigo)
+    {
+        if (!long.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var usuarioId))
+            return Unauthorized();
+
+        var command = new QuitarDescuentoCodigoCommand
+        {
+            Codigo = codigo,
+            SolicitanteId = usuarioId
+        };
+        return this.ToActionResult(await _mediator.Send(command));
+    }
+
+    [HttpPost("codigo/{codigo}/aplicar")]
+    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
+    public async Task<IActionResult> Aplicar(string codigo)
+    {
+        if (!long.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var usuarioId))
+            return Unauthorized();
+
+        var command = new AplicarDescuentoCodigoCommand
+        {
+            Codigo = codigo,
+            SolicitanteId = usuarioId
+        };
+        return this.ToActionResult(await _mediator.Send(command));
     }
 
     [HttpPost]

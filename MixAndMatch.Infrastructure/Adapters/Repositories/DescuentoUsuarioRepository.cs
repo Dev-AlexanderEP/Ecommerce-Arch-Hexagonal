@@ -14,6 +14,10 @@ public class DescuentoUsuarioRepository(MixAndMatchDbContext context)
         _context.Set<DescuentoUsuario>()
             .AnyAsync(d => d.DescuentoCodigoId == descuentoCodigoId && d.UsuarioId == usuarioId);
 
+    public Task<DescuentoUsuario?> BuscarPorCodigoYUsuario(long descuentoCodigoId, long usuarioId) =>
+        _context.Set<DescuentoUsuario>()
+            .FirstOrDefaultAsync(d => d.DescuentoCodigoId == descuentoCodigoId && d.UsuarioId == usuarioId);
+
     public async Task<(IEnumerable<DescuentoUsuario> Items, int TotalCount)> GetPagedByUsuario(long usuarioId, int page, int pageSize)
     {
         var query = _context.Set<DescuentoUsuario>()

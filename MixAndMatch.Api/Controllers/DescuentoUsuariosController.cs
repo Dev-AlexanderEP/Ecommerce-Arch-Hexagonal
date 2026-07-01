@@ -14,7 +14,7 @@ namespace MixAndMatch.Api.Controllers;
 public class DescuentoUsuariosController(IMediator _mediator) : ApiControllerBase
 {
     [HttpGet]
-    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
+    [Authorize(Roles = $"{nameof(RolUsuario.CLIENTE)},{nameof(RolUsuario.ADMIN)}")]
     public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
         this.ToActionResult(await _mediator.Send(new GetAllDescuentoUsuariosQuery
         {
@@ -24,7 +24,7 @@ public class DescuentoUsuariosController(IMediator _mediator) : ApiControllerBas
         }));
 
     [HttpGet("{id}")]
-    [Authorize(Roles = nameof(RolUsuario.CLIENTE))]
+    [Authorize(Roles = $"{nameof(RolUsuario.CLIENTE)},{nameof(RolUsuario.ADMIN)}")]
     public async Task<IActionResult> GetById(long id) =>
         this.ToActionResult(await _mediator.Send(new GetDescuentoUsuarioByIdQuery
         {
