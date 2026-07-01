@@ -14,9 +14,23 @@ namespace MixAndMatch.Api.Controllers;
 public class UsuariosController(IMediator _mediator) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> GetAll(
+        [FromQuery] string? nombre,
+        [FromQuery] string? email,
+        [FromQuery] string? rol,
+        [FromQuery] bool? activo,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
     {
-        return this.ToActionResult(await _mediator.Send(new GetAllUsuariosQuery { Page = page, PageSize = pageSize }));
+        return this.ToActionResult(await _mediator.Send(new GetAllUsuariosQuery
+        {
+            Nombre = nombre,
+            Email = email,
+            Rol = rol,
+            Activo = activo,
+            Page = page,
+            PageSize = pageSize
+        }));
     }
 
     [HttpGet("{id}")]

@@ -7,6 +7,10 @@ namespace MixAndMatch.Application.UseCases.Usuario.Queries;
 
 public class GetAllUsuariosQuery : IRequest<ApiPaginationResponse<UsuarioResponseDto>>
 {
+    public string? Nombre { get; set; }
+    public string? Email { get; set; }
+    public string? Rol { get; set; }
+    public bool? Activo { get; set; }
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 10;
 }
@@ -15,7 +19,8 @@ public class GetAllUsuariosQueryHandler(IUnitOfWork _uow) : IRequestHandler<GetA
 {
     public async Task<ApiPaginationResponse<UsuarioResponseDto>> Handle(GetAllUsuariosQuery request, CancellationToken cancellationToken)
     {
-        var (items, total) = await _uow.Usuarios.GetPaged(request.Page, request.PageSize);
+        var (items, total) = await _uow.Usuarios.GetPagedConFiltro(
+            request.Nombre, request.Email, request.Rol, request.Activo, request.Page, request.PageSize);
 
         // Una lista vacia no es un error: se devuelve 200 con data: [].
         return ApiPaginationResponse<UsuarioResponseDto>.Ok(items.Select(u => new UsuarioResponseDto
