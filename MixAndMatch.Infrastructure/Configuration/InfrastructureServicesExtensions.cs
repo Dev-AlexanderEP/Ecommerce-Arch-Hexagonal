@@ -9,6 +9,7 @@ using MixAndMatch.Domain.Ports.IRepositories;
 using MixAndMatch.Domain.Ports.IServices;
 using MixAndMatch.Infrastructure.Adapters;
 using MixAndMatch.Infrastructure.Adapters.Services;
+using MixAndMatch.Infrastructure.Adapters.Tools;
 using MixAndMatch.Infrastructure.Middlewares;
 using StackExchange.Redis;
 
@@ -96,6 +97,12 @@ public static class InfrastructureServicesExtensions
 
         // Reportes Excel
         services.AddScoped<IReporteService, ReporteExcelService>();
+
+        // IA — DeepSeek + tools
+        services.Configure<DeepSeekSettings>(configuration.GetSection(DeepSeekSettings.SectionName));
+        services.AddScoped<BuscarPrendasTool>();
+        services.AddScoped<ConocimientoBaseTool>();
+        services.AddHttpClient<IChatIAService, DeepSeekService>();
 
         // Middlewares
         services.AddExceptionHandler<GlobalExceptionHandler>();
